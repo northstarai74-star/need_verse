@@ -124,30 +124,35 @@ section.s{padding:84px 0 0}
 .chip:hover{border-color:var(--text)}
 .chip.on{background:var(--text);color:#111;border-color:var(--text)}
 .toolbar select{appearance:none;background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:9px 18px;cursor:pointer;outline:0}
-.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;display:flex;flex-direction:column;transition:.25s}
-.card:hover{transform:translateY(-6px);border-color:#3a414e;box-shadow:0 24px 50px rgba(0,0,0,.5)}
-.pic{position:relative;aspect-ratio:1/.85;display:grid;place-items:center;overflow:hidden;background:radial-gradient(circle at 50% 45%,var(--c),transparent 70%),var(--bg2)}
-.pic::after{content:"";position:absolute;bottom:14%;left:50%;translate:-50% 0;width:46%;height:14px;border-radius:50%;background:rgba(0,0,0,.6);filter:blur(8px)}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:44px 22px}
+.card{display:flex;flex-direction:column;gap:14px}
+.pic{position:relative;aspect-ratio:1/1;display:grid;place-items:center;overflow:hidden;border-radius:22px;border:1px solid var(--line);background:radial-gradient(circle at 50% 40%,var(--c),transparent 68%),linear-gradient(180deg,var(--panel),var(--bg2));transition:border-color .3s,box-shadow .3s,translate .3s}
+.pic::before{content:"";position:absolute;inset:0;background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:26px 26px;opacity:.5;-webkit-mask-image:radial-gradient(ellipse at 50% 100%,#000,transparent 62%);mask-image:radial-gradient(ellipse at 50% 100%,#000,transparent 62%)}
+.pic::after{content:"";position:absolute;bottom:15%;left:50%;translate:-50% 0;width:46%;height:14px;border-radius:50%;background:rgba(0,0,0,.65);filter:blur(8px);transition:.35s}
+.card:hover .pic{border-color:var(--cc);box-shadow:0 28px 60px -30px var(--cc);translate:0 -4px}
+.card:hover .pic::after{width:36%;opacity:.7}
 .pic img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;transition:.3s}
 .card:hover .pic img{scale:1.06}
-.pic:has(img)::after{display:none}
-.pic span{position:relative;z-index:1;font-size:4.6rem;filter:drop-shadow(0 14px 14px rgba(0,0,0,.45));transition:.3s}
-.card:hover .pic span{scale:1.14;rotate:-4deg}
-.pic .art{position:relative;z-index:1;width:58%;height:auto;filter:drop-shadow(0 18px 16px rgba(0,0,0,.55));transition:.3s}
-.card:hover .pic .art{scale:1.08;rotate:-3deg}
-.fitbadge{z-index:3!important;position:absolute;top:12px;left:12px;z-index:2;background:rgba(10,11,13,.75);backdrop-filter:blur(6px);border:1px solid var(--line);border-radius:999px;font-size:.7rem;font-weight:600;padding:4px 10px;display:flex;gap:5px;align-items:center}
-.fitbadge.ok{color:var(--ok);border-color:rgba(61,220,132,.4)}
-.best{position:absolute;top:12px;right:12px;z-index:3;background:var(--accent);font-size:.7rem;font-weight:700;padding:4px 10px;border-radius:999px;text-transform:uppercase;letter-spacing:.06em}
-.info{padding:16px 18px 18px;display:flex;flex-direction:column;gap:6px;flex:1}
-.info .cat-l{font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
-.info h3{font:600 1.05rem/1.25 var(--body);text-transform:none;letter-spacing:0}
-.info p{margin:0;color:var(--muted);font-size:.85rem;flex:1}
-.stars{color:var(--gold);font-size:.85rem;letter-spacing:1px}.stars small{color:var(--muted);letter-spacing:0;margin-left:4px}
-.buy{display:flex;justify-content:space-between;align-items:center;margin-top:8px}
-.price{font:800 1.7rem/1 var(--disp)}
-.add{background:var(--text);color:#111;border:0;border-radius:10px;padding:10px 16px;font-weight:700;font-size:.88rem;cursor:pointer;transition:.2s}
-.add:hover{background:var(--accent);color:#fff}
+.pic:has(img)::before,.pic:has(img)::after{display:none}
+.pic .emo{position:relative;z-index:1;font-size:4.6rem;filter:drop-shadow(0 14px 14px rgba(0,0,0,.45));transition:.3s}
+.card:hover .pic .emo{scale:1.14;rotate:-4deg}
+.pic .art{position:relative;z-index:1;width:56%;height:auto;margin-top:-6%;filter:drop-shadow(0 18px 16px rgba(0,0,0,.55));transition:.35s}
+.card:hover .pic .art{translate:0 -6px;scale:1.06;rotate:-3deg}
+.pic .idx{position:absolute;left:14px;bottom:6px;font:900 3.2rem/1 var(--wide);font-stretch:125%;letter-spacing:-.02em;color:transparent;-webkit-text-stroke:1px rgba(244,241,236,.16);pointer-events:none}
+.best{position:absolute;top:14px;left:14px;z-index:3;background:var(--accent);color:#fff;font-size:.66rem;font-weight:800;padding:5px 10px;border-radius:999px;text-transform:uppercase;letter-spacing:.08em}
+.add{position:absolute;right:14px;bottom:14px;z-index:3;width:46px;height:46px;border-radius:50%;border:0;display:grid;place-items:center;background:var(--text);color:#111;cursor:pointer;box-shadow:0 10px 24px rgba(0,0,0,.45);transition:.25s}
+.add svg{width:20px;height:20px;pointer-events:none}
+.add .i-ok,.add.done .i-plus{display:none}.add.done .i-ok{display:block}
+.add:hover{background:var(--accent);color:#fff;scale:1.08}
+.add.done{background:var(--ok);color:#111}
+.add:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.info{display:flex;flex-direction:column;gap:6px;padding:0 4px}
+.meta{display:flex;justify-content:space-between;gap:8px;font-size:.7rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.meta .fit{letter-spacing:.04em;white-space:nowrap}.meta .fit.ok{color:var(--ok)}
+.info h3{font:600 1.02rem/1.3 var(--body);text-transform:none;letter-spacing:0}
+.buy{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-top:2px}
+.price{font:800 1.6rem/1 var(--disp)}
+.rate{font-size:.85rem;font-weight:600;white-space:nowrap}.rate b{color:var(--gold)}.rate small{color:var(--muted);font-weight:400;font-size:.78rem}
 .empty{grid-column:1/-1;text-align:center;padding:70px 20px;color:var(--muted);border:1px dashed var(--line);border-radius:var(--r)}
 
 /* reorder */
@@ -213,7 +218,7 @@ dialog input:focus{border-color:var(--accent)}
 
 /* responsive */
 @media (max-width:1050px){.grid{grid-template-columns:repeat(3,1fr)}.cats{grid-template-columns:repeat(3,1fr)}.hero .wrap{grid-template-columns:1fr}.trust .wrap{grid-template-columns:1fr 1fr}.links{display:none}.fgrid{grid-template-columns:1fr 1fr}}
-@media (max-width:720px){.wrap{padding:0 16px}.grid{grid-template-columns:repeat(2,1fr);gap:12px}.kits{grid-template-columns:1fr}.cats{grid-template-columns:repeat(2,1fr)}.nav .wrap{gap:12px;height:64px}.logo span{display:none}.search{max-width:none}.hero{padding:44px 0 56px}.pic span{font-size:3.4rem}.info{padding:12px}.price{font-size:1.4rem}.add{padding:8px 12px}.buy{flex-wrap:wrap;gap:8px}.fgrid{grid-template-columns:1fr}.trust .wrap{grid-template-columns:1fr}.reorder{padding:26px}section.s{padding-top:60px}}
+@media (max-width:720px){.wrap{padding:0 16px}.grid{grid-template-columns:repeat(2,1fr);gap:30px 12px}.kits{grid-template-columns:1fr}.cats{grid-template-columns:repeat(2,1fr)}.nav .wrap{gap:12px;height:64px}.logo span{display:none}.search{max-width:none}.hero{padding:44px 0 56px}.pic .emo{font-size:3.4rem}.pic{border-radius:18px}.pic .idx{font-size:2.2rem;left:10px}.best{top:10px;left:10px;font-size:.58rem;padding:4px 8px}.add{width:38px;height:38px;right:10px;bottom:10px}.add svg{width:16px;height:16px}.card{gap:10px}.info{padding:0 2px}.meta{font-size:.6rem;letter-spacing:.08em}.info h3{font-size:.92rem}.price{font-size:1.35rem}.buy{flex-wrap:wrap;row-gap:4px}.rate small{display:none}.fgrid{grid-template-columns:1fr}.trust .wrap{grid-template-columns:1fr}.reorder{padding:26px}section.s{padding-top:60px}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -385,7 +390,7 @@ function renderChips(){
 $("chips").onclick=e=>{const c=e.target.dataset.c;if(c){cat=c;renderChips();render()}};
 
 /* product grid */
-function stars(r){const f=Math.round(r);return "★".repeat(f)+"☆".repeat(5-f)}
+const ICONS=`<svg class="i-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg><svg class="i-ok" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>`;
 function render(){
   const q=$("search").value.trim().toLowerCase();
   const list=PRODUCTS.filter(p=>fits(p)&&(cat==="All"||p.cat===cat)&&(!q||(p.name+" "+p.cat+" "+p.desc).toLowerCase().includes(q)));
@@ -393,22 +398,22 @@ function render(){
   list.sort((a,b)=>s==="low"?a.price-b.price:s==="high"?b.price-a.price:s==="rate"?b.rating-a.rating:b.pop-a.pop);
   $("shopEye").textContent=cat==="All"?"All products":cat;
   $("resultInfo").textContent=`${list.length} item${list.length===1?"":"s"}`+(vehicle?` that fit your ${vehicle.make} ${vehicle.model}`:"");
-  $("grid").innerHTML=list.length?list.map(p=>`
-    <article class="card">
-      <div class="pic" style="--c:${col(p)}40">
-        ${hasArt(p.id)?art(p.id):`<span>${p.icon}</span>`}${photo(p)}
-        <div class="fitbadge ${vehicle?"ok":""}">${vehicle?"✔ Fits your car":p.fits==="all"?"Universal fit":"Check fit"}</div>
+  $("grid").innerHTML=list.length?list.map((p,i)=>`
+    <article class="card" title="${p.desc.replace(/"/g,"&quot;")}">
+      <div class="pic" style="--c:${col(p)}40;--cc:${col(p)}">
+        <span class="idx" aria-hidden="true">${String(i+1).padStart(2,"0")}</span>
+        ${hasArt(p.id)?art(p.id):`<span class="emo">${p.icon}</span>`}${photo(p)}
         ${p.pop>=90?'<div class="best">Best seller</div>':""}
+        <button class="add" data-add="${p.id}" aria-label="Add ${p.name.replace(/"/g,"&quot;")} to cart">${ICONS}</button>
       </div>
       <div class="info">
-        <span class="cat-l">${p.cat}</span>
+        <div class="meta"><span>${p.cat}</span><span class="fit ${vehicle?"ok":""}">${vehicle?"✓ Fits":p.fits==="all"?"Universal":"Check fit"}</span></div>
         <h3>${p.name}</h3>
-        <p>${p.desc}</p>
-        <div class="stars">${stars(p.rating)}<small>${p.rating} (${p.n.toLocaleString()})</small></div>
-        <div class="buy"><span class="price">${money(p.price)}</span><button class="add" data-add="${p.id}">Add to cart</button></div>
+        <div class="buy"><span class="price">${money(p.price)}</span><span class="rate"><b>★</b> ${p.rating} <small>(${p.n.toLocaleString()})</small></span></div>
       </div>
     </article>`).join(""):`<div class="empty"><div style="font-size:2.6rem">🔍</div><p>No matches. Try another category or clear your search.</p></div>`}
-$("grid").onclick=e=>{const id=e.target.dataset.add;if(id){add(+id);toast("Added to cart")}};
+$("grid").onclick=e=>{const b=e.target.closest("[data-add]");if(!b)return;add(+b.dataset.add);toast("Added to cart");
+  b.classList.add("done");setTimeout(()=>b.classList.remove("done"),1000)};
 $("search").oninput=()=>{render();if($("search").value)$("shop").scrollIntoView({behavior:"smooth"})};
 $("sort").onchange=render;
 
