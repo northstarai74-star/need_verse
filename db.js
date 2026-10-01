@@ -86,4 +86,109 @@ async function importOrder(orderId, o) {
   if (error) fail("import", error);
 }
 
-module.exports = { configured, check, insertOrder, getOrder, findByPaymentId, listOrders, updateOrder, importOrder };
+// ===== Products =====
+async function getProduct(id) {
+  const { data, error } = await sb.from("products").select("*").eq("id", id).maybeSingle();
+  if (error) fail("getProduct", error);
+  return data;
+}
+async function listProducts(active = null) {
+  let q = sb.from("products");
+  if (active !== null) q = q.eq("active", active);
+  const { data, error } = await q.order("created_at", { ascending: false });
+  if (error) fail("listProducts", error);
+  return data || [];
+}
+async function createProduct(p) {
+  const { data, error } = await sb.from("products").insert(p).select();
+  if (error) fail("createProduct", error);
+  return data?.[0];
+}
+async function updateProduct(id, p) {
+  const { data, error } = await sb.from("products").update({ ...p, updated_at: new Date().toISOString() }).eq("id", id).select();
+  if (error) fail("updateProduct", error);
+  return data?.[0];
+}
+async function deleteProduct(id) {
+  const { error } = await sb.from("products").delete().eq("id", id);
+  if (error) fail("deleteProduct", error);
+}
+
+// ===== Inventory =====
+async function getInventory(productId) {
+  const { data, error } = await sb.from("inventory").select("*").eq("product_id", productId).maybeSingle();
+  if (error) fail("getInventory", error);
+  return data || { product_id: productId, quantity: 0, reserved: 0 };
+}
+async function updateInventory(productId, qty, reserved = null) {
+  const update = { quantity: qty, updated_at: new Date().toISOString() };
+  if (reserved !== null) update.reserved = reserved;
+  const { data, error } = await sb.from("inventory").upsert({ product_id: productId, ...update }, { onConflict: "product_id" }).select();
+  if (error) fail("updateInventory", error);
+  return data?.[0];
+}
+
+// ===== Coupons =====
+async function getCoupon(code) {
+  const { data, error } = await sb.from("coupons").select("*").eq("code", code.toUpperCase()).maybeSingle();
+  if (error) fail("getCoupon", error);
+  return data;
+}
+async function listCoupons(active = null) {
+  let q = sb.from("coupons");
+  if (active !== null) q = q.eq("active", active);
+  const { data, error } = await q.order("created_at", { ascending: false });
+  if (error) fail("listCoupons", error);
+  return data || [];
+}
+async function createCoupon(c) {
+  const { data, error } = await sb.from("coupons").insert({ ...c, code: c.code.toUpperCase() }).select();
+  if (error) fail("createCoupon", error);
+  return data?.[0];
+}
+async function updateCoupon(id, c) {
+  const { data, error } = await sb.from("coupons").update(c).eq("id", id).select();
+  if (error) fail("updateCoupon", error);
+  return data?.[0];
+}
+async function incrementCouponUsage(code) {
+  const { data, error } = await sb.from("coupons").update({ used_count: sb.raw("used_count + 1") }).eq("code", code.toUpperCase()).select();
+  if (error) fail("incrementCouponUsage", error);
+  return data?.[0];
+}
+
+// ===== Customers =====
+async function getOrCreateCustomer(email, name, phone, addr, city, zip) {
+  const { data: existing } = await sb.from("customers").select("*").eq("email", email).maybeSingle();
+  if (existing) return existing;
+  const { data, error } = await sb.from("customers").insert({ email, name, phone, addr, city, zip }).select();
+  if (error) fail("createCustomer", error);
+  return data?.[0];
+}
+async function listCustomers() {
+  const { data, error } = await sb.from("customers").select("*").order("created_at", { ascending: false });
+  if (error) fail("listCustomers", error);
+  return data || [];
+}
+async function updateCustomer(id, c) {
+  const { data, error } = await sb.from("customers").update({ ...c, updated_at: new Date().toISOString() }).eq("id", id).select();
+  if (error) fail("updateCustomer", error);
+  return data?.[0];
+}
+async function updateCustomerStats(email, amount) {
+  const { data, error } = await sb.from("customers").update({
+    total_orders: sb.raw("total_orders + 1"),
+    total_spent: sb.raw("total_spent + " + amount),
+    updated_at: new Date().toISOString()
+  }).eq("email", email).select();
+  if (error) fail("updateCustomerStats", error);
+  return data?.[0];
+}
+
+module.exports = {
+  configured, check, insertOrder, getOrder, findByPaymentId, listOrders, updateOrder, importOrder,
+  getProduct, listProducts, createProduct, updateProduct, deleteProduct,
+  getInventory, updateInventory,
+  getCoupon, listCoupons, createCoupon, updateCoupon, incrementCouponUsage,
+  getOrCreateCustomer, listCustomers, updateCustomer, updateCustomerStats
+};

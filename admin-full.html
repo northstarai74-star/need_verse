@@ -1,0 +1,503 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Nnedverse Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0b0d;--panel:#15181d;--panel2:#1b1f26;--line:#262b34;--text:#f4f1ec;--muted:#8e97a6;--accent:#ff4d1a;--ok:#3ddc84;--warn:#ffc53d;--blue:#3d8bff;--bad:#ff5c5c}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:400 15px/1.5 Inter,system-ui,sans-serif}
+.wrap{max-width:1400px;margin:0 auto;padding:0 20px}
+header{border-bottom:1px solid var(--line);background:var(--panel)}
+header .wrap{display:flex;align-items:center;justify-content:space-between;min-height:64px;padding-block:10px;gap:12px;flex-wrap:wrap}
+.logo{font:800 1.7rem/1 "Barlow Condensed",sans-serif;text-transform:uppercase}.logo b{color:var(--accent)}
+.muted{color:var(--muted)}
+button,input,select{font:inherit;color:inherit}
+.btn{background:var(--accent);color:#fff;border:0;border-radius:10px;padding:9px 16px;font-weight:600;cursor:pointer;text-decoration:none;display:inline-block;transition:.2s}
+.btn:hover{background:#ff7a3d}
+.btn.ghost{background:transparent;border:1px solid var(--line)}.btn.ghost:hover{border-color:var(--text)}
+.btn.sm{padding:6px 12px;font-size:.85rem}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+
+.tabs{display:flex;gap:0;border-bottom:1px solid var(--line);background:var(--panel);overflow:auto}
+.tab{padding:12px 20px;cursor:pointer;border-bottom:3px solid transparent;color:var(--muted);transition:.2s;white-space:nowrap}
+.tab.active{border-bottom-color:var(--accent);color:var(--text)}
+.tab:hover{color:var(--text)}
+
+.content{padding:24px 0}
+.section{display:none}
+.section.active{display:block}
+
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:24px 0}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px}
+.stat span{font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.stat b{display:block;font:800 2.2rem/1.1 "Barlow Condensed",sans-serif;margin-top:4px}
+
+.bar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.bar input,.bar select{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:9px 14px;outline:0}
+.bar input{flex:1;min-width:200px}.bar input:focus,.bar select:focus{border-color:var(--accent)}
+
+table{width:100%;border-collapse:collapse;background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-bottom:20px}
+th{text-align:left;font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);padding:12px 16px;background:var(--panel2)}
+td{padding:13px 16px;border-top:1px solid var(--line);vertical-align:middle}
+tr:hover td{background:var(--panel2)}
+.pill{display:inline-block;padding:3px 10px;border-radius:99px;font-size:.75rem;font-weight:600}
+.paid{background:rgba(61,220,132,.15);color:var(--ok)}.created{background:rgba(255,197,61,.15);color:var(--warn)}
+.ok-pill{background:rgba(61,220,132,.15);color:var(--ok)}.bad-pill{background:rgba(255,92,92,.15);color:var(--bad)}
+
+.form-group{margin:14px 0}
+.form-group label{display:block;font-size:.85rem;font-weight:600;color:var(--muted);margin-bottom:6px}
+.form-group input,.form-group select,.form-group textarea{display:block;width:100%;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 12px;outline:0}
+.form-group input:focus,.form-group select:focus{border-color:var(--accent)}
+
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;align-items:center;justify-content:center}
+.modal.show{display:flex}
+.modal-content{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:24px;width:min(500px,90vw);max-height:90vh;overflow:auto}
+.modal-content h2{margin-top:0}
+.modal-close{float:right;background:none;border:0;color:var(--muted);font-size:1.5rem;cursor:pointer}
+
+.chart{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px;margin:20px 0}
+.chart-title{font-weight:600;margin-bottom:16px}
+.bar-chart{display:flex;align-items:flex-end;gap:8px;height:200px;margin-top:10px}
+.bar-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:8px}
+.bar-fill{width:100%;background:var(--accent);border-radius:4px 4px 0 0}
+.bar-label{font-size:.75rem;text-align:center}
+
+.empty{text-align:center;padding:60px;color:var(--muted)}
+.right{text-align:right}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px}
+.card h3{margin-top:0;font-size:1rem}
+.card p{margin:6px 0;font-size:.85rem;color:var(--muted)}
+
+@media (max-width:1050px){.stats{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:720px){.stats{grid-template-columns:1fr}.grid{grid-template-columns:1fr}.bar{flex-direction:column}.bar input{min-width:auto}.tabs{overflow-x:auto}}
+</style>
+</head>
+<body>
+
+<header><div class="wrap">
+  <div class="logo">Nnedverse <b>Admin</b></div>
+  <button class="btn ghost" id="logout">Logout</button>
+</div></header>
+
+<div class="tabs wrap">
+  <div class="tab active" data-tab="orders">📦 Orders</div>
+  <div class="tab" data-tab="products">🛍️ Products</div>
+  <div class="tab" data-tab="inventory">📊 Inventory</div>
+  <div class="tab" data-tab="coupons">🏷️ Coupons</div>
+  <div class="tab" data-tab="customers">👥 Customers</div>
+  <div class="tab" data-tab="analytics">📈 Analytics</div>
+</div>
+
+<main class="wrap">
+
+<!-- ORDERS SECTION -->
+<div id="orders" class="section active">
+  <div class="bar">
+    <input id="q" type="search" placeholder="Search name, email, phone, order number…">
+    <select id="fPay"><option value="">All payments</option><option value="paid">Paid</option><option value="created">Unpaid</option></select>
+    <select id="fFul"><option value="">All fulfilment</option><option>new</option><option>packed</option><option>shipped</option><option>delivered</option><option>cancelled</option></select>
+    <button class="btn" id="exportBtn">Export CSV</button>
+  </div>
+  <table>
+    <thead><tr><th>Order</th><th>Date</th><th>Customer</th><th>Payment</th><th>Fulfilment</th><th>Items</th><th class="right">Total</th></tr></thead>
+    <tbody id="ordersTable"></tbody>
+  </table>
+</div>
+
+<!-- PRODUCTS SECTION -->
+<div id="products" class="section">
+  <div class="bar">
+    <button class="btn" id="addProductBtn">+ Add Product</button>
+    <input id="pSearch" type="search" placeholder="Search products…">
+  </div>
+  <table>
+    <thead><tr><th>Name</th><th>Category</th><th>Price</th><th>Stock</th><th>Rating</th><th>Active</th><th>Actions</th></tr></thead>
+    <tbody id="productsTable"></tbody>
+  </table>
+</div>
+
+<!-- INVENTORY SECTION -->
+<div id="inventory" class="section">
+  <div class="bar">
+    <input id="invSearch" type="search" placeholder="Search products…">
+    <select id="stockFilter">
+      <option value="">All stock levels</option>
+      <option value="low">Low stock (≤10)</option>
+      <option value="out">Out of stock</option>
+    </select>
+  </div>
+  <table>
+    <thead><tr><th>Product</th><th>Available</th><th>Reserved</th><th>Low Stock Alert</th><th>Actions</th></tr></thead>
+    <tbody id="inventoryTable"></tbody>
+  </table>
+</div>
+
+<!-- COUPONS SECTION -->
+<div id="coupons" class="section">
+  <button class="btn" id="addCouponBtn">+ Add Coupon</button>
+  <table style="margin-top:14px">
+    <thead><tr><th>Code</th><th>Discount</th><th>Uses</th><th>Expires</th><th>Active</th><th>Actions</th></tr></thead>
+    <tbody id="couponsTable"></tbody>
+  </table>
+</div>
+
+<!-- CUSTOMERS SECTION -->
+<div id="customers" class="section">
+  <div class="bar">
+    <input id="custSearch" type="search" placeholder="Search customers by name or email…">
+  </div>
+  <table>
+    <thead><tr><th>Name</th><th>Email</th><th>Orders</th><th>Total Spent</th><th>Joined</th></tr></thead>
+    <tbody id="customersTable"></tbody>
+  </table>
+</div>
+
+<!-- ANALYTICS SECTION -->
+<div id="analytics" class="section">
+  <div class="stats">
+    <div class="stat"><span>Total Orders</span><b id="aTotalOrders">–</b></div>
+    <div class="stat"><span>Total Revenue</span><b id="aTotalRevenue">–</b></div>
+    <div class="stat"><span>Avg Order Value</span><b id="aAvgOrder">–</b></div>
+    <div class="stat"><span>Delivered Orders</span><b id="aDelivered">–</b></div>
+  </div>
+
+  <div class="chart">
+    <div class="chart-title">Top 10 Products by Revenue</div>
+    <table style="font-size:.9rem">
+      <thead><tr><th>Product</th><th class="right">Units Sold</th><th class="right">Revenue</th></tr></thead>
+      <tbody id="topProductsTable"></tbody>
+    </table>
+  </div>
+
+  <div class="chart">
+    <div class="chart-title">Orders & Revenue (Last 7 Days)</div>
+    <div class="bar-chart" id="dailyChart"></div>
+  </div>
+</div>
+
+</main>
+
+<!-- Modals -->
+<div id="productModal" class="modal">
+  <div class="modal-content">
+    <button class="modal-close" onclick="closeModal('productModal')">&times;</button>
+    <h2 id="productModalTitle">Add Product</h2>
+    <form id="productForm">
+      <div class="form-group"><label>Name</label><input name="name" required></div>
+      <div class="form-group"><label>Category</label><input name="cat" placeholder="Interior, Electronics, etc." required></div>
+      <div class="form-group"><label>Price (₹)</label><input name="price" type="number" step="0.01" required></div>
+      <div class="form-group"><label>Rating</label><input name="rating" type="number" min="0" max="5" step="0.1" value="4.5"></div>
+      <div class="form-group"><label>Icon/Emoji</label><input name="icon" placeholder="🛍️"></div>
+      <div class="form-group"><label>Description</label><textarea name="desc"></textarea></div>
+      <div class="form-group"><label><input type="checkbox" name="active" checked> Active</label></div>
+      <button type="submit" class="btn">Save Product</button>
+    </form>
+  </div>
+</div>
+
+<div id="inventoryModal" class="modal">
+  <div class="modal-content">
+    <button class="modal-close" onclick="closeModal('inventoryModal')">&times;</button>
+    <h2>Update Inventory</h2>
+    <form id="inventoryForm">
+      <div class="form-group"><label>Product</label><input id="invProduct" disabled></div>
+      <div class="form-group"><label>Quantity Available</label><input id="invQuantity" type="number" min="0" required></div>
+      <div class="form-group"><label>Reserved</label><input id="invReserved" type="number" min="0" value="0"></div>
+      <button type="submit" class="btn">Update</button>
+    </form>
+  </div>
+</div>
+
+<div id="couponModal" class="modal">
+  <div class="modal-content">
+    <button class="modal-close" onclick="closeModal('couponModal')">&times;</button>
+    <h2 id="couponModalTitle">Add Coupon</h2>
+    <form id="couponForm">
+      <div class="form-group"><label>Code</label><input name="code" placeholder="SAVE10" required></div>
+      <div class="form-group"><label>Discount %</label><input name="discount_percent" type="number" min="0" max="100" step="0.1" required></div>
+      <div class="form-group"><label>Max Uses (leave empty for unlimited)</label><input name="max_uses" type="number" min="0"></div>
+      <div class="form-group"><label>Expires (leave empty for no expiry)</label><input name="expires_at" type="datetime-local"></div>
+      <div class="form-group"><label><input type="checkbox" name="active" checked> Active</label></div>
+      <button type="submit" class="btn">Save Coupon</button>
+    </form>
+  </div>
+</div>
+
+<div id="toast" class="toast" role="status" style="position:fixed;bottom:20px;left:20px;background:var(--ok);color:#fff;padding:12px 20px;border-radius:8px;opacity:0;transition:.3s"></div>
+
+<script>
+const $=id=>document.getElementById(id);
+const API_BASE="/api/admin";
+let money=(n,s="₹")=>s+Number(n).toLocaleString("en-IN",{maximumFractionDigits:2});
+let allProducts=[],allInventory={},allCoupons=[],allCustomers=[];
+let currentProductId=null,currentInvProductId=null,currentCouponId=null;
+
+function toast(msg){const t=$("toast");t.textContent=msg;t.style.opacity="1";setTimeout(()=>t.style.opacity="0",3000)}
+function closeModal(id){$(id).classList.remove("show")}
+
+// TABS
+document.querySelectorAll(".tab").forEach(t=>{t.onclick=()=>{
+  document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+  document.querySelectorAll(".section").forEach(x=>x.classList.remove("active"));
+  t.classList.add("active");
+  $(t.dataset.tab).classList.add("active");
+  if(t.dataset.tab==="analytics")loadAnalytics();
+}});
+
+// ORDERS
+async function loadOrders(){
+  const r=await fetch(API_BASE+"/orders",{headers:{"authorization":"Basic "+btoa("admin:"+prompt("Password:"))}});
+  if(!r.ok)return toast("Failed to load orders");
+  const j=await r.json();
+  renderOrders(j.orders);
+}
+
+function renderOrders(orders){
+  const q=$("q").value.toLowerCase(),fp=$("fPay").value,ff=$("fFul").value;
+  const list=orders.filter(o=>(!fp||o.status===fp)&&(!ff||o.fulfillment===ff)&&(!q||[o.ref,o.customer.name,o.customer.email].join(" ").toLowerCase().includes(q)));
+  $("ordersTable").innerHTML=list.map(o=>`<tr>
+    <td><b>${o.ref}</b></td>
+    <td class="muted">${new Date(o.createdAt).toLocaleDateString("en-IN")}</td>
+    <td>${o.customer.name}<div class="muted" style="font-size:.8rem">${o.customer.email}</div></td>
+    <td><span class="pill ${o.status==="paid"?"paid":"created"}">${o.status}</span></td>
+    <td><span class="pill">${o.fulfillment||"new"}</span></td>
+    <td>${o.lines.reduce((s,l)=>s+l.qty,0)}</td>
+    <td class="right"><b>${money(o.amount)}</b></td>
+  </tr>`).join("");
+}
+
+// PRODUCTS
+async function loadProducts(){
+  const r=await fetch(API_BASE+"/products");
+  if(!r.ok)return toast("Failed to load products");
+  const j=await r.json();
+  allProducts=j.products;
+  allInventory={};
+  j.products.forEach(p=>{if(p.inventory)allInventory[p.id]=p.inventory});
+  renderProducts();
+}
+
+function renderProducts(){
+  const q=$("pSearch").value.toLowerCase();
+  const list=allProducts.filter(p=>p.name.toLowerCase().includes(q)||p.cat.toLowerCase().includes(q));
+  $("productsTable").innerHTML=list.map(p=>`<tr>
+    <td><b>${p.name}</b><div class="muted" style="font-size:.8rem">${p.cat}</div></td>
+    <td>${p.cat}</td>
+    <td>${money(p.price)}</td>
+    <td>${allInventory[p.id]?.quantity||0}</td>
+    <td>${p.rating}★</td>
+    <td><span class="pill ${p.active?"ok-pill":"bad-pill"}">${p.active?"Active":"Inactive"}</span></td>
+    <td><button class="btn sm ghost" onclick="editProduct(${p.id})">Edit</button> <button class="btn sm ghost" onclick="deleteProduct(${p.id})">Delete</button></td>
+  </tr>`).join("");
+}
+
+function editProduct(id){
+  currentProductId=id;
+  const p=allProducts.find(x=>x.id===id);
+  $("productModalTitle").textContent="Edit Product";
+  $("productForm").elements.name.value=p.name;
+  $("productForm").elements.cat.value=p.cat;
+  $("productForm").elements.price.value=p.price;
+  $("productForm").elements.rating.value=p.rating;
+  $("productForm").elements.icon.value=p.icon||"";
+  $("productForm").elements.desc.value=p.desc||"";
+  $("productForm").elements.active.checked=p.active;
+  $("productModal").classList.add("show");
+}
+
+$("addProductBtn").onclick=()=>{
+  currentProductId=null;
+  $("productModalTitle").textContent="Add Product";
+  $("productForm").reset();
+  $("productForm").elements.active.checked=true;
+  $("productModal").classList.add("show");
+};
+
+$("productForm").onsubmit=async e=>{e.preventDefault();
+  const data=new FormData($("productForm"));
+  const payload={
+    name:data.get("name"),cat:data.get("cat"),price:Number(data.get("price")),
+    rating:Number(data.get("rating")),icon:data.get("icon"),desc:data.get("desc"),
+    active:data.get("active")==="on"
+  };
+  const method=currentProductId?"PUT":"POST";
+  const url=currentProductId?`${API_BASE}/products/${currentProductId}`:API_BASE+"/products";
+  const r=await fetch(url,{method,headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
+  if(!r.ok){toast("Error saving product");return}
+  toast("Product saved!");
+  closeModal("productModal");
+  loadProducts();
+};
+
+async function deleteProduct(id){if(!confirm("Delete this product?"))return;
+  const r=await fetch(`${API_BASE}/products/${id}`,{method:"DELETE"});
+  if(!r.ok){toast("Error deleting product");return}
+  toast("Product deleted!");
+  loadProducts();
+}
+
+// INVENTORY
+async function loadInventory(){loadProducts()}
+
+function renderInventory(){
+  const q=$("invSearch").value.toLowerCase(),f=$("stockFilter").value;
+  const list=allProducts.filter(p=>{
+    const inv=allInventory[p.id]||{quantity:0};
+    if(f==="low"&&inv.quantity>10)return false;
+    if(f==="out"&&inv.quantity>0)return false;
+    return p.name.toLowerCase().includes(q);
+  });
+  $("inventoryTable").innerHTML=list.map(p=>{
+    const inv=allInventory[p.id]||{quantity:0,reserved:0};
+    return `<tr>
+      <td><b>${p.name}</b></td>
+      <td>${inv.quantity}</td>
+      <td>${inv.reserved}</td>
+      <td>${inv.low_stock_alert||10}</td>
+      <td><button class="btn sm ghost" onclick="editInventory(${p.id},'${p.name}')">Edit</button></td>
+    </tr>`;
+  }).join("");
+}
+
+function editInventory(id,name){
+  currentInvProductId=id;
+  const inv=allInventory[id]||{quantity:0,reserved:0};
+  $("invProduct").value=name;
+  $("invQuantity").value=inv.quantity;
+  $("invReserved").value=inv.reserved||0;
+  $("inventoryModal").classList.add("show");
+}
+
+$("inventoryForm").onsubmit=async e=>{e.preventDefault();
+  const r=await fetch(`${API_BASE}/inventory/${currentInvProductId}`,{
+    method:"PUT",headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({quantity:Number($("invQuantity").value),reserved:Number($("invReserved").value)})
+  });
+  if(!r.ok){toast("Error updating inventory");return}
+  toast("Inventory updated!");
+  closeModal("inventoryModal");
+  loadInventory();
+};
+
+// COUPONS
+async function loadCoupons(){
+  const r=await fetch(API_BASE+"/coupons");
+  if(!r.ok)return toast("Failed to load coupons");
+  const j=await r.json();
+  allCoupons=j.coupons;
+  renderCoupons();
+}
+
+function renderCoupons(){
+  $("couponsTable").innerHTML=allCoupons.map(c=>`<tr>
+    <td><b>${c.code}</b></td>
+    <td>${c.discount_percent}%</td>
+    <td>${c.used_count}${c.max_uses?" / "+c.max_uses:""}</td>
+    <td>${c.expires_at?new Date(c.expires_at).toLocaleDateString("en-IN"):"—"}</td>
+    <td><span class="pill ${c.active?"ok-pill":"bad-pill"}">${c.active?"Active":"Inactive"}</span></td>
+    <td><button class="btn sm ghost" onclick="editCoupon(${c.id})">Edit</button></td>
+  </tr>`).join("");
+}
+
+function editCoupon(id){
+  currentCouponId=id;
+  const c=allCoupons.find(x=>x.id===id);
+  $("couponModalTitle").textContent="Edit Coupon";
+  $("couponForm").elements.code.value=c.code;
+  $("couponForm").elements.discount_percent.value=c.discount_percent;
+  $("couponForm").elements.max_uses.value=c.max_uses||"";
+  $("couponForm").elements.expires_at.value=c.expires_at?c.expires_at.slice(0,16):"";
+  $("couponForm").elements.active.checked=c.active;
+  $("couponModal").classList.add("show");
+}
+
+$("addCouponBtn").onclick=()=>{
+  currentCouponId=null;
+  $("couponModalTitle").textContent="Add Coupon";
+  $("couponForm").reset();
+  $("couponForm").elements.active.checked=true;
+  $("couponModal").classList.add("show");
+};
+
+$("couponForm").onsubmit=async e=>{e.preventDefault();
+  const data=new FormData($("couponForm"));
+  const payload={
+    code:data.get("code"),discount_percent:Number(data.get("discount_percent")),
+    max_uses:data.get("max_uses")?Number(data.get("max_uses")):null,
+    expires_at:data.get("expires_at")||null,active:data.get("active")==="on"
+  };
+  const method=currentCouponId?"PUT":"POST";
+  const url=currentCouponId?`${API_BASE}/coupons/${currentCouponId}`:API_BASE+"/coupons";
+  const r=await fetch(url,{method,headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
+  if(!r.ok){toast("Error saving coupon");return}
+  toast("Coupon saved!");
+  closeModal("couponModal");
+  loadCoupons();
+};
+
+// CUSTOMERS
+async function loadCustomers(){
+  const r=await fetch(API_BASE+"/customers");
+  if(!r.ok)return toast("Failed to load customers");
+  const j=await r.json();
+  allCustomers=j.customers;
+  renderCustomers();
+}
+
+function renderCustomers(){
+  const q=$("custSearch").value.toLowerCase();
+  const list=allCustomers.filter(c=>c.name.toLowerCase().includes(q)||c.email.toLowerCase().includes(q));
+  $("customersTable").innerHTML=list.map(c=>`<tr>
+    <td><b>${c.name}</b></td>
+    <td>${c.email}</td>
+    <td>${c.total_orders}</td>
+    <td>${money(c.total_spent)}</td>
+    <td>${new Date(c.created_at).toLocaleDateString("en-IN")}</td>
+  </tr>`).join("");
+}
+
+// ANALYTICS
+async function loadAnalytics(){
+  const r=await fetch(API_BASE+"/analytics");
+  if(!r.ok)return toast("Failed to load analytics");
+  const j=await r.json();
+  $("aTotalOrders").textContent=j.stats.totalOrders;
+  $("aTotalRevenue").textContent=money(j.stats.totalRevenue);
+  $("aAvgOrder").textContent=money(j.stats.avgOrderValue);
+  $("aDelivered").textContent=j.stats.deliveredOrders;
+
+  $("topProductsTable").innerHTML=j.topProducts.map(p=>`<tr>
+    <td>${p.name}</td><td class="right">${p.qty}</td><td class="right">${money(p.revenue)}</td>
+  </tr>`).join("");
+
+  const dailyData=Object.entries(j.dailyOrders).map(([date,d])=>({date:new Date(date).toLocaleDateString("en-IN",{month:"short",day:"numeric"}),orders:d.orders,revenue:d.revenue}));
+  const maxOrders=Math.max(...dailyData.map(d=>d.orders),1);
+  $("dailyChart").innerHTML=dailyData.map(d=>`<div class="bar-item">
+    <div class="bar-fill" style="height:${d.orders/maxOrders*100}%"></div>
+    <div class="bar-label">${d.date}</div>
+  </div>`).join("");
+}
+
+// EVENTS
+["q","fPay","fFul"].forEach(i=>$(i)?.addEventListener("input",()=>loadOrders()));
+$("pSearch")?.addEventListener("input",renderProducts);
+$("invSearch")?.addEventListener("input",renderInventory);
+$("stockFilter")?.addEventListener("change",renderInventory);
+$("custSearch")?.addEventListener("input",renderCustomers);
+$("exportBtn")?.onclick=()=>window.location=API_BASE+"/orders.csv";
+$("logout").onclick=()=>location.href="/";
+
+// INIT
+loadOrders();
+loadProducts();
+loadCoupons();
+loadCustomers();
+</script>
+</body>
+</html>

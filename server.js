@@ -175,6 +175,7 @@ function adminAuth(req, res, next) {
 const FULFIL = ["new", "packed", "shipped", "delivered", "cancelled"];
 
 app.get("/admin", adminAuth, (req, res) => res.sendFile(path.join(__dirname, "admin.html")));
+app.get("/admin-full", adminAuth, (req, res) => res.sendFile(path.join(__dirname, "admin-full.html")));
 app.get("/api/admin/orders", adminAuth, wrap(async (req, res) => {
   const items = (await db.listOrders()).map((o) => ({
     ...o, lines: Object.entries(o.cart).map(([id, q]) => { const p = byId(Number(id)); return { name: p ? p.name : "Product " + id, qty: q, price: p ? p.price : 0 }; })
@@ -270,6 +271,139 @@ app.get("/api/admin/orders.csv", adminAuth, wrap(async (req, res) => {
   for (const o of await db.listOrders()) rows.push([o.ref, o.createdAt, o.status, o.fulfillment || "new", o.amount, o.refunded || 0, o.customer.name, o.customer.email, o.customer.phone, o.customer.addr, o.customer.city, o.customer.zip,
     Object.entries(o.cart).map(([id, n]) => `${byId(Number(id))?.name} x${n}`).join("; "), o.paymentId || ""]);
   res.type("text/csv").attachment("orders.csv").send(rows.map((r) => r.map(q).join(",")).join("\n"));
+}));
+
+// ---------- Admin (Products Management) ----------
+app.get("/api/admin/products", adminAuth, wrap(async (req, res) => {
+  const products = await db.listProducts();
+  const withInventory = await Promise.all(products.map(async (p) => ({
+    ...p, inventory: await db.getInventory(p.id)
+  })));
+  res.json({ symbol: STORE.symbol, products: withInventory });
+}));
+
+app.post("/api/admin/products", adminAuth, wrap(async (req, res) => {
+  const { name, cat, price, rating, n, pop, icon, fits, desc, active } = req.body || {};
+  if (!name || !cat) return res.status(400).json({ error: "Name and category are required" });
+  const p = await db.createProduct({
+    name, cat, price: Number(price) || 0, rating: Number(rating) || 4.5, n: Number(n) || 0,
+    pop: Number(pop) || 50, icon, fits: fits || [], desc, active: active !== false
+  });
+  await db.updateInventory(p.id, 0, 0);
+  res.json(p);
+}));
+
+app.put("/api/admin/products/:id", adminAuth, wrap(async (req, res) => {
+  const { name, cat, price, rating, n, pop, icon, fits, desc, active } = req.body || {};
+  const p = await db.updateProduct(Number(req.params.id), {
+    name, cat, price: Number(price), rating: Number(rating), n: Number(n),
+    pop: Number(pop), icon, fits, desc, active
+  });
+  if (!p) return res.status(404).json({ error: "Product not found" });
+  res.json(p);
+}));
+
+app.delete("/api/admin/products/:id", adminAuth, wrap(async (req, res) => {
+  await db.deleteProduct(Number(req.params.id));
+  res.json({ ok: true });
+}));
+
+// ---------- Admin (Inventory Management) ----------
+app.put("/api/admin/inventory/:productId", adminAuth, wrap(async (req, res) => {
+  const { quantity, reserved, low_stock_alert } = req.body || {};
+  const inv = await db.updateInventory(Number(req.params.productId), Number(quantity), Number(reserved));
+  res.json(inv);
+}));
+
+// ---------- Admin (Coupon Management) ----------
+app.get("/api/admin/coupons", adminAuth, wrap(async (req, res) => {
+  const coupons = await db.listCoupons();
+  res.json({ coupons });
+}));
+
+app.post("/api/admin/coupons", adminAuth, wrap(async (req, res) => {
+  const { code, discount_percent, max_uses, active, expires_at } = req.body || {};
+  if (!code || !discount_percent) return res.status(400).json({ error: "Code and discount are required" });
+  const c = await db.createCoupon({
+    code: code.toUpperCase(), discount_percent: Number(discount_percent),
+    max_uses: max_uses ? Number(max_uses) : null, active: active !== false,
+    expires_at: expires_at || null
+  });
+  res.json(c);
+}));
+
+app.put("/api/admin/coupons/:id", adminAuth, wrap(async (req, res) => {
+  const { code, discount_percent, max_uses, active, expires_at } = req.body || {};
+  const c = await db.updateCoupon(Number(req.params.id), {
+    code: code ? code.toUpperCase() : undefined,
+    discount_percent: discount_percent !== undefined ? Number(discount_percent) : undefined,
+    max_uses: max_uses !== undefined ? (max_uses ? Number(max_uses) : null) : undefined,
+    active, expires_at
+  });
+  if (!c) return res.status(404).json({ error: "Coupon not found" });
+  res.json(c);
+}));
+
+// ---------- Admin (Customer Dashboard) ----------
+app.get("/api/admin/customers", adminAuth, wrap(async (req, res) => {
+  const customers = await db.listCustomers();
+  res.json({ customers });
+}));
+
+app.get("/api/admin/customers/:email", adminAuth, wrap(async (req, res) => {
+  const orders = (await db.listOrders()).filter(o => o.customer.email === req.params.email);
+  res.json({ orders: orders.map(o => ({
+    ref: o.ref, createdAt: o.createdAt, status: o.status, fulfillment: o.fulfillment,
+    amount: o.amount, refunded: o.refunded || 0
+  })) });
+}));
+
+// ---------- Admin (Analytics Dashboard) ----------
+app.get("/api/admin/analytics", adminAuth, wrap(async (req, res) => {
+  const orders = await db.listOrders();
+  const paidOrders = orders.filter(o => o.status === "paid");
+
+  const stats = {
+    totalOrders: orders.length,
+    paidOrders: paidOrders.length,
+    totalRevenue: paidOrders.reduce((s, o) => s + (o.amount - (o.refunded || 0)), 0),
+    avgOrderValue: paidOrders.length ? paidOrders.reduce((s, o) => s + o.amount, 0) / paidOrders.length : 0,
+    totalRefunded: paidOrders.reduce((s, o) => s + (o.refunded || 0), 0),
+    pendingOrders: orders.filter(o => o.fulfillment === "new").length,
+    shippedOrders: paidOrders.filter(o => o.fulfillment === "shipped").length,
+    deliveredOrders: paidOrders.filter(o => o.fulfillment === "delivered").length
+  };
+
+  // Top products
+  const productSales = {};
+  for (const o of paidOrders) {
+    for (const [id, qty] of Object.entries(o.cart)) {
+      const p = byId(Number(id));
+      if (!p) continue;
+      if (!productSales[id]) productSales[id] = { name: p.name, qty: 0, revenue: 0 };
+      productSales[id].qty += qty;
+      productSales[id].revenue += p.price * qty;
+    }
+  }
+  const topProducts = Object.values(productSales).sort((a, b) => b.revenue - a.revenue).slice(0, 10);
+
+  // Orders over time (last 7 days)
+  const now = new Date();
+  const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+  const dailyOrders = {};
+  for (let i = 0; i < 7; i++) {
+    const date = new Date(sevenDaysAgo.getTime() + i * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
+    dailyOrders[date] = { orders: 0, revenue: 0 };
+  }
+  for (const o of paidOrders) {
+    const date = o.createdAt.split("T")[0];
+    if (dailyOrders[date]) {
+      dailyOrders[date].orders += 1;
+      dailyOrders[date].revenue += o.amount - (o.refunded || 0);
+    }
+  }
+
+  res.json({ stats, topProducts, dailyOrders });
 }));
 
 // Anything that throws inside a route lands here. Customers never see internal details.
