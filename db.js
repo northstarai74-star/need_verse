@@ -2,9 +2,12 @@
 // camelCase order objects; this file maps them to and from table rows.
 const { createClient } = require("@supabase/supabase-js");
 
-const { SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY } = process.env;
+const { SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, DEMO_MODE } = process.env;
 const configured = Boolean(SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY);
 const sb = configured ? createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, { auth: { persistSession: false, autoRefreshToken: false } }) : null;
+
+// Mock in-memory database for demo/development
+const mockOrders = new Map();
 
 const T = "orders";
 const fail = (what, error) => { throw new Error(`Database error (${what}): ${error.message || error}`); };
@@ -33,6 +36,10 @@ function toRow(o) {
 
 // Throws a readable error if the connection or the table isn't ready.
 async function check() {
+  if (DEMO_MODE) {
+    console.log("Running in DEMO_MODE with in-memory database");
+    return;
+  }
   if (!configured) throw new Error("SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are not set.");
   const { error } = await sb.from(T).select("order_id").limit(1);
   if (error) throw new Error(/relation .* does not exist|schema cache|Could not find the table/i.test(error.message)
@@ -41,20 +48,36 @@ async function check() {
 }
 
 async function insertOrder(orderId, o) {
+  if (!configured || DEMO_MODE) {
+    mockOrders.set(orderId, { ...o, orderId });
+    return;
+  }
   const { error } = await sb.from(T).insert(toRow({ ...o, orderId }));
   if (error) fail("insert", error);
 }
 async function getOrder(orderId) {
+  if (!configured || DEMO_MODE) {
+    return mockOrders.get(orderId) || null;
+  }
   const { data, error } = await sb.from(T).select("*").eq("order_id", orderId).maybeSingle();
   if (error) fail("get", error);
   return fromRow(data);
 }
 async function findByPaymentId(paymentId) {
+  if (!configured || DEMO_MODE) {
+    for (const order of mockOrders.values()) {
+      if (order.paymentId === paymentId) return order;
+    }
+    return null;
+  }
   const { data, error } = await sb.from(T).select("*").eq("payment_id", paymentId).maybeSingle();
   if (error) fail("find", error);
   return fromRow(data);
 }
 async function listOrders() {
+  if (!configured || DEMO_MODE) {
+    return Array.from(mockOrders.values()).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  }
   const { data, error } = await sb.from(T).select("*").order("created_at", { ascending: false });
   if (error) fail("list", error);
   return data.map(fromRow);
@@ -64,6 +87,13 @@ async function listOrders() {
 // the same order can't silently overwrite each other (the loser re-reads and retries).
 // mutate(order) edits the object; return false to skip writing. Returns the saved order, or null if missing.
 async function updateOrder(orderId, mutate) {
+  if (!configured || DEMO_MODE) {
+    const order = mockOrders.get(orderId);
+    if (!order) return null;
+    await mutate(order);
+    mockOrders.set(orderId, order);
+    return order;
+  }
   for (let attempt = 0; attempt < 6; attempt++) {
     const { data, error } = await sb.from(T).select("*").eq("order_id", orderId).maybeSingle();
     if (error) fail("read", error);
@@ -82,6 +112,12 @@ async function updateOrder(orderId, mutate) {
 
 // Used by migrate-orders.js; skips orders that are already there.
 async function importOrder(orderId, o) {
+  if (!configured || DEMO_MODE) {
+    if (!mockOrders.has(orderId)) {
+      mockOrders.set(orderId, { ...o, orderId });
+    }
+    return;
+  }
   const { error } = await sb.from(T).upsert(toRow({ ...o, orderId }), { onConflict: "order_id", ignoreDuplicates: true });
   if (error) fail("import", error);
 }
