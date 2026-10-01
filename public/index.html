@@ -101,12 +101,15 @@ section.s{padding:84px 0 0}
 .cat:hover,.cat.on{border-color:var(--accent);transform:translateY(-4px)}
 .cat:hover::before,.cat.on::before{opacity:.7}
 .cat:hover .em{scale:1.15}
+.cat .art{position:absolute;top:38%;left:50%;translate:-50% -50%;width:56%;height:auto;filter:drop-shadow(0 12px 14px rgba(0,0,0,.55));transition:.25s}
+.cat:hover .art{scale:1.1}
 
 /* kits */
 .kits{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
 .kit{position:relative;overflow:hidden;background:linear-gradient(150deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:20px;padding:28px;display:flex;flex-direction:column;gap:10px;transition:.25s}
 .kit:hover{border-color:var(--accent);transform:translateY(-4px)}
 .kit .big{position:absolute;right:-10px;top:-10px;font-size:7rem;opacity:.16;rotate:-12deg}
+.kit svg.big{width:150px;height:150px;right:-22px;top:-22px;opacity:.22}
 .kit .tag{align-self:flex-start;background:rgba(61,220,132,.14);color:var(--ok);font-size:.75rem;font-weight:700;padding:4px 10px;border-radius:999px}
 .kit h3{font-size:1.35rem}
 .kit p{margin:0;color:var(--muted);font-size:.92rem;flex:1}
@@ -131,6 +134,8 @@ section.s{padding:84px 0 0}
 .pic:has(img)::after{display:none}
 .pic span{position:relative;z-index:1;font-size:4.6rem;filter:drop-shadow(0 14px 14px rgba(0,0,0,.45));transition:.3s}
 .card:hover .pic span{scale:1.14;rotate:-4deg}
+.pic .art{position:relative;z-index:1;width:58%;height:auto;filter:drop-shadow(0 18px 16px rgba(0,0,0,.55));transition:.3s}
+.card:hover .pic .art{scale:1.08;rotate:-3deg}
 .fitbadge{z-index:3!important;position:absolute;top:12px;left:12px;z-index:2;background:rgba(10,11,13,.75);backdrop-filter:blur(6px);border:1px solid var(--line);border-radius:999px;font-size:.7rem;font-weight:600;padding:4px 10px;display:flex;gap:5px;align-items:center}
 .fitbadge.ok{color:var(--ok);border-color:rgba(61,220,132,.4)}
 .best{position:absolute;top:12px;right:12px;z-index:3;background:var(--accent);font-size:.7rem;font-weight:700;padding:4px 10px;border-radius:999px;text-transform:uppercase;letter-spacing:.06em}
@@ -174,7 +179,7 @@ footer li a:hover{color:var(--accent)}
 .fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--ok));border-radius:99px;transition:width .4s}
 .items{flex:1;overflow:auto;padding:8px 24px}
 .line{display:grid;grid-template-columns:64px 1fr auto;gap:14px;align-items:center;padding:14px 0;border-bottom:1px solid var(--line)}
-.line .th{position:relative}.line .th img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.line .th{position:relative}.line .th .art{width:86%;height:86%}.line .th img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .line .th{overflow:hidden;width:64px;height:64px;border-radius:12px;background:radial-gradient(circle,var(--c),transparent 75%),var(--panel);display:grid;place-items:center;font-size:2rem}
 .line .n{font-weight:600;font-size:.92rem;line-height:1.3}
 .qty{display:inline-flex;align-items:center;margin-top:8px;border:1px solid var(--line);border-radius:999px}
@@ -341,6 +346,7 @@ dialog input:focus{border-color:var(--accent)}
 
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script src="catalog.js"></script>
+<script src="art.js"></script>
 <script>
 /* ===== App ===== */
 const $=id=>document.getElementById(id);
@@ -371,7 +377,7 @@ function renderGarage(){const g=$("garage");g.hidden=!vehicle;if(!vehicle)return
   $("clearCar").onclick=()=>{vehicle=null;store.set("vehicle",null);renderGarage();render()}}
 
 /* categories + chips */
-$("catGrid").innerHTML=Object.entries(CATS).map(([k,v])=>`<button class="cat" data-c="${k}" style="--c:${v.c}"><span class="em">${v.em}</span><b>${k}</b><span>${v.sub}</span></button>`).join("");
+$("catGrid").innerHTML=Object.entries(CATS).map(([k,v])=>`<button class="cat" data-c="${k}" style="--c:${v.c}">${hasArt(CAT_ART[k])?art(CAT_ART[k]):`<span class="em">${v.em}</span>`}<b>${k}</b><span>${v.sub}</span></button>`).join("");
 $("catGrid").onclick=e=>{const b=e.target.closest("[data-c]");if(!b)return;cat=b.dataset.c;renderChips();render();$("shop").scrollIntoView({behavior:"smooth"})};
 function renderChips(){
   $("chips").innerHTML=["All",...Object.keys(CATS)].map(c=>`<button class="chip ${c===cat?"on":""}" data-c="${c}">${c}</button>`).join("");
@@ -390,7 +396,7 @@ function render(){
   $("grid").innerHTML=list.length?list.map(p=>`
     <article class="card">
       <div class="pic" style="--c:${col(p)}40">
-        <span>${p.icon}</span>${photo(p)}
+        ${hasArt(p.id)?art(p.id):`<span>${p.icon}</span>`}${photo(p)}
         <div class="fitbadge ${vehicle?"ok":""}">${vehicle?"✔ Fits your car":p.fits==="all"?"Universal fit":"Check fit"}</div>
         ${p.pop>=90?'<div class="best">Best seller</div>':""}
       </div>
@@ -409,7 +415,7 @@ $("sort").onchange=render;
 /* kits */
 $("kitGrid").innerHTML=BUNDLES.map((b,i)=>{
   const raw=b.ids.reduce((s,id)=>s+byId(id).price,0);
-  return `<div class="kit"><span class="big">${b.icon}</span><span class="tag">Save ${Math.round(b.off*100)}%</span><h3>${b.name}</h3><p>${b.desc}</p>
+  return `<div class="kit">${hasArt(b.ids[0])?art(b.ids[0],"art big"):`<span class="big">${b.icon}</span>`}<span class="tag">Save ${Math.round(b.off*100)}%</span><h3>${b.name}</h3><p>${b.desc}</p>
   <div class="row"><b>${money(raw*(1-b.off))}</b><s>${money(raw)}</s></div>
   <button class="btn" data-b="${i}">Add full kit</button></div>`}).join("");
 $("kitGrid").onclick=e=>{const i=e.target.dataset.b;if(i==null)return;BUNDLES[i].ids.forEach(id=>cart[id]=(cart[id]||0)+1);cartChanged();toast("Kit added to cart");openCart(true)};
@@ -422,7 +428,7 @@ function renderCart(){
   const ids=Object.keys(cart),count=ids.reduce((s,i)=>s+cart[i],0);
   $("cartCount").textContent=count;
   $("cartItems").innerHTML=ids.length?ids.map(id=>{const p=byId(+id);
-    return `<div class="line"><div class="th" style="--c:${col(p)}55">${p.icon}${photo(p)}</div>
+    return `<div class="line"><div class="th" style="--c:${col(p)}55">${hasArt(p.id)?art(p.id):p.icon}${photo(p)}</div>
     <div><div class="n">${p.name}</div><div class="qty"><button data-q="${id}" data-d="-1" aria-label="Decrease">−</button><span>${cart[id]}</span><button data-q="${id}" data-d="1" aria-label="Increase">+</button></div></div>
     <div class="pr">${money(p.price*cart[id])}<button class="rm" data-rm="${id}">Remove</button></div></div>`}).join(""):`<div class="cempty"><div>🛒</div><p>Your cart is empty.<br>Add something and it shows up here.</p></div>`;
   const t=totals();
