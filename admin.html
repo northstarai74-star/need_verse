@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Nnedverse Orders</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0b0d;--panel:#15181d;--panel2:#1b1f26;--line:#262b34;--text:#f4f1ec;--muted:#8e97a6;--accent:#ff4d1a;--ok:#3ddc84;--warn:#ffc53d;--blue:#3d8bff;--bad:#ff5c5c}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:400 15px/1.5 Inter,system-ui,sans-serif}
+.wrap{max-width:1200px;margin:0 auto;padding:0 20px}
+header{border-bottom:1px solid var(--line);background:var(--panel)}
+header .wrap{display:flex;align-items:center;justify-content:space-between;min-height:64px;padding-block:10px;gap:12px;flex-wrap:wrap}
+.logo{font:800 1.7rem/1 "Barlow Condensed",sans-serif;text-transform:uppercase}.logo b{color:var(--accent)}
+.muted{color:var(--muted)}
+button,input,select{font:inherit;color:inherit}
+.btn{background:var(--accent);color:#fff;border:0;border-radius:10px;padding:9px 16px;font-weight:600;cursor:pointer;text-decoration:none;display:inline-block}
+.btn.ghost{background:transparent;border:1px solid var(--line)}.btn.ghost:hover{border-color:var(--text)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:24px 0}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px}
+.stat span{font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.stat b{display:block;font:800 2.2rem/1.1 "Barlow Condensed",sans-serif;margin-top:4px}
+.bar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.bar input,.bar select{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:9px 14px;outline:0}
+.bar input{flex:1;min-width:200px}.bar input:focus,.bar select:focus{border-color:var(--accent)}
+table{width:100%;border-collapse:collapse;background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+th{text-align:left;font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);padding:12px 16px;background:var(--panel2)}
+td{padding:13px 16px;border-top:1px solid var(--line);vertical-align:middle}
+tr.row{cursor:pointer}tr.row:hover td{background:var(--panel2)}
+.pill{display:inline-block;padding:3px 10px;border-radius:99px;font-size:.75rem;font-weight:600}
+.paid{background:rgba(61,220,132,.15);color:var(--ok)}.created{background:rgba(255,197,61,.15);color:var(--warn)}
+.f-new{background:rgba(255,77,26,.15);color:var(--accent)}.f-packed{background:rgba(255,197,61,.15);color:var(--warn)}
+.f-shipped{background:rgba(61,139,255,.15);color:var(--blue)}.f-delivered{background:rgba(61,220,132,.15);color:var(--ok)}.f-cancelled{background:rgba(255,92,92,.15);color:var(--bad)}
+.refunded{background:rgba(255,92,92,.15);color:var(--bad)}.part{background:rgba(255,197,61,.15);color:var(--warn)}
+.rbox{margin-top:18px;padding-top:14px;border-top:1px dashed var(--line)}.rbox .r{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}.rbox input{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:8px 12px;outline:0;min-width:0}.rbox input:focus{border-color:var(--accent)}.rbox .btn{background:var(--bad)}.rbox .btn:disabled{opacity:.5}
+.detail td{background:var(--bg);padding:0}
+.dbox{display:grid;grid-template-columns:1.3fr 1fr;gap:28px;padding:20px 24px}
+.dbox h4{margin:0 0 8px;font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.li{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line)}
+.dbox select{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:8px 12px;margin-top:8px}
+dialog{background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:18px;width:min(440px,92vw);padding:24px}
+dialog::backdrop{background:rgba(0,0,0,.7)}
+dialog h2{margin:0 0 4px;font:800 1.8rem/1 "Barlow Condensed",sans-serif;text-transform:uppercase}
+dialog label{display:block;margin-top:12px;font-size:.75rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+dialog input{display:block;width:100%;margin-top:5px;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px;outline:0;text-transform:none;letter-spacing:0;font-weight:400;font-size:.95rem}
+dialog input:focus{border-color:var(--accent)}
+.flash{position:fixed;left:50%;bottom:24px;translate:-50% 100px;color:#111;font-weight:600;padding:12px 22px;border-radius:99px;opacity:0;transition:.3s;z-index:9;max-width:92vw}
+.flash.show{translate:-50% 0;opacity:1}
+.empty{text-align:center;padding:60px;color:var(--muted)}
+.right{text-align:right}
+@media (max-width:760px){.stats{grid-template-columns:1fr 1fr}.dbox{grid-template-columns:1fr}th:nth-child(2),td:nth-child(2),th:nth-child(6),td:nth-child(6){display:none}td,th{padding:10px}}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <div class="logo">Nnedverse <b>Orders</b></div>
+  <div><button class="btn ghost" id="refresh">Refresh</button> <a class="btn" href="/api/admin/orders.csv">Export CSV</a></div>
+</div></header>
+
+<main class="wrap">
+  <div class="stats">
+    <div class="stat"><span>Net revenue</span><b id="sRev">–</b></div>
+    <div class="stat"><span>Paid orders</span><b id="sPaid">–</b></div>
+    <div class="stat"><span>To ship</span><b id="sShip">–</b></div>
+    <div class="stat"><span>Unpaid / abandoned</span><b id="sOpen">–</b></div>
+  </div>
+  <div class="bar">
+    <input id="q" type="search" placeholder="Search name, email, phone, order number…">
+    <select id="fPay"><option value="">All payments</option><option value="paid">Paid</option><option value="created">Unpaid</option></select>
+    <select id="fFul"><option value="">All fulfilment</option><option>new</option><option>packed</option><option>shipped</option><option>delivered</option><option>cancelled</option></select>
+  </div>
+  <table>
+    <thead><tr><th>Order</th><th>Date</th><th>Customer</th><th>Payment</th><th>Fulfilment</th><th>Items</th><th class="right">Total</th></tr></thead>
+    <tbody id="rows"></tbody>
+  </table>
+</main>
+
+<dialog id="shipDlg">
+  <form id="shipForm">
+    <h2>Mark as shipped</h2>
+    <p class="muted" id="shipRef" style="margin:0"></p>
+    <label>Courier (optional)<input id="tCarrier" placeholder="e.g. Delhivery, Blue Dart"></label>
+    <label>Tracking number (optional)<input id="tNumber"></label>
+    <label>Tracking link (optional)<input id="tUrl" type="url" placeholder="https://..."></label>
+    <p class="muted" id="shipNote" style="font-size:.85rem"></p>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px"><button type="button" id="shipCancel" class="btn ghost">Cancel</button><button class="btn">Mark shipped &amp; email</button></div>
+  </form>
+</dialog>
+<div id="flash" class="flash" role="status"></div>
+<script>
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+let data=[],sym="₹",open=null;
+const money=n=>sym+Number(n).toLocaleString("en-IN",{maximumFractionDigits:2});
+const ful=o=>o.fulfillment||"new";
+const payPill=o=>o.status!=="paid"?'<span class="pill created">Unpaid</span>':(o.refunded||0)>=o.amount?'<span class="pill refunded">Refunded</span>':(o.refunded||0)>0?'<span class="pill part">Part refunded</span>':'<span class="pill paid">Paid</span>';
+const left=o=>Math.round((o.amount-(o.refunded||0))*100)/100;
+
+async function load(){
+  const r=await fetch("/api/admin/orders");
+  if(!r.ok){$("rows").innerHTML=`<tr><td colspan="7" class="empty">Could not load orders (${r.status}).</td></tr>`;return}
+  const j=await r.json();data=j.orders;sym=j.symbol;render();
+}
+function refundBox(o){
+  if(o.status!=="paid"||!o.paymentId)return"";
+  const hist=(o.refunds||[]).map(r=>`<div class="li"><span>${money(r.amount)} <span class="muted">· ${esc(r.status)}${r.reason?" · "+esc(r.reason):""}</span></span><span class="muted">${new Date(r.createdAt).toLocaleDateString("en-IN",{dateStyle:"medium"})}</span></div>`).join("");
+  const form=left(o)>0?`<div class="r"><input id="rAmt-${esc(o.orderId)}" type="number" min="1" max="${left(o)}" step="0.01" placeholder="Amount (max ${money(left(o))})" style="width:190px"><input id="rWhy-${esc(o.orderId)}" placeholder="Reason (optional)" style="flex:1"><button class="btn" data-refund="${esc(o.orderId)}">Refund</button></div><p class="muted" style="font-size:.8rem;margin:6px 0 0">Leave the amount empty to refund the full remaining ${money(left(o))}.</p>`:'<p class="muted" style="margin:6px 0 0">Fully refunded.</p>';
+  return `<div class="rbox"><h4>Refunds</h4>${hist}${form}</div>`}
+function render(){
+  const paid=data.filter(o=>o.status==="paid");
+  $("sRev").textContent=money(paid.reduce((s,o)=>s+o.amount-(o.refunded||0),0));
+  $("sPaid").textContent=paid.length;
+  $("sShip").textContent=paid.filter(o=>["new","packed"].includes(ful(o))).length;
+  $("sOpen").textContent=data.length-paid.length;
+  const q=$("q").value.trim().toLowerCase(),fp=$("fPay").value,ff=$("fFul").value;
+  const list=data.filter(o=>(!fp||o.status===fp)&&(!ff||ful(o)===ff)&&(!q||[o.ref,o.customer.name,o.customer.email,o.customer.phone,o.paymentId].join(" ").toLowerCase().includes(q)));
+  $("rows").innerHTML=list.length?list.map(o=>{
+    const n=o.lines.reduce((s,l)=>s+l.qty,0);
+    let h=`<tr class="row" data-id="${esc(o.orderId)}"><td><b>${esc(o.ref)}</b></td><td class="muted">${new Date(o.createdAt).toLocaleString("en-IN",{dateStyle:"medium",timeStyle:"short"})}</td>
+      <td>${esc(o.customer.name)}<div class="muted" style="font-size:.8rem">${esc(o.customer.email)}</div></td>
+      <td>${payPill(o)}</td>
+      <td><span class="pill f-${ful(o)}">${ful(o)}</span></td><td>${n}</td><td class="right"><b>${money(o.amount)}</b></td></tr>`;
+    if(open===o.orderId)h+=`<tr class="detail"><td colspan="7"><div class="dbox">
+      <div><h4>Items</h4>${o.lines.map(l=>`<div class="li"><span>${esc(l.name)} × ${l.qty}</span><span>${money(l.price*l.qty)}</span></div>`).join("")}
+        <div class="li"><b>Total${o.promo?` (code ${esc(o.promo)})`:""}</b><b>${money(o.amount)}</b></div>
+        ${o.vehicle?`<p class="muted" style="margin:10px 0 0">Vehicle: ${esc(o.vehicle.year)} ${esc(o.vehicle.make)} ${esc(o.vehicle.model)}</p>`:""}
+        ${o.paymentId?`<p class="muted" style="margin:4px 0 0">Payment ID: ${esc(o.paymentId)}</p>`:""}
+        ${refundBox(o)}</div>
+      <div><h4>Ship to</h4><div>${esc(o.customer.name)}<br>${esc(o.customer.addr)}<br>${esc(o.customer.city)} ${esc(o.customer.zip)}<br>${esc(o.customer.phone)}<br>${esc(o.customer.email)}</div>
+        <h4 style="margin-top:16px">Fulfilment</h4>
+        <select data-ful="${esc(o.orderId)}" ${o.status!=="paid"?"disabled title='Only paid orders can be fulfilled'":""}>${["new","packed","shipped","delivered","cancelled"].map(s=>`<option ${s===ful(o)?"selected":""}>${s}</option>`).join("")}</select></div>
+    </div></td></tr>`;
+    return h}).join(""):`<tr><td colspan="7" class="empty">No orders yet.</td></tr>`;
+}
+$("rows").onclick=async e=>{
+  const rb=e.target.closest("[data-refund]");
+  if(rb){const id=rb.dataset.refund,o=data.find(x=>x.orderId===id);
+    const a=document.getElementById("rAmt-"+id).value,why=document.getElementById("rWhy-"+id).value;
+    const amt=a===""?left(o):Number(a);
+    if(!confirm(`Refund ${money(amt)} to ${o.customer.name} for order ${o.ref}?
+This sends the money back through Razorpay and cannot be undone.`))return;
+    rb.disabled=true;rb.textContent="Refunding…";
+    const r=await fetch(`/api/admin/orders/${encodeURIComponent(id)}/refund`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({amount:a===""?undefined:Number(a),reason:why})});
+    const j=await r.json().catch(()=>({}));
+    if(!r.ok)flash(j.error||"Refund failed",true);else flash(`Refund of ${money(j.refund.amount)} ${j.refund.status==="processed"?"processed":"started"}. Customer emailed.`);
+    await load();return}
+  if(e.target.closest("select")||e.target.closest("input"))return;const tr=e.target.closest("tr.row");if(!tr)return;open=open===tr.dataset.id?null:tr.dataset.id;render()};
+async function setStatus(id,status,tracking){
+  const r=await fetch(`/api/admin/orders/${encodeURIComponent(id)}/fulfillment`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({status,tracking})});
+  const j=await r.json().catch(()=>({}));
+  if(!r.ok)alert(j.error||"Could not update status");
+  else if(status==="shipped")flash(j.emailed?"Marked shipped. Customer emailed.":j.emailError?"Marked shipped, but: "+j.emailError:"Marked shipped (customer was already emailed).",!!j.emailError);
+  await load()}
+let shipId=null;
+$("rows").onchange=e=>{const id=e.target.dataset.ful;if(!id)return;
+  if(e.target.value!=="shipped")return setStatus(id,e.target.value);
+  const o=data.find(x=>x.orderId===id),t=o.tracking||{};
+  shipId=id;$("shipRef").textContent=o.ref+" · "+o.customer.email;
+  $("tCarrier").value=t.carrier||"";$("tNumber").value=t.number||"";$("tUrl").value=t.url||"";
+  $("shipNote").textContent=o.shippedEmailSent?"The customer was already emailed for this order; no second email will be sent.":"The customer will get a \"your order has shipped\" email.";
+  $("shipDlg").showModal()};
+$("shipCancel").onclick=()=>{$("shipDlg").close();load()};
+$("shipDlg").addEventListener("cancel",()=>load());
+$("shipForm").onsubmit=async e=>{e.preventDefault();$("shipDlg").close();
+  await setStatus(shipId,"shipped",{carrier:$("tCarrier").value,number:$("tNumber").value,url:$("tUrl").value})};
+let ft;function flash(m,bad){const t=$("flash");t.textContent=m;t.style.background=bad?"var(--warn)":"var(--ok)";t.classList.add("show");clearTimeout(ft);ft=setTimeout(()=>t.classList.remove("show"),5000)}
+["q","fPay","fFul"].forEach(i=>$(i).addEventListener("input",render));
+$("refresh").onclick=load;
+load();setInterval(()=>{if(!document.hidden&&!document.activeElement.matches("select,input"))load()},30000);
+</script>
+</body>
+</html>

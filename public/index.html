@@ -1,0 +1,481 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nnedverse | Car Accessories That Fit</title>
+<meta name="description" content="Car accessories that fit your vehicle. Pick your car once, see only what fits, check out in seconds.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0b0d;--bg2:#101216;--panel:#15181d;--panel2:#1b1f26;--line:#262b34;
+  --text:#f4f1ec;--muted:#8e97a6;--accent:#ff4d1a;--accent2:#ff7a3d;--ok:#3ddc84;--gold:#ffc53d;
+  --disp:"Barlow Condensed","Arial Narrow",Impact,sans-serif;--body:Inter,system-ui,Segoe UI,sans-serif;
+  --r:16px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+html,body{overflow-x:clip}
+.hero .wrap>*,.search{min-width:0}
+body{margin:0;background:var(--bg);color:var(--text);font:400 16px/1.55 var(--body);-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+button,input,select{font:inherit;color:inherit}
+.wrap{max-width:1240px;margin:0 auto;padding:0 24px}
+.muted{color:var(--muted)}.small{font-size:.85rem}
+.eyebrow{font:700 .78rem/1 var(--body);letter-spacing:.18em;text-transform:uppercase;color:var(--accent)}
+h1,h2,h3{font-family:var(--disp);text-transform:uppercase;letter-spacing:.01em;margin:0;line-height:.95}
+h2{font-size:clamp(2rem,4vw,3rem)}
+
+/* announcement + nav */
+.announce{background:var(--accent);color:#fff;text-align:center;font-size:.8rem;font-weight:600;letter-spacing:.04em;padding:8px 12px}
+.nav{position:sticky;top:0;z-index:30;background:rgba(10,11,13,.85);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.nav .wrap{display:flex;align-items:center;gap:28px;height:72px}
+.logo{font:800 1.9rem/1 var(--disp);text-transform:uppercase;letter-spacing:.02em;display:flex;align-items:center;gap:8px}
+.logo i{display:grid;place-items:center;width:32px;height:32px;background:var(--accent);border-radius:8px;font-style:normal;font-size:1.3rem;transform:skewX(-8deg)}
+.links{display:flex;gap:24px;font-size:.92rem;font-weight:500;color:var(--muted)}
+.links a:hover{color:var(--text)}
+.search{flex:1;position:relative;max-width:420px;margin-left:auto}
+.search input{width:100%;background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:11px 18px 11px 42px;outline:0;transition:.2s}
+.search input:focus{border-color:var(--accent);box-shadow:0 0 0 4px rgba(255,77,26,.15)}
+.search svg{position:absolute;left:15px;top:50%;translate:0 -50%;color:var(--muted)}
+.cartbtn{position:relative;display:flex;align-items:center;gap:8px;background:var(--text);color:#111;border:0;border-radius:999px;padding:10px 18px;font-weight:700;cursor:pointer;transition:.2s}
+.cartbtn:hover{background:var(--accent);color:#fff}
+.cartbtn b{background:var(--accent);color:#fff;border-radius:999px;min-width:22px;height:22px;display:grid;place-items:center;font-size:.75rem}
+.cartbtn:hover b{background:#fff;color:var(--accent)}
+
+/* hero */
+.hero{position:relative;overflow:hidden;padding:72px 0 88px;background:
+  radial-gradient(900px 500px at 85% 10%,rgba(255,77,26,.28),transparent 60%),
+  radial-gradient(700px 400px at 0% 100%,rgba(255,122,61,.12),transparent 60%),var(--bg)}
+.hero::before{content:"";position:absolute;inset:0;background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:64px 64px;opacity:.35;mask-image:radial-gradient(ellipse at 70% 30%,#000,transparent 70%);-webkit-mask-image:radial-gradient(ellipse at 70% 30%,#000,transparent 70%)}
+.hero .wrap{position:relative;display:grid;grid-template-columns:1.15fr .85fr;gap:56px;align-items:center}
+.hero h1{font-size:clamp(3.4rem,8vw,7rem);font-weight:800;margin:18px 0 22px}
+.hero h1 em{font-style:normal;color:var(--accent);display:block}
+.hero p.lead{font-size:1.15rem;color:#c1c7d1;max-width:520px;margin:0 0 30px}
+.stats{display:flex;gap:36px;flex-wrap:wrap}
+.stats div b{display:block;font:800 2.2rem/1 var(--disp)}
+.stats div span{font-size:.82rem;color:var(--muted)}
+.finder{background:linear-gradient(160deg,rgba(27,31,38,.95),rgba(16,18,22,.95));border:1px solid var(--line);border-radius:24px;padding:28px;box-shadow:0 30px 80px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.06)}
+.finder h3{font-size:1.9rem;margin-bottom:4px}
+.finder .step{display:flex;align-items:center;gap:12px;margin-top:14px}
+.finder .num{flex:none;width:28px;height:28px;border-radius:50%;background:var(--panel2);border:1px solid var(--line);display:grid;place-items:center;font-size:.8rem;font-weight:700;color:var(--muted)}
+.finder .step.done .num{background:var(--accent);border-color:var(--accent);color:#fff}
+.finder select{flex:1;appearance:none;background:var(--bg) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none' stroke='%238e97a6' stroke-width='2'%3E%3Cpath d='m1 1 5 5 5-5'/%3E%3C/svg%3E") no-repeat right 16px center;border:1px solid var(--line);border-radius:12px;padding:14px 40px 14px 16px;outline:0;cursor:pointer}
+.finder select:focus{border-color:var(--accent)}
+.finder select:disabled{opacity:.45;cursor:not-allowed}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:var(--accent);color:#fff;border:0;border-radius:12px;padding:14px 22px;font-weight:700;cursor:pointer;transition:.2s}
+.btn:hover{background:var(--accent2);transform:translateY(-1px)}
+.btn:disabled{opacity:.4;pointer-events:none}
+.btn.ghost{background:transparent;border:1px solid var(--line)}
+.btn.ghost:hover{border-color:var(--text);background:transparent}
+.btn.block{width:100%}
+.finder .btn{margin-top:20px;width:100%;font-size:1rem}
+.garage{margin-top:16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding-top:16px;border-top:1px dashed var(--line);font-size:.9rem}
+.garage b{color:var(--ok)}
+.garage button{background:none;border:0;color:var(--muted);text-decoration:underline;cursor:pointer}
+
+/* trust */
+.trust{border-block:1px solid var(--line);background:var(--bg2)}
+.trust .wrap{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;padding-block:26px}
+.trust div{display:flex;gap:14px;align-items:center}
+.trust .ic{flex:none;width:46px;height:46px;border-radius:12px;background:var(--panel2);display:grid;place-items:center;font-size:1.3rem}
+.trust b{display:block;font-size:.95rem}.trust span{font-size:.82rem;color:var(--muted)}
+
+/* sections */
+section.s{padding:84px 0 0}
+.head{display:flex;justify-content:space-between;align-items:end;gap:20px;flex-wrap:wrap;margin-bottom:32px}
+.head h2{margin-top:10px}
+
+/* categories */
+.cats{display:grid;grid-template-columns:repeat(6,1fr);gap:14px}
+.cat{position:relative;aspect-ratio:1/1.1;border-radius:var(--r);overflow:hidden;cursor:pointer;border:1px solid var(--line);background:var(--panel);text-align:left;padding:18px;display:flex;flex-direction:column;justify-content:flex-end;transition:.25s}
+.cat::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 30%,var(--c),transparent 65%);opacity:.35;transition:.25s}
+.cat .em{position:absolute;top:22%;left:50%;translate:-50% -50%;font-size:3.6rem;filter:drop-shadow(0 12px 18px rgba(0,0,0,.5));transition:.25s}
+.cat b{position:relative;font:700 1.35rem/1 var(--disp);text-transform:uppercase}
+.cat span{position:relative;font-size:.78rem;color:var(--muted)}
+.cat:hover,.cat.on{border-color:var(--accent);transform:translateY(-4px)}
+.cat:hover::before,.cat.on::before{opacity:.7}
+.cat:hover .em{scale:1.15}
+
+/* kits */
+.kits{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.kit{position:relative;overflow:hidden;background:linear-gradient(150deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:20px;padding:28px;display:flex;flex-direction:column;gap:10px;transition:.25s}
+.kit:hover{border-color:var(--accent);transform:translateY(-4px)}
+.kit .big{position:absolute;right:-10px;top:-10px;font-size:7rem;opacity:.16;rotate:-12deg}
+.kit .tag{align-self:flex-start;background:rgba(61,220,132,.14);color:var(--ok);font-size:.75rem;font-weight:700;padding:4px 10px;border-radius:999px}
+.kit h3{font-size:2rem}
+.kit p{margin:0;color:var(--muted);font-size:.92rem;flex:1}
+.kit .row{display:flex;align-items:baseline;gap:10px}
+.kit .row b{font:800 2rem/1 var(--disp)}
+.kit s{color:var(--muted)}
+
+/* products */
+.toolbar{display:flex;gap:14px;justify-content:space-between;align-items:center;flex-wrap:wrap;margin-bottom:24px}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{background:transparent;border:1px solid var(--line);border-radius:999px;padding:8px 16px;cursor:pointer;font-size:.88rem;font-weight:500;transition:.2s}
+.chip:hover{border-color:var(--text)}
+.chip.on{background:var(--text);color:#111;border-color:var(--text)}
+.toolbar select{appearance:none;background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:9px 18px;cursor:pointer;outline:0}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;display:flex;flex-direction:column;transition:.25s}
+.card:hover{transform:translateY(-6px);border-color:#3a414e;box-shadow:0 24px 50px rgba(0,0,0,.5)}
+.pic{position:relative;aspect-ratio:1/.85;display:grid;place-items:center;overflow:hidden;background:radial-gradient(circle at 50% 45%,var(--c),transparent 70%),var(--bg2)}
+.pic::after{content:"";position:absolute;bottom:14%;left:50%;translate:-50% 0;width:46%;height:14px;border-radius:50%;background:rgba(0,0,0,.6);filter:blur(8px)}
+.pic img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;transition:.3s}
+.card:hover .pic img{scale:1.06}
+.pic:has(img)::after{display:none}
+.pic span{position:relative;z-index:1;font-size:4.6rem;filter:drop-shadow(0 14px 14px rgba(0,0,0,.45));transition:.3s}
+.card:hover .pic span{scale:1.14;rotate:-4deg}
+.fitbadge{z-index:3!important;position:absolute;top:12px;left:12px;z-index:2;background:rgba(10,11,13,.75);backdrop-filter:blur(6px);border:1px solid var(--line);border-radius:999px;font-size:.7rem;font-weight:600;padding:4px 10px;display:flex;gap:5px;align-items:center}
+.fitbadge.ok{color:var(--ok);border-color:rgba(61,220,132,.4)}
+.best{position:absolute;top:12px;right:12px;z-index:3;background:var(--accent);font-size:.7rem;font-weight:700;padding:4px 10px;border-radius:999px;text-transform:uppercase;letter-spacing:.06em}
+.info{padding:16px 18px 18px;display:flex;flex-direction:column;gap:6px;flex:1}
+.info .cat-l{font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.info h3{font:600 1.05rem/1.25 var(--body);text-transform:none;letter-spacing:0}
+.info p{margin:0;color:var(--muted);font-size:.85rem;flex:1}
+.stars{color:var(--gold);font-size:.85rem;letter-spacing:1px}.stars small{color:var(--muted);letter-spacing:0;margin-left:4px}
+.buy{display:flex;justify-content:space-between;align-items:center;margin-top:8px}
+.price{font:800 1.7rem/1 var(--disp)}
+.add{background:var(--text);color:#111;border:0;border-radius:10px;padding:10px 16px;font-weight:700;font-size:.88rem;cursor:pointer;transition:.2s}
+.add:hover{background:var(--accent);color:#fff}
+.empty{grid-column:1/-1;text-align:center;padding:70px 20px;color:var(--muted);border:1px dashed var(--line);border-radius:var(--r)}
+
+/* reorder */
+.reorder{margin-top:84px;padding:36px;border-radius:24px;background:linear-gradient(120deg,var(--accent),#c2310a);display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap}
+.reorder h2{font-size:2.4rem}.reorder p{margin:6px 0 0;opacity:.9}
+.reorder .btn{background:#fff;color:#111}
+
+/* footer */
+footer{margin-top:96px;border-top:1px solid var(--line);background:var(--bg2);padding:60px 0 28px}
+.fgrid{display:grid;grid-template-columns:1.6fr 1fr 1fr 1.4fr;gap:40px}
+footer h4{margin:0 0 14px;font-size:.8rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+footer li{list-style:none;margin-bottom:9px;font-size:.92rem}footer ul{padding:0;margin:0}
+footer li a:hover{color:var(--accent)}
+.news{display:flex;gap:8px;margin-top:10px}
+.news input{flex:1;min-width:0;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:11px 14px;outline:0}
+.copy{margin-top:44px;padding-top:22px;border-top:1px solid var(--line);font-size:.82rem;color:var(--muted);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+
+/* drawer */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(3px);z-index:40;opacity:0;pointer-events:none;transition:.25s}
+.overlay.on{opacity:1;pointer-events:auto}
+.drawer{position:fixed;top:0;right:0;height:100%;width:min(440px,100%);background:var(--bg2);border-left:1px solid var(--line);z-index:50;display:flex;flex-direction:column;translate:100% 0;transition:.3s cubic-bezier(.2,.8,.2,1)}
+.drawer.open{translate:0}
+.dh{display:flex;justify-content:space-between;align-items:center;padding:20px 24px;border-bottom:1px solid var(--line)}
+.dh h2{font-size:2rem}
+.x{background:var(--panel);border:1px solid var(--line);width:38px;height:38px;border-radius:50%;cursor:pointer;font-size:1rem}
+.x:hover{border-color:var(--accent)}
+.ship{padding:16px 24px 6px;font-size:.86rem}
+.track{height:8px;background:var(--panel2);border-radius:99px;margin-top:8px;overflow:hidden}
+.fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--ok));border-radius:99px;transition:width .4s}
+.items{flex:1;overflow:auto;padding:8px 24px}
+.line{display:grid;grid-template-columns:64px 1fr auto;gap:14px;align-items:center;padding:14px 0;border-bottom:1px solid var(--line)}
+.line .th{position:relative}.line .th img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.line .th{overflow:hidden;width:64px;height:64px;border-radius:12px;background:radial-gradient(circle,var(--c),transparent 75%),var(--panel);display:grid;place-items:center;font-size:2rem}
+.line .n{font-weight:600;font-size:.92rem;line-height:1.3}
+.qty{display:inline-flex;align-items:center;margin-top:8px;border:1px solid var(--line);border-radius:999px}
+.qty button{width:30px;height:30px;background:none;border:0;cursor:pointer;font-size:1rem}
+.qty button:hover{color:var(--accent)}.qty span{min-width:22px;text-align:center;font-size:.9rem}
+.line .pr{text-align:right;font-weight:700}
+.rm{display:block;margin-top:8px;background:none;border:0;color:var(--muted);font-size:.78rem;cursor:pointer;margin-left:auto}
+.rm:hover{color:var(--accent)}
+.cempty{text-align:center;padding:60px 10px;color:var(--muted)}.cempty div{font-size:3rem}
+.df{border-top:1px solid var(--line);padding:18px 24px 24px;background:var(--bg)}
+.pf{display:flex;gap:8px;margin-bottom:14px}
+.pf input{flex:1;min-width:0;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:11px 14px;outline:0;text-transform:uppercase}
+.pf input::placeholder{text-transform:none}
+.pf button{padding:0 18px}
+.tot div{display:flex;justify-content:space-between;padding:3px 0;color:var(--muted);font-size:.92rem}
+.tot .g{color:var(--text);font:800 1.8rem/1 var(--disp);padding-top:12px;margin-top:8px;border-top:1px solid var(--line)}
+.tot .dsc{color:var(--ok)}
+.df .btn{margin-top:14px}
+
+/* dialogs */
+dialog{background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:22px;width:min(480px,92vw);padding:30px;box-shadow:0 40px 100px rgba(0,0,0,.7)}
+dialog::backdrop{background:rgba(0,0,0,.7);backdrop-filter:blur(4px)}
+dialog h2{font-size:2.2rem;margin-bottom:6px}
+dialog label{display:block;font-size:.78rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-top:14px}
+dialog input{display:block;width:100%;margin-top:6px;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:12px 14px;outline:0;text-transform:none;letter-spacing:0;font-weight:400;font-size:1rem}
+dialog input:focus{border-color:var(--accent)}
+.two{display:grid;grid-template-columns:2fr 1fr;gap:12px}
+.acts{display:flex;gap:10px;justify-content:flex-end;margin-top:22px}
+.toast{position:fixed;left:50%;bottom:28px;translate:-50% 100px;background:var(--text);color:#111;font-weight:600;font-size:.92rem;padding:12px 22px;border-radius:999px;opacity:0;transition:.3s;z-index:70;pointer-events:none;box-shadow:0 12px 40px rgba(0,0,0,.5)}
+.toast.show{translate:-50% 0;opacity:1}
+
+/* responsive */
+@media (max-width:1050px){.grid{grid-template-columns:repeat(3,1fr)}.cats{grid-template-columns:repeat(3,1fr)}.hero .wrap{grid-template-columns:1fr}.trust .wrap{grid-template-columns:1fr 1fr}.links{display:none}.fgrid{grid-template-columns:1fr 1fr}}
+@media (max-width:720px){.wrap{padding:0 16px}.grid{grid-template-columns:repeat(2,1fr);gap:12px}.kits{grid-template-columns:1fr}.cats{grid-template-columns:repeat(2,1fr)}.nav .wrap{gap:12px;height:64px}.logo span{display:none}.search{max-width:none}.hero{padding:44px 0 56px}.pic span{font-size:3.4rem}.info{padding:12px}.price{font-size:1.4rem}.add{padding:8px 12px}.buy{flex-wrap:wrap;gap:8px}.fgrid{grid-template-columns:1fr}.trust .wrap{grid-template-columns:1fr}.reorder{padding:26px}section.s{padding-top:60px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="announce">FREE SHIPPING OVER ₹999 &nbsp;·&nbsp; SAME-DAY DISPATCH BEFORE 2 PM &nbsp;·&nbsp; 30-DAY RETURNS</div>
+
+<nav class="nav">
+  <div class="wrap">
+    <a class="logo" href="#"><i>N</i><span>Nnedverse</span></a>
+    <div class="links"><a href="#shop">Shop</a><a href="#kits">Kits</a><a href="#cats">Categories</a><a href="#help">Help</a></div>
+    <label class="search">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="search" type="search" placeholder="Search floor mats, dash cams…" aria-label="Search products">
+    </label>
+    <button id="cartBtn" class="cartbtn" aria-label="Open cart">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6h15l-2 9H8L6 3H3"/><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/></svg>
+      Cart <b id="cartCount">0</b>
+    </button>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <div>
+      <span class="eyebrow">Car accessories, made simple</span>
+      <h1>Gear up.<em>Drive on.</em></h1>
+      <p class="lead">Tell us your car once. We only show accessories that actually fit, then check you out in under a minute.</p>
+      <div class="stats">
+        <div><b>10,000+</b><span>Orders shipped</span></div>
+        <div><b>4.8 ★</b><span>Average rating</span></div>
+        <div><b>60 sec</b><span>Average checkout</span></div>
+      </div>
+    </div>
+    <form id="fitForm" class="finder">
+      <span class="eyebrow">Fit finder</span>
+      <h3>What do you drive?</h3>
+      <p class="muted small" style="margin:6px 0 0">Saved on this device, so you only do this once.</p>
+      <div class="step" id="s1"><span class="num">1</span><select id="make" aria-label="Make"><option value="">Select make</option></select></div>
+      <div class="step" id="s2"><span class="num">2</span><select id="model" aria-label="Model" disabled><option value="">Select model</option></select></div>
+      <div class="step" id="s3"><span class="num">3</span><select id="year" aria-label="Year" disabled><option value="">Select year</option></select></div>
+      <button class="btn" type="submit">Show parts that fit →</button>
+      <div id="garage" class="garage" hidden></div>
+    </form>
+  </div>
+</header>
+
+<div class="trust"><div class="wrap">
+  <div><span class="ic">✔️</span><p style="margin:0"><b>Guaranteed fit</b><span>Or we pay return shipping</span></p></div>
+  <div><span class="ic">🚚</span><p style="margin:0"><b>Fast delivery</b><span>Same-day dispatch before 2 PM</span></p></div>
+  <div><span class="ic">↩️</span><p style="margin:0"><b>30-day returns</b><span>No questions asked</span></p></div>
+  <div><span class="ic">💬</span><p style="margin:0"><b>Real support</b><span>Answers in under an hour</span></p></div>
+</div></div>
+
+<main class="wrap">
+  <section class="s" id="cats">
+    <div class="head"><div><span class="eyebrow">Browse</span><h2>Shop by category</h2></div></div>
+    <div id="catGrid" class="cats"></div>
+  </section>
+
+  <section class="s" id="kits">
+    <div class="head"><div><span class="eyebrow">Save time &amp; money</span><h2>One-click kits</h2></div><p class="muted" style="max-width:380px;margin:0">Everything you need for a job, bundled and discounted automatically.</p></div>
+    <div id="kitGrid" class="kits"></div>
+  </section>
+
+  <section class="s" id="shop">
+    <div class="head"><div><span class="eyebrow" id="shopEye">All products</span><h2>The shop</h2></div><span id="resultInfo" class="muted"></span></div>
+    <div class="toolbar">
+      <div id="chips" class="chips"></div>
+      <select id="sort" aria-label="Sort products">
+        <option value="pop">Most popular</option><option value="low">Price: low to high</option><option value="high">Price: high to low</option><option value="rate">Top rated</option>
+      </select>
+    </div>
+    <div id="grid" class="grid"></div>
+  </section>
+
+  <section id="reorderSec" class="reorder" hidden>
+    <div><h2>Order again in one click</h2><p>Add everything from your last order back to your cart.</p></div>
+    <button id="reorderBtn" class="btn">Reorder last order</button>
+  </section>
+</main>
+
+<footer id="help"><div class="wrap">
+  <div class="fgrid">
+    <div><a class="logo" href="#"><i>N</i><span>Nnedverse</span></a><p class="muted small" style="max-width:300px;margin-top:14px">Car accessories that fit your vehicle, picked once and shipped fast.</p></div>
+    <div><h4>Shop</h4><ul><li><a href="#cats">Categories</a></li><li><a href="#kits">Kits</a></li><li><a href="#shop">All products</a></li></ul></div>
+    <div><h4>Help</h4><ul><li><a href="#">Shipping</a></li><li><a href="#">Returns</a></li><li><a href="#">Contact</a></li></ul></div>
+    <div><h4>Get 5% off</h4><p class="muted small" style="margin:0">Use code <b style="color:var(--text)">WELCOME5</b> at checkout, or join the list.</p>
+      <form class="news" id="newsForm"><input type="email" placeholder="you@email.com" aria-label="Email" required><button class="btn">Join</button></form></div>
+  </div>
+  <div class="copy"><span>© <span id="yr"></span> Nnedverse. All rights reserved.</span><span>Secure payments by Razorpay</span></div>
+</div></footer>
+
+<div id="overlay" class="overlay"></div>
+<aside id="drawer" class="drawer" aria-label="Cart" aria-hidden="true">
+  <div class="dh"><h2>Your cart</h2><button id="closeCart" class="x" aria-label="Close cart">✕</button></div>
+  <div id="ship" class="ship"></div>
+  <div id="cartItems" class="items"></div>
+  <div class="df">
+    <form id="promoForm" class="pf"><input id="promoIn" placeholder="Promo code (try SAVE10)" aria-label="Promo code"><button class="btn ghost">Apply</button></form>
+    <div class="tot">
+      <div><span>Subtotal</span><span id="tSub">₹0</span></div>
+      <div class="dsc" id="tDiscRow" hidden><span>Savings</span><span id="tDisc"></span></div>
+      <div><span>Shipping</span><span id="tShip">₹0</span></div>
+      <div class="g"><span>Total</span><span id="tTotal">₹0</span></div>
+    </div>
+    <button id="checkoutBtn" class="btn block">Checkout →</button>
+  </div>
+</aside>
+
+<dialog id="checkout">
+  <form id="coForm">
+    <h2>Checkout</h2>
+    <p class="muted small" style="margin:0">One page, no account. Your details are remembered for next time.</p>
+    <label>Full name<input name="name" autocomplete="name" required></label>
+    <label>Email<input name="email" type="email" autocomplete="email" required></label>
+    <label>Phone<input name="phone" type="tel" autocomplete="tel" required></label>
+    <label>Street address<input name="addr" autocomplete="street-address" required></label>
+    <div class="two"><label>City<input name="city" autocomplete="address-level2" required></label><label>ZIP<input name="zip" autocomplete="postal-code" required></label></div>
+    <p class="muted small" style="margin:16px 0 0">Pay securely with UPI, cards, netbanking or wallets via Razorpay.</p>
+    <div class="acts"><button type="button" id="coCancel" class="btn ghost">Back</button><button class="btn" id="payBtn">Pay securely · <span id="coTotal"></span></button></div>
+  </form>
+</dialog>
+<dialog id="done">
+  <h2>Order confirmed ✅</h2>
+  <p id="doneMsg" class="muted"></p>
+  <div class="acts"><button id="doneClose" class="btn">Keep shopping</button></div>
+</dialog>
+<div id="toast" class="toast" role="status"></div>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script src="catalog.js"></script>
+<script>
+/* ===== App ===== */
+const $=id=>document.getElementById(id);
+const money=n=>STORE.symbol+n.toLocaleString("en-IN",{minimumFractionDigits:n%1?2:0,maximumFractionDigits:2});
+const FREE_SHIP=STORE.freeShip,PROMOS=STORE.promos;
+const store={get(k,d){try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch{}}};
+let cart=store.get("cart",{}),vehicle=store.get("vehicle",null),promo=store.get("promo",null),cat="All";
+const fits=p=>!vehicle||p.fits==="all"||p.fits.includes(vehicle.make);
+const col=p=>CATS[p.cat].c;
+/* Product photos: put files in /images named <id>.jpg (e.g. images/1.jpg), or set img:"https://..." on a product. Emoji shows if no photo exists. */
+const photo=p=>`<img src="${p.img||`images/${p.id}.jpg`}" alt="${p.name.replace(/"/g,"&quot;")}" loading="lazy" onerror="this.remove()">`;
+
+/* fit finder */
+const makeSel=$("make"),modelSel=$("model"),yearSel=$("year");
+function fill(sel,items,label){sel.innerHTML=`<option value="">${label}</option>`+items.map(i=>`<option>${i}</option>`).join("");sel.disabled=!items.length}
+function steps(){$("s1").classList.toggle("done",!!makeSel.value);$("s2").classList.toggle("done",!!modelSel.value);$("s3").classList.toggle("done",!!yearSel.value)}
+fill(makeSel,Object.keys(VEHICLES),"Select make");
+makeSel.onchange=()=>{fill(modelSel,Object.keys(VEHICLES[makeSel.value]||{}),"Select model");fill(yearSel,[],"Select year");steps()};
+modelSel.onchange=()=>{const r=(VEHICLES[makeSel.value]||{})[modelSel.value],ys=[];if(r)for(let y=r[1];y>=r[0];y--)ys.push(y);fill(yearSel,ys,"Select year");steps()};
+yearSel.onchange=steps;
+$("fitForm").onsubmit=e=>{e.preventDefault();
+  if(!makeSel.value||!modelSel.value||!yearSel.value)return toast("Pick make, model and year");
+  vehicle={make:makeSel.value,model:modelSel.value,year:yearSel.value};store.set("vehicle",vehicle);
+  renderGarage();render();toast("Showing parts for your "+vehicle.model);
+  $("shop").scrollIntoView({behavior:"smooth"})};
+function renderGarage(){const g=$("garage");g.hidden=!vehicle;if(!vehicle)return;
+  g.innerHTML=`<span>✔ Your car:</span><b>${vehicle.year} ${vehicle.make} ${vehicle.model}</b><button type="button" id="clearCar">Change</button>`;
+  $("clearCar").onclick=()=>{vehicle=null;store.set("vehicle",null);renderGarage();render()}}
+
+/* categories + chips */
+$("catGrid").innerHTML=Object.entries(CATS).map(([k,v])=>`<button class="cat" data-c="${k}" style="--c:${v.c}"><span class="em">${v.em}</span><b>${k}</b><span>${v.sub}</span></button>`).join("");
+$("catGrid").onclick=e=>{const b=e.target.closest("[data-c]");if(!b)return;cat=b.dataset.c;renderChips();render();$("shop").scrollIntoView({behavior:"smooth"})};
+function renderChips(){
+  $("chips").innerHTML=["All",...Object.keys(CATS)].map(c=>`<button class="chip ${c===cat?"on":""}" data-c="${c}">${c}</button>`).join("");
+  document.querySelectorAll(".cat").forEach(b=>b.classList.toggle("on",b.dataset.c===cat))}
+$("chips").onclick=e=>{const c=e.target.dataset.c;if(c){cat=c;renderChips();render()}};
+
+/* product grid */
+function stars(r){const f=Math.round(r);return "★".repeat(f)+"☆".repeat(5-f)}
+function render(){
+  const q=$("search").value.trim().toLowerCase();
+  const list=PRODUCTS.filter(p=>fits(p)&&(cat==="All"||p.cat===cat)&&(!q||(p.name+" "+p.cat+" "+p.desc).toLowerCase().includes(q)));
+  const s=$("sort").value;
+  list.sort((a,b)=>s==="low"?a.price-b.price:s==="high"?b.price-a.price:s==="rate"?b.rating-a.rating:b.pop-a.pop);
+  $("shopEye").textContent=cat==="All"?"All products":cat;
+  $("resultInfo").textContent=`${list.length} item${list.length===1?"":"s"}`+(vehicle?` that fit your ${vehicle.make} ${vehicle.model}`:"");
+  $("grid").innerHTML=list.length?list.map(p=>`
+    <article class="card">
+      <div class="pic" style="--c:${col(p)}40">
+        <span>${p.icon}</span>${photo(p)}
+        <div class="fitbadge ${vehicle?"ok":""}">${vehicle?"✔ Fits your car":p.fits==="all"?"Universal fit":"Check fit"}</div>
+        ${p.pop>=90?'<div class="best">Best seller</div>':""}
+      </div>
+      <div class="info">
+        <span class="cat-l">${p.cat}</span>
+        <h3>${p.name}</h3>
+        <p>${p.desc}</p>
+        <div class="stars">${stars(p.rating)}<small>${p.rating} (${p.n.toLocaleString()})</small></div>
+        <div class="buy"><span class="price">${money(p.price)}</span><button class="add" data-add="${p.id}">Add to cart</button></div>
+      </div>
+    </article>`).join(""):`<div class="empty"><div style="font-size:2.6rem">🔍</div><p>No matches. Try another category or clear your search.</p></div>`}
+$("grid").onclick=e=>{const id=e.target.dataset.add;if(id){add(+id);toast("Added to cart")}};
+$("search").oninput=()=>{render();if($("search").value)$("shop").scrollIntoView({behavior:"smooth"})};
+$("sort").onchange=render;
+
+/* kits */
+$("kitGrid").innerHTML=BUNDLES.map((b,i)=>{
+  const raw=b.ids.reduce((s,id)=>s+byId(id).price,0);
+  return `<div class="kit"><span class="big">${b.icon}</span><span class="tag">Save ${Math.round(b.off*100)}%</span><h3>${b.name}</h3><p>${b.desc}</p>
+  <div class="row"><b>${money(raw*(1-b.off))}</b><s>${money(raw)}</s></div>
+  <button class="btn" data-b="${i}">Add full kit</button></div>`}).join("");
+$("kitGrid").onclick=e=>{const i=e.target.dataset.b;if(i==null)return;BUNDLES[i].ids.forEach(id=>cart[id]=(cart[id]||0)+1);cartChanged();toast("Kit added to cart");openCart(true)};
+
+/* cart */
+function add(id,n=1){cart[id]=(cart[id]||0)+n;cartChanged()}
+function cartChanged(){store.set("cart",cart);renderCart()}
+const totals=()=>computeTotals(cart,promo);
+function renderCart(){
+  const ids=Object.keys(cart),count=ids.reduce((s,i)=>s+cart[i],0);
+  $("cartCount").textContent=count;
+  $("cartItems").innerHTML=ids.length?ids.map(id=>{const p=byId(+id);
+    return `<div class="line"><div class="th" style="--c:${col(p)}55">${p.icon}${photo(p)}</div>
+    <div><div class="n">${p.name}</div><div class="qty"><button data-q="${id}" data-d="-1" aria-label="Decrease">−</button><span>${cart[id]}</span><button data-q="${id}" data-d="1" aria-label="Increase">+</button></div></div>
+    <div class="pr">${money(p.price*cart[id])}<button class="rm" data-rm="${id}">Remove</button></div></div>`}).join(""):`<div class="cempty"><div>🛒</div><p>Your cart is empty.<br>Add something and it shows up here.</p></div>`;
+  const t=totals();
+  $("tSub").textContent=money(t.sub);$("tDiscRow").hidden=t.disc<=0;$("tDisc").textContent="−"+money(t.disc);
+  $("tShip").textContent=t.ship?money(t.ship):"Free";$("tTotal").textContent=money(t.total);
+  const left=FREE_SHIP-t.after;
+  $("ship").innerHTML=t.sub===0?"":left>0?`Add <b>${money(left)}</b> more for free shipping<div class="track"><div class="fill" style="width:${Math.min(100,t.after/FREE_SHIP*100)}%"></div></div>`:`🎉 <b>You've unlocked free shipping</b><div class="track"><div class="fill" style="width:100%"></div></div>`;
+  $("checkoutBtn").disabled=!ids.length;
+  $("reorderSec").hidden=!store.get("lastOrder",null)}
+$("cartItems").onclick=e=>{const{q,d,rm}=e.target.dataset;
+  if(rm)delete cart[rm];if(q){cart[q]+=+d;if(cart[q]<=0)delete cart[q]}
+  if(rm||q)cartChanged()};
+$("promoForm").onsubmit=e=>{e.preventDefault();const c=$("promoIn").value.trim().toUpperCase();
+  if(PROMOS[c]){promo=c;toast(c+" applied")}else{promo=null;toast("Invalid code")}
+  store.set("promo",promo);renderCart()};
+function openCart(o){$("drawer").classList.toggle("open",o);$("overlay").classList.toggle("on",o);$("drawer").setAttribute("aria-hidden",!o)}
+$("cartBtn").onclick=()=>openCart(true);
+$("closeCart").onclick=$("overlay").onclick=()=>openCart(false);
+addEventListener("keydown",e=>{if(e.key==="Escape")openCart(false)});
+
+/* checkout */
+const co=$("checkout");
+$("checkoutBtn").onclick=()=>{const s=store.get("contact",{});for(const k in s)if($("coForm").elements[k])$("coForm").elements[k].value=s[k];
+  $("coTotal").textContent=money(totals().total);co.showModal()};
+$("coCancel").onclick=()=>co.close();
+$("coForm").onsubmit=async e=>{e.preventDefault();
+  const f=Object.fromEntries(new FormData($("coForm")));store.set("contact",f);
+  const btn=$("payBtn");btn.disabled=true;
+  try{
+    if(typeof Razorpay==="undefined")throw new Error("Payment script failed to load. Check your internet connection.");
+    const r=await fetch("/api/create-order",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({cart,promo,customer:f,vehicle})});
+    const o=await r.json().catch(()=>({}));
+    if(!r.ok)throw new Error(o.error||"Could not start payment. Is the server running?");
+    const rz=new Razorpay({key:o.key,amount:o.amount,currency:o.currency,name:"Nnedverse",description:"Order "+o.ref,order_id:o.orderId,
+      prefill:{name:f.name,email:f.email,contact:f.phone},theme:{color:"#ff4d1a"},
+      modal:{ondismiss:()=>{btn.disabled=false}},
+      handler:async resp=>{
+        try{
+          const v=await fetch("/api/verify-payment",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(resp)});
+          const d=await v.json();if(!v.ok)throw new Error(d.error||"Verification failed");
+          store.set("lastOrder",cart);
+          $("doneMsg").textContent=`Thanks ${f.name.split(" ")[0]}! Payment received for order ${d.ref} (${money(d.amount)}). A receipt will be sent to ${f.email}.`;
+          cart={};promo=null;store.set("promo",null);cartChanged();openCart(false);$("done").showModal();
+        }catch(err){toast(err.message+" Contact us with payment id "+resp.razorpay_payment_id)}
+        btn.disabled=false}});
+    rz.on("payment.failed",x=>{toast(x.error.description||"Payment failed");btn.disabled=false});
+    co.close();rz.open();
+  }catch(err){toast(err.message);btn.disabled=false}};
+$("doneClose").onclick=()=>$("done").close();
+$("reorderBtn").onclick=()=>{const l=store.get("lastOrder",{});for(const id in l)cart[id]=(cart[id]||0)+l[id];cartChanged();openCart(true)};
+$("newsForm").onsubmit=e=>{e.preventDefault();e.target.reset();toast("You're on the list. Use WELCOME5 for 5% off")};
+
+let tt;function toast(m){const t=$("toast");t.textContent=m;t.classList.add("show");clearTimeout(tt);tt=setTimeout(()=>t.classList.remove("show"),2000)}
+
+$("yr").textContent=new Date().getFullYear();
+renderGarage();renderChips();render();renderCart();
+</script>
+</body>
+</html>
