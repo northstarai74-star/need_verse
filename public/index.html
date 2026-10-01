@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Nnedverse | Car Accessories That Fit</title>
+<title>NEEDVERSE | Car Accessories That Fit</title>
 <meta name="description" content="Car accessories that fit your vehicle. Pick your car once, see only what fits, check out in seconds.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -215,7 +215,7 @@ dialog input:focus{border-color:var(--accent)}
 
 <nav class="nav">
   <div class="wrap">
-    <a class="logo" href="#"><i>N</i><span>Nnedverse</span></a>
+    <a class="logo" href="#"><i>N</i><span>NEEDVERSE</span></a>
     <div class="links"><a href="#shop">Shop</a><a href="#kits">Kits</a><a href="#cats">Categories</a><a href="#help">Help</a></div>
     <label class="search">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
@@ -290,13 +290,13 @@ dialog input:focus{border-color:var(--accent)}
 
 <footer id="help"><div class="wrap">
   <div class="fgrid">
-    <div><a class="logo" href="#"><i>N</i><span>Nnedverse</span></a><p class="muted small" style="max-width:300px;margin-top:14px">Car accessories that fit your vehicle, picked once and shipped fast.</p></div>
+    <div><a class="logo" href="#"><i>N</i><span>NEEDVERSE</span></a><p class="muted small" style="max-width:300px;margin-top:14px">Car accessories that fit your vehicle, picked once and shipped fast.</p></div>
     <div><h4>Shop</h4><ul><li><a href="#cats">Categories</a></li><li><a href="#kits">Kits</a></li><li><a href="#shop">All products</a></li></ul></div>
     <div><h4>Help</h4><ul><li><a href="#">Shipping</a></li><li><a href="#">Returns</a></li><li><a href="#">Contact</a></li></ul></div>
     <div><h4>Get 5% off</h4><p class="muted small" style="margin:0">Use code <b style="color:var(--text)">WELCOME5</b> at checkout, or join the list.</p>
       <form class="news" id="newsForm"><input type="email" placeholder="you@email.com" aria-label="Email" required><button class="btn">Join</button></form></div>
   </div>
-  <div class="copy"><span>© <span id="yr"></span> Nnedverse. All rights reserved.</span><span>Secure payments by Razorpay</span></div>
+  <div class="copy"><span>© <span id="yr"></span> NEEDVERSE. All rights reserved.</span><span>Secure payments by Razorpay</span></div>
 </div></footer>
 
 <div id="overlay" class="overlay"></div>
@@ -453,7 +453,7 @@ $("coForm").onsubmit=async e=>{e.preventDefault();
     const r=await fetch("/api/create-order",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({cart,promo,customer:f,vehicle})});
     const o=await r.json().catch(()=>({}));
     if(!r.ok)throw new Error(o.error||"Could not start payment. Is the server running?");
-    const rz=new Razorpay({key:o.key,amount:o.amount,currency:o.currency,name:"Nnedverse",description:"Order "+o.ref,order_id:o.orderId,
+    const rz=new Razorpay({key:o.key,amount:o.amount,currency:o.currency,name:"NEEDVERSE",description:"Order "+o.ref,order_id:o.orderId,
       prefill:{name:f.name,email:f.email,contact:f.phone},theme:{color:"#ff4d1a"},
       modal:{ondismiss:()=>{btn.disabled=false}},
       handler:async resp=>{
