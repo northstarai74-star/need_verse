@@ -91,6 +91,7 @@ tr:hover td{background:var(--panel2)}
   <div class="tab" data-tab="inventory">📊 Inventory</div>
   <div class="tab" data-tab="coupons">🏷️ Coupons</div>
   <div class="tab" data-tab="customers">👥 Customers</div>
+  <div class="tab" data-tab="reviews">⭐ Reviews</div>
   <div class="tab" data-tab="analytics">📈 Analytics</div>
 </div>
 
@@ -155,6 +156,24 @@ tr:hover td{background:var(--panel2)}
   <table>
     <thead><tr><th>Name</th><th>Email</th><th>Orders</th><th>Total Spent</th><th>Joined</th></tr></thead>
     <tbody id="customersTable"></tbody>
+  </table>
+</div>
+
+<!-- REVIEWS SECTION -->
+<div id="reviews" class="section">
+  <div class="bar">
+    <input id="reviewSearch" type="search" placeholder="Search reviews…">
+    <select id="reviewFilter">
+      <option value="">All reviews</option>
+      <option value="5">5 stars</option>
+      <option value="4">4 stars</option>
+      <option value="3">3 stars</option>
+      <option value="1-2">1-2 stars</option>
+    </select>
+  </div>
+  <table>
+    <thead><tr><th>Product</th><th>Author</th><th>Rating</th><th>Review</th><th>Date</th><th>Actions</th></tr></thead>
+    <tbody id="reviewsTable"></tbody>
   </table>
 </div>
 
@@ -450,6 +469,49 @@ async function loadCustomers(){
   renderCustomers();
 }
 
+// REVIEWS (using localStorage)
+function loadReviews(){
+  const store={get(k,d){try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}}};
+  const allReviews=[];
+  const productReviews=store.get("productReviews",{});
+  for(const productId in productReviews){
+    const p=PRODUCTS?.find(x=>x.id==productId);
+    productReviews[productId].forEach(r=>{
+      allReviews.push({...r,productName:p?.name||`Product ${productId}`});
+    });
+  }
+  renderReviews(allReviews.sort((a,b)=>new Date(b.date)-new Date(a.date)));
+}
+
+function renderReviews(allReviews){
+  const q=$("reviewSearch").value.toLowerCase(),f=$("reviewFilter").value;
+  let list=allReviews.filter(r=>r.title.toLowerCase().includes(q)||r.text.toLowerCase().includes(q)||r.author.toLowerCase().includes(q));
+  if(f){
+    const rating=Number(f);
+    list=list.filter(r=>f==="1-2"?r.rating<=2:r.rating===rating);
+  }
+  $("reviewsTable").innerHTML=list.length?list.map(r=>`<tr>
+    <td><b>${r.productName}</b></td>
+    <td>${r.author}<div class="muted" style="font-size:.8rem">${r.email}</div></td>
+    <td><span class="pill ok-pill">${"★".repeat(r.rating)}${"☆".repeat(5-r.rating)}</span></td>
+    <td><b>${r.title}</b><div class="muted" style="font-size:.85rem">${r.text.substring(0,80)}…</div></td>
+    <td>${new Date(r.date).toLocaleDateString("en-IN")}</td>
+    <td><button class="btn sm ghost" onclick="deleteReview('${r.productId}','${r.id}')">Delete</button></td>
+  </tr>`).join(""):`<tr><td colspan="6" class="empty">No reviews yet.</td></tr>`;
+}
+
+function deleteReview(productId,reviewId){
+  if(!confirm("Delete this review?"))return;
+  const store={get(k,d){try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch{}}};
+  const all=store.get("productReviews",{});
+  if(all[productId]){
+    all[productId]=all[productId].filter(r=>r.id!==reviewId);
+    store.set("productReviews",all);
+  }
+  toast("Review deleted!");
+  loadReviews();
+}
+
 function renderCustomers(){
   const q=$("custSearch").value.toLowerCase();
   const list=allCustomers.filter(c=>c.name.toLowerCase().includes(q)||c.email.toLowerCase().includes(q));
@@ -490,6 +552,8 @@ $("pSearch")?.addEventListener("input",renderProducts);
 $("invSearch")?.addEventListener("input",renderInventory);
 $("stockFilter")?.addEventListener("change",renderInventory);
 $("custSearch")?.addEventListener("input",renderCustomers);
+$("reviewSearch")?.addEventListener("input",loadReviews);
+$("reviewFilter")?.addEventListener("change",loadReviews);
 $("exportBtn")?.onclick=()=>window.location=API_BASE+"/orders.csv";
 $("logout").onclick=()=>location.href="/";
 
@@ -498,6 +562,7 @@ loadOrders();
 loadProducts();
 loadCoupons();
 loadCustomers();
+loadReviews();
 </script>
 </body>
 </html>

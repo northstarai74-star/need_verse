@@ -359,10 +359,54 @@ dialog input:focus{border-color:var(--accent)}
   <p id="doneMsg" class="muted"></p>
   <div class="acts"><button id="doneClose" class="btn">Keep shopping</button></div>
 </dialog>
+
+<dialog id="reviewModal">
+  <button style="float:right;background:none;border:0;font-size:1.5rem;cursor:pointer" onclick="$('reviewModal').close()">✕</button>
+  <h2 id="reviewModalTitle">Reviews</h2>
+  <div id="reviewStats" style="background:var(--panel2);border-radius:12px;padding:16px;margin:16px 0">
+    <div style="display:flex;gap:16px;align-items:center">
+      <div style="font-size:2.5rem;font-weight:800" id="avgRating">4.5</div>
+      <div>
+        <div id="ratingStars"></div>
+        <div style="font-size:.9rem;color:var(--muted);margin-top:4px"><span id="totalReviews">0</span> reviews</div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:16px" id="ratingBreakdown"></div>
+  </div>
+  <button class="btn" style="width:100%;margin-bottom:16px" id="writeReviewBtn" onclick="toggleReviewForm()">Write a review</button>
+  <form id="reviewForm" style="display:none;background:var(--panel2);border-radius:12px;padding:16px;margin-bottom:16px">
+    <div style="margin-bottom:12px">
+      <label style="display:block;font-weight:600;margin-bottom:8px">Rating</label>
+      <div style="display:flex;gap:8px;font-size:1.5rem">
+        <button type="button" class="star" data-rating="1">☆</button>
+        <button type="button" class="star" data-rating="2">☆</button>
+        <button type="button" class="star" data-rating="3">☆</button>
+        <button type="button" class="star" data-rating="4">☆</button>
+        <button type="button" class="star" data-rating="5">☆</button>
+      </div>
+      <input type="hidden" id="reviewRating" value="5">
+    </div>
+    <div style="margin-bottom:12px">
+      <label style="display:block;font-weight:600;margin-bottom:6px">Review title</label>
+      <input type="text" id="reviewTitle" placeholder="Brief summary of your review" style="width:100%;padding:8px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--text)" required>
+    </div>
+    <div style="margin-bottom:12px">
+      <label style="display:block;font-weight:600;margin-bottom:6px">Your review</label>
+      <textarea id="reviewText" placeholder="Share your experience..." style="width:100%;padding:8px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--text);min-height:100px" required></textarea>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button type="submit" class="btn">Post review</button>
+      <button type="button" class="btn ghost" onclick="toggleReviewForm()">Cancel</button>
+    </div>
+  </form>
+  <div id="reviewsList" style="max-height:400px;overflow-y:auto"></div>
+</dialog>
+
 <div id="toast" class="toast" role="status"></div>
 
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script src="catalog.js"></script>
+<script src="reviews.js"></script>
 <script>
 /* ===== App ===== */
 const $=id=>document.getElementById(id);
@@ -421,7 +465,9 @@ function render(){
         <h3>${p.name}</h3>
         <p>${p.desc}</p>
         <div class="stars">${stars(p.rating)}<small>${p.rating} (${p.n.toLocaleString()})</small></div>
+        <div style="font-size:.8rem;color:var(--muted);margin:6px 0"><span id="reviewCount${p.id}">${reviews.getProductReviews(p.id).length}</span> customer review${reviews.getProductReviews(p.id).length !== 1 ? 's' : ''}</div>
         <div class="buy"><span class="price">${money(p.price)}</span><button class="add" data-add="${p.id}">Add to cart</button></div>
+        <button style="width:100%;background:transparent;border:1px solid var(--line);color:var(--text);padding:8px 12px;border-radius:8px;margin-top:8px;font-size:.85rem;cursor:pointer" data-review="${p.id}" onclick="openReviewModal(${p.id},'${p.name}')">Read reviews</button>
       </div>
     </article>`).join(""):`<div class="empty"><div style="font-size:2.6rem">🔍</div><p>No matches. Try another category or clear your search.</p></div>`}
 $("grid").onclick=e=>{const id=e.target.dataset.add;if(id){add(+id);toast("Added to cart")}};
@@ -543,6 +589,96 @@ function goToWishlist(){
 $("yr").textContent=new Date().getFullYear();
 updateAuthUI();
 renderGarage();renderChips();render();renderCart();
+
+/* ===== Reviews ===== */
+let currentReviewProductId=null;
+function openReviewModal(productId,productName){
+  currentReviewProductId=productId;
+  $("reviewModalTitle").textContent=productName+" - Customer Reviews";
+  const productReviews=reviews.getProductReviews(productId);
+
+  $("avgRating").textContent=reviews.getAverageRating(productId)||"—";
+  $("totalReviews").textContent=productReviews.length;
+  $("ratingStars").innerHTML="★★★★★".substring(0,Math.round(reviews.getAverageRating(productId)||0));
+
+  const dist=reviews.getRatingDistribution(productId);
+  const maxCount=Math.max(...Object.values(dist),1);
+  $("ratingBreakdown").innerHTML=[5,4,3,2,1].map(r=>`<div style="text-align:center">
+    <div style="font-size:.8rem">${r}★</div>
+    <div style="height:4px;background:var(--line);border-radius:2px;margin:6px 0;overflow:hidden">
+      <div style="height:100%;background:var(--accent);width:${dist[r]/maxCount*100}%"></div>
+    </div>
+    <div style="font-size:.75rem;color:var(--muted)">${dist[r]}</div>
+  </div>`).join("");
+
+  const user=store.get("currentUser",null);
+  if(!user){
+    $("writeReviewBtn").innerHTML="<a href='/auth.html' style='color:#fff'>Sign in to review</a>";
+    $("writeReviewBtn").style.pointerEvents="none";
+  }else if(reviews.userHasReviewed(productId)){
+    $("writeReviewBtn").textContent="✓ You reviewed this";
+    $("writeReviewBtn").disabled=true;
+  }else{
+    $("writeReviewBtn").textContent="Write a review";
+    $("writeReviewBtn").disabled=false;
+    $("writeReviewBtn").style.pointerEvents="auto";
+  }
+
+  renderReviewsList(productId);
+  $("reviewModal").showModal();
+}
+
+function toggleReviewForm(){
+  $("reviewForm").style.display=$("reviewForm").style.display==="none"?"block":"none";
+}
+
+document.querySelectorAll(".star").forEach(btn=>{
+  btn.onclick=e=>{
+    e.preventDefault();
+    const rating=Number(btn.dataset.rating);
+    $("reviewRating").value=rating;
+    document.querySelectorAll(".star").forEach((b,i)=>{
+      b.textContent=i<rating?"★":"☆";
+    });
+  }
+});
+
+$("reviewForm").onsubmit=e=>{
+  e.preventDefault();
+  const user=store.get("currentUser",null);
+  if(!user){toast("Please sign in to review");return}
+
+  const review=reviews.addReview(currentReviewProductId,{
+    rating:Number($("reviewRating").value),
+    title:$("reviewTitle").value,
+    text:$("reviewText").value,
+    author:user.name,
+    email:user.email
+  });
+
+  toast("Review posted! Thanks for your feedback");
+  $("reviewForm").reset();
+  $("reviewRating").value="5";
+  document.querySelectorAll(".star").forEach((b,i)=>{b.textContent=i<5?"★":"☆"});
+  toggleReviewForm();
+  renderReviewsList(currentReviewProductId);
+  $("reviewModalTitle").textContent=$("reviewModalTitle").textContent;
+};
+
+function renderReviewsList(productId){
+  const productReviews=reviews.getProductReviews(productId);
+  $("reviewsList").innerHTML=productReviews.length?productReviews.map(r=>`<div style="border-bottom:1px solid var(--line);padding:12px 0">
+    <div style="display:flex;justify-content:space-between;align-items:start">
+      <div>
+        <div style="font-weight:600">${r.title}</div>
+        <div style="color:var(--accent);font-size:.85rem">${"★".repeat(r.rating)}${"☆".repeat(5-r.rating)}</div>
+      </div>
+      <div style="font-size:.75rem;color:var(--muted)">${new Date(r.date).toLocaleDateString("en-IN")}</div>
+    </div>
+    <div style="color:var(--text);font-size:.9rem;margin:8px 0">${r.text}</div>
+    <div style="font-size:.8rem;color:var(--muted)">by ${r.author}</div>
+  </div>`).join(""):'<div style="text-align:center;padding:20px;color:var(--muted)">No reviews yet. Be the first!</div>';
+}
 </script>
 </body>
 </html>
