@@ -39,11 +39,22 @@ h2{font-size:clamp(1.6rem,3.2vw,2.4rem)}
 .logo i{display:grid;place-items:center;width:32px;height:32px;background:var(--accent);border-radius:8px;font-style:normal;font-size:1.3rem;transform:skewX(-8deg)}
 .links{display:flex;gap:24px;font-size:.92rem;font-weight:500;color:var(--muted)}
 .links a:hover{color:var(--text)}
-.search{flex:1;position:relative;max-width:420px;margin-left:auto}
-.search input{width:100%;background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:11px 18px 11px 42px;outline:0;transition:.2s;text-overflow:ellipsis}
-.search input::placeholder{color:var(--muted)}
-.search input:focus{border-color:var(--accent);box-shadow:0 0 0 4px rgba(255,77,26,.15)}
-.search svg{position:absolute;left:15px;top:50%;translate:0 -50%;color:var(--muted)}
+.search{flex:1;position:relative;max-width:420px;margin-left:auto;display:flex;align-items:center;gap:4px;height:46px;padding:0 7px 0 6px;background:var(--panel);border:1px solid var(--line);border-radius:14px;cursor:text;transition:.2s}
+.search:hover{border-color:#3a414e}
+.search:focus-within{border-color:var(--accent);box-shadow:0 0 0 4px rgba(255,77,26,.15)}
+.s-ic{flex:none;display:grid;place-items:center;width:34px;height:34px;border-radius:10px;background:var(--accent);color:#fff;transform:skewX(-8deg)}
+.s-ic svg{transform:skewX(8deg)}
+.search input{flex:1;min-width:0;height:100%;padding:0 8px;background:transparent;border:0;outline:0;font-size:1rem}
+.search input::-webkit-search-cancel-button{filter:invert(1);opacity:.5;cursor:pointer}
+.s-hint{position:absolute;left:52px;right:42px;top:50%;translate:0 -50%;display:flex;gap:.32em;color:var(--muted);white-space:nowrap;overflow:hidden;pointer-events:none}
+.s-roll{display:inline-block;height:1.5em;line-height:1.5em;overflow:hidden}
+#sWord{display:inline-block;color:var(--text);font-weight:600;transition:transform .35s cubic-bezier(.2,.8,.2,1),opacity .35s}
+#sWord.out{transform:translateY(-100%);opacity:0}
+#sWord.in{transform:translateY(100%);opacity:0;transition:none}
+.search input:not(:placeholder-shown)~.s-hint{display:none}
+.search:focus-within .s-hint{opacity:.55}
+.s-key{flex:none;display:grid;place-items:center;min-width:24px;height:24px;font:600 .78rem/1 var(--body);color:var(--muted);background:var(--bg2);border:1px solid var(--line);border-bottom-width:2px;border-radius:7px}
+.search:focus-within .s-key{display:none}
 .cartbtn{position:relative;display:flex;align-items:center;gap:8px;background:var(--text);color:#111;border:0;border-radius:999px;padding:10px 18px;font-weight:700;cursor:pointer;transition:.2s}
 .cartbtn:hover{background:var(--accent);color:#fff}
 .cartbtn b{background:var(--accent);color:#fff;border-radius:999px;min-width:22px;height:22px;display:grid;place-items:center;font-size:.75rem}
@@ -219,7 +230,7 @@ dialog input:focus{border-color:var(--accent)}
 
 /* responsive */
 @media (max-width:1050px){.grid{grid-template-columns:repeat(3,1fr)}.cats{grid-template-columns:repeat(3,1fr)}.hero .wrap{grid-template-columns:1fr}.trust .wrap{grid-template-columns:1fr 1fr}.links{display:none}.fgrid{grid-template-columns:1fr 1fr}}
-@media (max-width:720px){.wrap{padding:0 16px}.grid{grid-template-columns:repeat(2,1fr);gap:30px 12px}.kits{grid-template-columns:1fr}.cats{grid-template-columns:repeat(2,1fr)}.nav .wrap{gap:12px;height:64px}.logo span{display:none}.search{max-width:none}.search input{padding:11px 8px 11px 36px}.search svg{left:12px}.hero{padding:44px 0 56px}.pic .emo{font-size:3.4rem}.pic{border-radius:18px}.pic .idx{font-size:2.2rem;left:10px}.best{top:10px;left:10px;font-size:.58rem;padding:4px 8px}.add{width:38px;height:38px;right:10px;bottom:10px}.add svg{width:16px;height:16px}.card{gap:10px}.info{padding:0 2px}.meta{font-size:.6rem;letter-spacing:.08em}.info h3{font-size:.92rem}.price{font-size:1.35rem}.buy{flex-wrap:wrap;row-gap:4px}.rate small{display:none}.fgrid{grid-template-columns:1fr}.trust .wrap{grid-template-columns:1fr}.reorder{padding:26px}section.s{padding-top:60px}}
+@media (max-width:720px){.wrap{padding:0 16px}.grid{grid-template-columns:repeat(2,1fr);gap:30px 12px}.kits{grid-template-columns:1fr}.cats{grid-template-columns:repeat(2,1fr)}.nav .wrap{gap:12px;height:64px}.logo span{display:none}.search{max-width:none}.search{height:42px;padding:0 5px 0 4px}.s-ic{width:32px;height:32px}.s-key,.s-pre{display:none}.s-hint{left:44px;right:10px}#sWord::first-letter{text-transform:uppercase}.hero{padding:44px 0 56px}.pic .emo{font-size:3.4rem}.pic{border-radius:18px}.pic .idx{font-size:2.2rem;left:10px}.best{top:10px;left:10px;font-size:.58rem;padding:4px 8px}.add{width:38px;height:38px;right:10px;bottom:10px}.add svg{width:16px;height:16px}.card{gap:10px}.info{padding:0 2px}.meta{font-size:.6rem;letter-spacing:.08em}.info h3{font-size:.92rem}.price{font-size:1.35rem}.buy{flex-wrap:wrap;row-gap:4px}.rate small{display:none}.fgrid{grid-template-columns:1fr}.trust .wrap{grid-template-columns:1fr}.reorder{padding:26px}section.s{padding-top:60px}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -232,8 +243,10 @@ dialog input:focus{border-color:var(--accent)}
     <a class="logo" href="#"><i>N</i><span>NEED<b class="graf">VERSE</b></span></a>
     <div class="links"><a href="#shop">Shop</a><a href="#kits">Kits</a><a href="#cats">Categories</a><a href="#help">Help</a></div>
     <label class="search">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-      <input id="search" type="search" placeholder="Search floor mats, dash cams…" aria-label="Search products">
+      <span class="s-ic"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></span>
+      <input id="search" type="search" placeholder=" " autocomplete="off" aria-label="Search products">
+      <span class="s-hint" aria-hidden="true"><span class="s-pre">Search</span><span class="s-roll"><span id="sWord">dash cams</span></span></span>
+      <kbd class="s-key" aria-hidden="true">/</kbd>
     </label>
     <button id="cartBtn" class="cartbtn" aria-label="Open cart">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6h15l-2 9H8L6 3H3"/><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/></svg>
@@ -418,19 +431,13 @@ $("grid").onclick=e=>{const b=e.target.closest("[data-add]");if(!b)return;add(+b
 $("search").oninput=()=>{render();if($("search").value)$("shop").scrollIntoView({behavior:"smooth"})};
 
 /* search placeholder: types out popular searches while the box is idle */
-const searchIn=$("search"),HINTS=["dash cams","floor mats","jump starters","seat covers","LED bulbs","phone mounts","car vacuums","wiper blades"];
-const narrow=()=>searchIn.clientWidth<240;
-const idleHint=()=>narrow()?"Search…":"Search floor mats, dash cams…";
-let hi=0,hc=0,hdel=false;
-function hintTick(){
-  if(document.activeElement===searchIn||searchIn.value){searchIn.placeholder=idleHint();hc=0;hdel=false;return setTimeout(hintTick,400)}
-  const w=HINTS[hi],pre=narrow()?"":"Search ",word=pre?w:w[0].toUpperCase()+w.slice(1);
-  if(!hdel&&hc===w.length){hdel=true;searchIn.placeholder=pre+word;return setTimeout(hintTick,1600)}
-  if(hdel&&hc===0){hdel=false;hi=(hi+1)%HINTS.length;return setTimeout(hintTick,250)}
-  hc+=hdel?-1:1;searchIn.placeholder=pre+word.slice(0,hc)+"|";
-  setTimeout(hintTick,hdel?35:75)}
-searchIn.addEventListener("focus",()=>{searchIn.placeholder=idleHint()});
-if(matchMedia("(prefers-reduced-motion: reduce)").matches)searchIn.placeholder=idleHint();else hintTick();
+const searchIn=$("search"),sWord=$("sWord"),HINTS=["dash cams","floor mats","jump starters","seat covers","LED bulbs","phone mounts","car vacuums","wiper blades"];
+let hi=0;
+if(!matchMedia("(prefers-reduced-motion: reduce)").matches)setInterval(()=>{
+  if(document.hidden||document.activeElement===searchIn||searchIn.value)return;
+  sWord.classList.add("out");
+  setTimeout(()=>{hi=(hi+1)%HINTS.length;sWord.textContent=HINTS[hi];sWord.classList.replace("out","in");sWord.offsetWidth;sWord.classList.remove("in")},350)},2400);
+addEventListener("keydown",e=>{if(e.key==="/"&&!e.target.closest("input,textarea,select")){e.preventDefault();searchIn.focus()}});
 $("sort").onchange=render;
 
 /* kits */
