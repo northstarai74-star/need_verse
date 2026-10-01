@@ -7,12 +7,13 @@
 <meta name="description" content="Car accessories that fit your vehicle. Pick your car once, see only what fits, check out in seconds.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@125,800;125,900&family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600;700&family=Permanent+Marker&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg:#0a0b0d;--bg2:#101216;--panel:#15181d;--panel2:#1b1f26;--line:#262b34;
   --text:#f4f1ec;--muted:#8e97a6;--accent:#ff4d1a;--accent2:#ff7a3d;--ok:#3ddc84;--gold:#ffc53d;
   --disp:"Barlow Condensed","Arial Narrow",Impact,sans-serif;--body:Inter,system-ui,Segoe UI,sans-serif;
+  --wide:Archivo,"Arial Black",Impact,sans-serif;--tag:"Permanent Marker","Marker Felt",cursive;
   --r:16px;
 }
 *{box-sizing:border-box}
@@ -25,14 +26,16 @@ button,input,select{font:inherit;color:inherit}
 .wrap{max-width:1240px;margin:0 auto;padding:0 24px}
 .muted{color:var(--muted)}.small{font-size:.85rem}
 .eyebrow{font:700 .78rem/1 var(--body);letter-spacing:.18em;text-transform:uppercase;color:var(--accent)}
-h1,h2,h3{font-family:var(--disp);text-transform:uppercase;letter-spacing:.06em;margin:0;line-height:.95;font-weight:900;font-style:italic;transform:skewX(-10deg)}
-h2{font-size:clamp(2rem,4vw,3rem)}
+h1,h2,h3{font-family:var(--wide);font-stretch:125%;font-weight:900;text-transform:uppercase;letter-spacing:-.01em;margin:0;line-height:.95}
+h2{font-size:clamp(1.6rem,3.2vw,2.4rem)}
+.graf{display:inline-block;font-family:var(--tag);font-stretch:normal;font-weight:400;letter-spacing:0;line-height:1.05;rotate:-3deg;transform-origin:left center}
 
 /* announcement + nav */
 .announce{background:var(--accent);color:#fff;text-align:center;font-size:.8rem;font-weight:600;letter-spacing:.04em;padding:8px 12px}
 .nav{position:sticky;top:0;z-index:30;background:rgba(10,11,13,.85);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
 .nav .wrap{display:flex;align-items:center;gap:28px;height:72px}
-.logo{font:900 2.2rem/1 var(--disp);text-transform:uppercase;letter-spacing:.06em;display:flex;align-items:center;gap:8px;font-weight:900;transform:skewX(-12deg);font-style:italic}
+.logo{font:900 1.45rem/1 var(--wide);font-stretch:125%;text-transform:uppercase;letter-spacing:-.01em;display:flex;align-items:center;gap:8px}
+.logo .graf{font-size:1.2em;margin-left:.06em}
 .logo i{display:grid;place-items:center;width:32px;height:32px;background:var(--accent);border-radius:8px;font-style:normal;font-size:1.3rem;transform:skewX(-8deg)}
 .links{display:flex;gap:24px;font-size:.92rem;font-weight:500;color:var(--muted)}
 .links a:hover{color:var(--text)}
@@ -51,14 +54,14 @@ h2{font-size:clamp(2rem,4vw,3rem)}
   radial-gradient(700px 400px at 0% 100%,rgba(255,122,61,.12),transparent 60%),var(--bg)}
 .hero::before{content:"";position:absolute;inset:0;background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:64px 64px;opacity:.35;mask-image:radial-gradient(ellipse at 70% 30%,#000,transparent 70%);-webkit-mask-image:radial-gradient(ellipse at 70% 30%,#000,transparent 70%)}
 .hero .wrap{position:relative;display:grid;grid-template-columns:1.15fr .85fr;gap:56px;align-items:center}
-.hero h1{font-size:clamp(3.4rem,8vw,7rem);font-weight:800;margin:18px 0 22px}
-.hero h1 em{font-style:normal;color:var(--accent);display:block}
+.hero h1{font-size:clamp(2.4rem,5.6vw,4.8rem);margin:18px 0 22px}
+.hero h1 em{font-style:normal;color:var(--accent);display:block;width:max-content;font-size:1.25em;margin-top:.1em}
 .hero p.lead{font-size:1.15rem;color:#c1c7d1;max-width:520px;margin:0 0 30px}
 .stats{display:flex;gap:36px;flex-wrap:wrap}
 .stats div b{display:block;font:800 2.2rem/1 var(--disp)}
 .stats div span{font-size:.82rem;color:var(--muted)}
 .finder{background:linear-gradient(160deg,rgba(27,31,38,.95),rgba(16,18,22,.95));border:1px solid var(--line);border-radius:24px;padding:28px;box-shadow:0 30px 80px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.06)}
-.finder h3{font-size:1.9rem;margin-bottom:4px}
+.finder h3{font-size:1.35rem;margin-bottom:4px}
 .finder .step{display:flex;align-items:center;gap:12px;margin-top:14px}
 .finder .num{flex:none;width:28px;height:28px;border-radius:50%;background:var(--panel2);border:1px solid var(--line);display:grid;place-items:center;font-size:.8rem;font-weight:700;color:var(--muted)}
 .finder .step.done .num{background:var(--accent);border-color:var(--accent);color:#fff}
@@ -105,7 +108,7 @@ section.s{padding:84px 0 0}
 .kit:hover{border-color:var(--accent);transform:translateY(-4px)}
 .kit .big{position:absolute;right:-10px;top:-10px;font-size:7rem;opacity:.16;rotate:-12deg}
 .kit .tag{align-self:flex-start;background:rgba(61,220,132,.14);color:var(--ok);font-size:.75rem;font-weight:700;padding:4px 10px;border-radius:999px}
-.kit h3{font-size:2rem}
+.kit h3{font-size:1.35rem}
 .kit p{margin:0;color:var(--muted);font-size:.92rem;flex:1}
 .kit .row{display:flex;align-items:baseline;gap:10px}
 .kit .row b{font:800 2rem/1 var(--disp)}
@@ -144,7 +147,7 @@ section.s{padding:84px 0 0}
 
 /* reorder */
 .reorder{margin-top:84px;padding:36px;border-radius:24px;background:linear-gradient(120deg,var(--accent),#c2310a);display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap}
-.reorder h2{font-size:2.4rem}.reorder p{margin:6px 0 0;opacity:.9}
+.reorder h2{font-size:1.9rem}.reorder p{margin:6px 0 0;opacity:.9}
 .reorder .btn{background:#fff;color:#111}
 
 /* footer */
@@ -163,7 +166,7 @@ footer li a:hover{color:var(--accent)}
 .drawer{position:fixed;top:0;right:0;height:100%;width:min(440px,100%);background:var(--bg2);border-left:1px solid var(--line);z-index:50;display:flex;flex-direction:column;translate:100% 0;transition:.3s cubic-bezier(.2,.8,.2,1)}
 .drawer.open{translate:0}
 .dh{display:flex;justify-content:space-between;align-items:center;padding:20px 24px;border-bottom:1px solid var(--line)}
-.dh h2{font-size:2rem}
+.dh h2{font-size:1.6rem}
 .x{background:var(--panel);border:1px solid var(--line);width:38px;height:38px;border-radius:50%;cursor:pointer;font-size:1rem}
 .x:hover{border-color:var(--accent)}
 .ship{padding:16px 24px 6px;font-size:.86rem}
@@ -194,7 +197,7 @@ footer li a:hover{color:var(--accent)}
 /* dialogs */
 dialog{background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:22px;width:min(480px,92vw);padding:30px;box-shadow:0 40px 100px rgba(0,0,0,.7)}
 dialog::backdrop{background:rgba(0,0,0,.7);backdrop-filter:blur(4px)}
-dialog h2{font-size:2.2rem;margin-bottom:6px}
+dialog h2{font-size:1.6rem;margin-bottom:6px}
 dialog label{display:block;font-size:.78rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-top:14px}
 dialog input{display:block;width:100%;margin-top:6px;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:12px 14px;outline:0;text-transform:none;letter-spacing:0;font-weight:400;font-size:1rem}
 dialog input:focus{border-color:var(--accent)}
@@ -215,7 +218,7 @@ dialog input:focus{border-color:var(--accent)}
 
 <nav class="nav">
   <div class="wrap">
-    <a class="logo" href="#"><i>N</i><span>NEEDVERSE</span></a>
+    <a class="logo" href="#"><i>N</i><span>NEED<b class="graf">VERSE</b></span></a>
     <div class="links"><a href="#shop">Shop</a><a href="#kits">Kits</a><a href="#cats">Categories</a><a href="#help">Help</a></div>
     <label class="search">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
@@ -232,7 +235,7 @@ dialog input:focus{border-color:var(--accent)}
   <div class="wrap">
     <div>
       <span class="eyebrow">Car accessories, made simple</span>
-      <h1>Gear up.<em>Drive on.</em></h1>
+      <h1>Gear up.<em class="graf">Drive on.</em></h1>
       <p class="lead">Tell us your car once. We only show accessories that actually fit, then check you out in under a minute.</p>
       <div class="stats">
         <div><b>10,000+</b><span>Orders shipped</span></div>
@@ -290,7 +293,7 @@ dialog input:focus{border-color:var(--accent)}
 
 <footer id="help"><div class="wrap">
   <div class="fgrid">
-    <div><a class="logo" href="#"><i>N</i><span>NEEDVERSE</span></a><p class="muted small" style="max-width:300px;margin-top:14px">Car accessories that fit your vehicle, picked once and shipped fast.</p></div>
+    <div><a class="logo" href="#"><i>N</i><span>NEED<b class="graf">VERSE</b></span></a><p class="muted small" style="max-width:300px;margin-top:14px">Car accessories that fit your vehicle, picked once and shipped fast.</p></div>
     <div><h4>Shop</h4><ul><li><a href="#cats">Categories</a></li><li><a href="#kits">Kits</a></li><li><a href="#shop">All products</a></li></ul></div>
     <div><h4>Help</h4><ul><li><a href="#">Shipping</a></li><li><a href="#">Returns</a></li><li><a href="#">Contact</a></li></ul></div>
     <div><h4>Get 5% off</h4><p class="muted small" style="margin:0">Use code <b style="color:var(--text)">WELCOME5</b> at checkout, or join the list.</p>
