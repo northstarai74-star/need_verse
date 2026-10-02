@@ -131,13 +131,23 @@ app.use(wrap(async (req, res, next) => {
     }
   }
 
-  // Simple cookie setter
+  // Store cookies to set, and apply them all at once in the response
+  res._cookies = res._cookies || [];
   res.cookie = function(name, value, opts) {
-    const cookieStr = `${name}=${encodeURIComponent(value)}; Path=/; SameSite=Strict${opts?.maxAge ? `; Max-Age=${opts.maxAge}` : ""}`;
-    res.set("Set-Cookie", cookieStr);
+    const cookieStr = `${name}=${encodeURIComponent(value)}; Path=/; SameSite=Strict; HttpOnly${opts?.maxAge ? `; Max-Age=${opts.maxAge}` : ""}`;
+    res._cookies.push(cookieStr);
+    // Also set it immediately for use in this response
+    const existing = res.getHeader("Set-Cookie") || [];
+    const arr = Array.isArray(existing) ? existing : [existing].filter(Boolean);
+    arr.push(cookieStr);
+    res.set("Set-Cookie", arr);
   };
   res.clearCookie = function(name) {
-    res.set("Set-Cookie", `${name}=; Path=/; Max-Age=0`);
+    const cookieStr = `${name}=; Path=/; Max-Age=0; HttpOnly`;
+    const existing = res.getHeader("Set-Cookie") || [];
+    const arr = Array.isArray(existing) ? existing : [existing].filter(Boolean);
+    arr.push(cookieStr);
+    res.set("Set-Cookie", arr);
   };
 
   next();

@@ -206,6 +206,7 @@ dialog input:focus{border-color:var(--accent)}
 /* auth */
 .authbtn{position:relative;display:flex;align-items:center;gap:8px;background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:999px;padding:10px 18px;font-weight:600;cursor:pointer;transition:.2s;font-size:.92rem}
 .authbtn:hover{border-color:var(--accent);color:var(--accent)}
+.authbtn.on{border-color:var(--accent);color:var(--accent)}
 #authMenu{position:absolute;top:100%;right:0;margin-top:8px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;min-width:160px;box-shadow:0 12px 30px rgba(0,0,0,.5);opacity:0;pointer-events:none;transition:.2s;z-index:100}
 #authMenu.show{opacity:1;pointer-events:auto}
 #authMenu button{display:block;width:100%;text-align:left;background:none;border:0;color:var(--text);padding:12px 16px;cursor:pointer;font-size:.92rem;transition:.2s}
@@ -503,10 +504,12 @@ $("newsForm").onsubmit=e=>{e.preventDefault();e.target.reset();toast("You're on 
 let tt;function toast(m){const t=$("toast");t.textContent=m;t.classList.add("show");clearTimeout(tt);tt=setTimeout(()=>t.classList.remove("show"),2000)}
 
 /* auth */
+let isLoggedIn=false;
 async function checkSession(){
   try{
     const r=await fetch("/api/session");
     const d=await r.json();
+    isLoggedIn=d.loggedIn;
     updateAuthUI(d.loggedIn,d.username);
   }catch(e){console.error("Session check failed:",e)}
 }
@@ -514,11 +517,11 @@ function updateAuthUI(loggedIn,username){
   const authBtn=$("authBtn");
   const authMenu=$("authMenu");
   if(loggedIn){
-    authBtn.textContent=username+" ▼";
+    authBtn.innerHTML=`<span>${username}</span> <span style="font-size:.75rem">▼</span>`;
     authBtn.classList.add("on");
-    authMenu.innerHTML=`<button onclick="goToAdmin()">Admin panel</button><button onclick="signOut()">Sign out</button>`;
+    authMenu.innerHTML=`<button onclick="goToAdmin();return false">Admin panel</button><button onclick="signOut();return false">Sign out</button>`;
   }else{
-    authBtn.textContent="Sign in";
+    authBtn.innerHTML="<span>Sign in</span>";
     authBtn.classList.remove("on");
     authMenu.innerHTML="";
   }
@@ -527,14 +530,28 @@ function toggleAuthMenu(){
   const authMenu=$("authMenu");
   authMenu.classList.toggle("show");
 }
-$("authBtn").onclick=e=>{e.stopPropagation();toggleAuthMenu()};
-document.onclick=()=>$("authMenu").classList.remove("show");
-$("signin").onclose=()=>$("authMenu").classList.remove("show");
+function closeAuthMenu(){
+  $("authMenu").classList.remove("show");
+}
+$("authBtn").onclick=e=>{e.preventDefault();e.stopPropagation();
+  if(isLoggedIn){
+    toggleAuthMenu();
+  }else{
+    openSignIn();
+  }
+};
+document.addEventListener("click",e=>{
+  if(!e.target.closest("#authBtn")&&!e.target.closest("#authMenu")){
+    closeAuthMenu();
+  }
+});
 
 $("signinCancel").onclick=()=>$("signin").close();
 $("signinForm").onsubmit=async e=>{e.preventDefault();
   const user=$("signinUser").value;const pass=$("signinPass").value;
   const errEl=$("signinError");
+  const btn=e.target.querySelector('button[type="submit"]');
+  btn.disabled=true;
   try{
     const r=await fetch("/api/signin",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:user,password:pass})});
     if(!r.ok){const d=await r.json();throw new Error(d.error||"Sign in failed")}
@@ -545,9 +562,8 @@ $("signinForm").onsubmit=async e=>{e.preventDefault();
   }catch(err){
     errEl.textContent=err.message;
     errEl.style.display="block";
-  }
+  }finally{btn.disabled=false}
 };
-$("authBtn").onmouseenter=()=>$("authBtn").classList.add("on");
 function openSignIn(){
   $("signinError").style.display="none";
   $("signinUser").value="";
@@ -555,29 +571,18 @@ function openSignIn(){
   $("signin").showModal();
   $("signinUser").focus();
 }
-$("authBtn").ondblclick=openSignIn;
-// Click sign in button to open modal when not logged in
-const originalAuthClick=$("authBtn").onclick;
-$("authBtn").onclick=function(e){
-  e.stopPropagation();
-  const authMenu=$("authMenu");
-  if(!authMenu.innerHTML.includes("Admin")){
-    openSignIn();
-  }else{
-    toggleAuthMenu();
-  }
-};
-
 async function goToAdmin(){
+  closeAuthMenu();
   window.location.href="/admin";
 }
 async function signOut(){
+  closeAuthMenu();
   try{
-    await fetch("/api/signout",{method:"POST"});
-    checkSession();
-    $("authMenu").classList.remove("show");
+    const r=await fetch("/api/signout",{method:"POST"});
+    if(!r.ok)throw new Error("Sign out failed");
+    await checkSession();
     toast("Signed out");
-  }catch(e){toast("Sign out failed")}
+  }catch(e){toast("Sign out failed: "+e.message)}
 }
 
 checkSession();
