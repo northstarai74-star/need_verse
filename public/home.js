@@ -18,8 +18,8 @@
     $("fitForm").onsubmit = (e) => {
       e.preventDefault();
       if (!makeSel.value || !modelSel.value || !yearSel.value) return S.toast("Pick make, model and year");
-      S.setVehicle({ make: makeSel.value, model: modelSel.value, year: yearSel.value });
       f.fit = true; $("fFit").checked = true;
+      S.setVehicle({ make: makeSel.value, model: modelSel.value, year: yearSel.value });
       S.toast("Showing parts for your " + modelSel.value);
       $("shop").scrollIntoView({ behavior: "smooth" });
     };

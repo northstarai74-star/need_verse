@@ -96,7 +96,7 @@ details summary{cursor:pointer;color:var(--muted);font-size:.85rem;margin-top:8p
 <script>
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-const money = (n) => "₹" + Number(n || 0).toLocaleString("en-IN", { maximumFractionDigits: 2 });
+const money = (n) => { n = Number(n || 0); return "₹" + n.toLocaleString("en-IN", { minimumFractionDigits: n % 1 ? 2 : 0, maximumFractionDigits: 2 }); };
 const num = (n) => Number(n || 0).toLocaleString("en-IN");
 const date = (d, t) => d ? new Date(d).toLocaleString("en-IN", t ? { dateStyle: "medium", timeStyle: "short" } : { dateStyle: "medium" }) : "-";
 async function api(method, url, body) {

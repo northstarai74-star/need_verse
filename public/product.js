@@ -23,7 +23,7 @@
     const ok = Core.fits(p, v);
     out.className = "fitres " + (ok ? "ok-t" : "bad-t");
     out.textContent = ok ? `✔ Fits your ${S.vehicleName(v)}` : `✘ Not listed for the ${S.vehicleName(v)}. Check compatible vehicles below, or ask us.`;
-    if (!S.vehicle || S.vehicleName(S.vehicle) !== S.vehicleName(v)) S.setVehicle(v);
+    if (!S.vehicle) S.setVehicle(v);
   }
   function setFrom(v) {
     if (!mk) return;

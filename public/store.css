@@ -406,3 +406,6 @@ dialog textarea{display:block;width:100%;margin-top:8px;background:rgba(10,11,13
 
 @media (max-width:1050px){.pp{grid-template-columns:1fr}.mini{grid-template-columns:repeat(2,1fr)}.acc{grid-template-columns:1fr}.acc nav{position:static;display:flex;overflow-x:auto}}
 @media (max-width:720px){.formgrid{grid-template-columns:1fr}.row3{grid-template-columns:1fr}.gal .main{font-size:6rem}.aibtn span{display:none}}
+.card{position:relative}
+.card .wish{top:12px;right:12px;bottom:auto}
+.card .best{top:auto;bottom:12px;right:auto;left:12px}
