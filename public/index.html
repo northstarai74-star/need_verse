@@ -196,10 +196,9 @@ footer li a:hover{color:var(--accent)}
 .df .btn{margin-top:14px}
 
 /* dialogs */
-dialog{background:linear-gradient(135deg,var(--panel2),var(--panel));color:var(--text);border:1px solid rgba(255,77,26,.2);border-radius:24px;width:min(520px,92vw);padding:0;box-shadow:0 50px 150px rgba(0,0,0,.8),inset 0 1px 0 rgba(255,255,255,.05);overflow:hidden}
+dialog{background:linear-gradient(135deg,var(--panel2),var(--panel));color:var(--text);border:1px solid rgba(255,77,26,.2);border-radius:24px;width:min(520px,92vw);padding:32px;box-shadow:0 50px 150px rgba(0,0,0,.8),inset 0 1px 0 rgba(255,255,255,.05)}
 dialog::backdrop{background:rgba(0,0,0,.75);backdrop-filter:blur(8px)}
-dialog>:first-child{padding:32px 32px 0}
-dialog h2{font-size:2.4rem;font-weight:800;margin:0 0 8px;background:linear-gradient(120deg,var(--text),rgba(255,255,255,.8));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+dialog h2{font-size:2.4rem;font-weight:800;margin:0 0 8px}
 dialog p.muted{margin:0 0 24px!important;font-size:.95rem}
 dialog label{display:block;font-size:.75rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-top:18px}
 dialog input{display:block;width:100%;margin-top:8px;background:rgba(10,11,13,.5);border:1.5px solid rgba(38,43,52,.6);border-radius:12px;padding:14px 16px;outline:0;text-transform:none;letter-spacing:0;font-weight:400;font-size:1rem;transition:.25s;color:var(--text)}
@@ -213,7 +212,7 @@ dialog input::placeholder{color:rgba(142,151,166,.45)}
 .co-security svg{width:16px;height:16px}
 .co-methods{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 0;font-size:.75rem}
 .co-method{display:inline-flex;align-items:center;gap:4px;background:rgba(142,151,166,.1);padding:6px 10px;border-radius:8px;color:var(--muted)}
-.acts{display:flex;gap:10px;justify-content:flex-end;margin-top:24px;padding:0 32px 32px}
+.acts{display:flex;gap:10px;justify-content:flex-end;margin-top:24px}
 .acts .btn{flex:1}
 .toast{position:fixed;left:50%;bottom:28px;translate:-50% 100px;background:var(--text);color:#111;font-weight:600;font-size:.92rem;padding:12px 22px;border-radius:999px;opacity:0;transition:.3s;z-index:70;pointer-events:none;box-shadow:0 12px 40px rgba(0,0,0,.5)}
 .toast.show{translate:-50% 0;opacity:1}

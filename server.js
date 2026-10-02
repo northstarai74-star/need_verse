@@ -7,7 +7,7 @@ const { STORE, byId, computeTotals } = require("./public/catalog.js");
 const { sendOrderEmails, sendShippedEmail, sendRefundEmail, emailEnabled } = require("./mailer");
 const db = require("./db");
 
-const { RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET, RAZORPAY_WEBHOOK_SECRET, ADMIN_USER = "admin", ADMIN_PASSWORD, PORT = 3000, SESSION_SECRET = "change-me-in-production" } = process.env;
+const { RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET, RAZORPAY_WEBHOOK_SECRET, ADMIN_USER = "admin", ADMIN_PASSWORD, PORT = 3000 } = process.env;
 if (!RAZORPAY_KEY_ID || !RAZORPAY_KEY_SECRET) {
   console.error("\nMissing Razorpay keys. Copy .env.example to .env and fill in RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET.\n");
   process.exit(1);
@@ -117,56 +117,32 @@ app.post("/api/razorpay-webhook", express.raw({ type: "*/*", limit: "200kb" }), 
 });
 
 app.use(express.json({ limit: "50kb" }));
+app.use(express.static(path.join(__dirname, "public")));
 app.use(cookieParser);
 
-// Session middleware - attach session info to requests
 app.use(wrap(async (req, res, next) => {
   const sessionId = req.cookies?.sid;
   if (sessionId) {
     try {
-      const session = await db.getSession(sessionId);
-      req.session = session;
+      req.session = await db.getSession(sessionId);
     } catch (err) {
       console.error("Session check failed:", err.message);
     }
   }
-
-  // Store cookies to set, and apply them all at once in the response
-  res._cookies = res._cookies || [];
-  res.cookie = function(name, value, opts) {
-    const cookieStr = `${name}=${encodeURIComponent(value)}; Path=/; SameSite=Strict; HttpOnly${opts?.maxAge ? `; Max-Age=${opts.maxAge}` : ""}`;
-    res._cookies.push(cookieStr);
-    // Also set it immediately for use in this response
-    const existing = res.getHeader("Set-Cookie") || [];
-    const arr = Array.isArray(existing) ? existing : [existing].filter(Boolean);
-    arr.push(cookieStr);
-    res.set("Set-Cookie", arr);
-  };
-  res.clearCookie = function(name) {
-    const cookieStr = `${name}=; Path=/; Max-Age=0; HttpOnly`;
-    const existing = res.getHeader("Set-Cookie") || [];
-    const arr = Array.isArray(existing) ? existing : [existing].filter(Boolean);
-    arr.push(cookieStr);
-    res.set("Set-Cookie", arr);
-  };
-
   next();
 }));
 
-app.use(express.static(path.join(__dirname, "public")));
-
-// Sign in endpoint
+const SESSION_MS = 7 * 24 * 60 * 60 * 1000;
 app.post("/api/signin", wrap(async (req, res) => {
+  if (!ADMIN_PASSWORD) return res.status(503).json({ error: "Sign in is disabled. Set ADMIN_PASSWORD in .env." });
   const { username, password } = req.body || {};
   if (!username || !password) return res.status(400).json({ error: "Username and password required" });
 
-  const same = (a, b) => { const x = crypto.createHash("sha256").update(String(a)).digest(), y = crypto.createHash("sha256").update(String(b)).digest(); return crypto.timingSafeEqual(x, y); };
-  if (username === ADMIN_USER && same(password, ADMIN_PASSWORD)) {
+  if (same(username, ADMIN_USER) && same(password, ADMIN_PASSWORD)) {
     const sessionId = crypto.randomBytes(24).toString("hex");
-    const ipAddress = req.ip || req.connection.remoteAddress;
-    await db.createSession(sessionId, ADMIN_USER, username, ipAddress);
-    res.cookie("sid", sessionId, { maxAge: 7 * 24 * 60 * 60 * 1000 });
-    res.json({ ok: true, username });
+    await db.createSession(sessionId, ADMIN_USER, ADMIN_USER, req.ip);
+    res.cookie("sid", sessionId, { httpOnly: true, sameSite: "strict", secure: req.secure, maxAge: SESSION_MS });
+    res.json({ ok: true, username: ADMIN_USER });
   } else {
     res.status(401).json({ error: "Invalid credentials" });
   }
@@ -186,7 +162,7 @@ app.post("/api/signout", wrap(async (req, res) => {
   const sessionId = req.cookies?.sid;
   if (sessionId) {
     await db.deleteSession(sessionId);
-    res.clearCookie("sid");
+    res.clearCookie("sid", { httpOnly: true, sameSite: "strict" });
   }
   res.json({ ok: true });
 }));
@@ -258,7 +234,7 @@ function adminAuth(req, res, next) {
   const [scheme, token] = (req.get("authorization") || "").split(" ");
   const [u, ...p] = scheme === "Basic" && token ? Buffer.from(token, "base64").toString().split(":") : [];
   if (u !== undefined && same(u, ADMIN_USER) && same(p.join(":"), ADMIN_PASSWORD)) return next();
-  res.status(401).json({ error: "Login required" });
+  res.set("WWW-Authenticate", 'Basic realm="Nnedverse admin"').status(401).send("Login required");
 }
 const FULFIL = ["new", "packed", "shipped", "delivered", "cancelled"];
 
