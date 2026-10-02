@@ -13,6 +13,7 @@ const { cookieParser, loadSession, adminOk } = require("./lib/auth");
 const { securityHeaders, sameOriginJson, limiter } = require("./lib/security");
 const { report } = require("./lib/alerts");
 const Core = require("./public/core");
+const Bot = require("./public/bot");
 
 const wrap = (fn) => (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next);
 
@@ -36,7 +37,15 @@ function createApp(ctx) {
   app.use(admin(ctx));
   app.use(store.api(ctx));
   app.post("/api/assistant", limiter("assistant", 30, 10 * 60000), wrap(async (req, res) => {
-    if (!assistant.enabled()) return res.status(503).json({ error: "The assistant isn't set up yet." });
+    if (!assistant.enabled()) {
+      const msgs = Array.isArray(req.body.messages) ? req.body.messages : [];
+      const last = msgs.filter((m) => m && m.role === "user" && typeof m.text === "string").pop();
+      if (!last) return res.status(400).json({ error: "Ask a question first." });
+      const c = await catalog.get();
+      const v = req.body.vehicle && typeof req.body.vehicle === "object" ? { make: String(req.body.vehicle.make || ""), model: String(req.body.vehicle.model || ""), year: Number(req.body.vehicle.year) || null } : null;
+      return res.json(Bot.answer(last.text.slice(0, 500), { products: c.products, vehicles: c.vehicles, vehicle: v && v.make ? v : null,
+        cod: process.env.COD_ENABLED !== "false", eta: process.env.DEFAULT_ETA_DAYS }));
+    }
     try {
       res.json(await assistant.chat(req.body.messages, { customerId: req.session?.role === "customer" ? req.session.userId : null, vehicle: req.body.vehicle }));
     } catch (e) {
@@ -47,7 +56,7 @@ function createApp(ctx) {
   }));
 
   // ----- Pages -----
-  const opts = (req) => ({ assistant: assistant.enabled(), loggedIn: req.session?.role === "customer" });
+  const opts = (req) => ({ assistant: assistant.enabled() ? "claude" : "basic", loggedIn: req.session?.role === "customer" });
   const data = (c) => ({ products: c.products, vehicles: c.vehicles, store: Core.STORE, cats: Core.CATS, bundles: Core.BUNDLES, cod: process.env.COD_ENABLED !== "false" });
   const cat = async () => { const c = await catalog.get(); return { ...c, data: data(c) }; };
   const html = (res, s) => res.set("Cache-Control", "no-cache").type("html").send(s);

@@ -377,6 +377,11 @@
       try {
         const r = await api("POST", "/api/assistant", { messages: history, vehicle });
         wait.remove(); history.push({ role: "assistant", text: r.reply }); show("assistant", r.reply);
+        if (Array.isArray(r.links) && r.links.length) {
+          const d = document.createElement("div"); d.className = "m a ailinks";
+          d.innerHTML = r.links.filter((l) => String(l[1]).startsWith("/")).map(([label, href]) => `<a href="${esc(href)}">${esc(label)} →</a>`).join("");
+          msgs.append(d); msgs.scrollTop = msgs.scrollHeight;
+        }
         const items = (r.actions || []).filter((a) => a.type === "add_to_cart" && byId.has(a.productId));
         if (items.length) {
           const b = document.createElement("button"); b.className = "btn act"; b.type = "button";

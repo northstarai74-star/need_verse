@@ -415,3 +415,8 @@ dialog textarea{display:block;width:100%;margin-top:8px;background:rgba(10,11,13
 /* Logo palette: deep orange -> amber */
 .btn{background:linear-gradient(135deg,var(--accent),#ff7a00)}
 .finder,.co-summary,.cat:hover,.cat.on,.kit:hover{border-color:rgba(255,160,0,.35)}
+.aimsgs .ailinks{display:flex;flex-direction:column;gap:6px;background:transparent;border:0;padding:0 2px}
+.aimsgs .ailinks a{color:var(--accent2);text-decoration:none;font-weight:600;font-size:.88rem}
+.aimsgs .ailinks a:hover{text-decoration:underline}
+.aimsgs>*{flex-shrink:0}
+.aimsgs .act{white-space:normal;text-align:center;line-height:1.3;padding:10px 16px;font-size:.88rem;max-width:88%}

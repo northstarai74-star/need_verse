@@ -38,7 +38,8 @@ The admin Overview page has a setup checklist. In short:
 | `lib/orders.js` | Order lifecycle: stock reservation, payment, fulfilment steps, refunds, expiry |
 | `lib/pages.js`, `lib/policies.js` | Server-rendered pages, structured data, sitemap, policies |
 | `lib/purchasing.js` | Suppliers, purchase orders, receiving stock and reorder suggestions |
-| `lib/shipping.js`, `lib/whatsapp.js`, `lib/assistant.js` | Shiprocket, WhatsApp and the Claude fit assistant (each off until configured) |
+| `lib/shipping.js`, `lib/whatsapp.js` | Shiprocket and WhatsApp (each off until configured) |
+| `public/bot.js`, `lib/assistant.js` | Website chat bot: a built-in helper that works with no setup, upgraded to Claude when `ANTHROPIC_API_KEY` is set |
 | `public/core.js` | Pricing, GST and fitment rules shared by browser and server |
 | `public/*.js`, `public/store.css` | Storefront scripts and styles |
 | `admin.html` | Admin dashboard |
