@@ -4,171 +4,516 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
-<title>Nnedverse Orders</title>
+<title>Nnedverse Admin</title>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#0a0b0d;--panel:#15181d;--panel2:#1b1f26;--line:#262b34;--text:#f4f1ec;--muted:#8e97a6;--accent:#ff4d1a;--ok:#3ddc84;--warn:#ffc53d;--blue:#3d8bff;--bad:#ff5c5c}
+:root{--bg:#0a0b0d;--panel:#15181d;--panel2:#1b1f26;--line:#262b34;--grid:#20242c;--text:#f4f1ec;--muted:#8e97a6;--accent:#ff4d1a;--ok:#3ddc84;--warn:#ffc53d;--blue:#3d8bff;--bad:#ff5c5c;color-scheme:dark}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--text);font:400 15px/1.5 Inter,system-ui,sans-serif}
-.wrap{max-width:1200px;margin:0 auto;padding:0 20px}
-header{border-bottom:1px solid var(--line);background:var(--panel)}
-header .wrap{display:flex;align-items:center;justify-content:space-between;min-height:64px;padding-block:10px;gap:12px;flex-wrap:wrap}
-.logo{font:800 1.7rem/1 "Barlow Condensed",sans-serif;text-transform:uppercase}.logo b{color:var(--accent)}
-.muted{color:var(--muted)}
-button,input,select{font:inherit;color:inherit}
+a{color:inherit}
+.wrap{max-width:1280px;margin:0 auto;padding:0 20px}
+header{border-bottom:1px solid var(--line);background:var(--panel);position:sticky;top:0;z-index:5}
+header .wrap{display:flex;align-items:center;gap:16px;min-height:60px;flex-wrap:wrap;padding-block:8px}
+.logo{font:800 1.6rem/1 "Barlow Condensed",sans-serif;text-transform:uppercase;text-decoration:none}.logo b{color:var(--accent)}
+nav.tabs{display:flex;gap:2px;overflow-x:auto;flex:1}
+nav.tabs button{background:none;border:0;color:var(--muted);padding:8px 12px;border-radius:8px;cursor:pointer;font:inherit;font-weight:600;white-space:nowrap}
+nav.tabs button.on,nav.tabs button:hover{background:var(--panel2);color:var(--text)}
+.muted{color:var(--muted)}.small{font-size:.85rem}
+button,input,select,textarea{font:inherit;color:inherit}
 .btn{background:var(--accent);color:#fff;border:0;border-radius:10px;padding:9px 16px;font-weight:600;cursor:pointer;text-decoration:none;display:inline-block}
+.btn:disabled{opacity:.5;cursor:not-allowed}
 .btn.ghost{background:transparent;border:1px solid var(--line)}.btn.ghost:hover{border-color:var(--text)}
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:24px 0}
-.stat{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px}
-.stat span{font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
-.stat b{display:block;font:800 2.2rem/1.1 "Barlow Condensed",sans-serif;margin-top:4px}
-.bar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
-.bar input,.bar select{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:9px 14px;outline:0}
-.bar input{flex:1;min-width:200px}.bar input:focus,.bar select:focus{border-color:var(--accent)}
-table{width:100%;border-collapse:collapse;background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden}
-th{text-align:left;font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);padding:12px 16px;background:var(--panel2)}
-td{padding:13px 16px;border-top:1px solid var(--line);vertical-align:middle}
-tr.row{cursor:pointer}tr.row:hover td{background:var(--panel2)}
-.pill{display:inline-block;padding:3px 10px;border-radius:99px;font-size:.75rem;font-weight:600}
-.paid{background:rgba(61,220,132,.15);color:var(--ok)}.created{background:rgba(255,197,61,.15);color:var(--warn)}
-.f-new{background:rgba(255,77,26,.15);color:var(--accent)}.f-packed{background:rgba(255,197,61,.15);color:var(--warn)}
-.f-shipped{background:rgba(61,139,255,.15);color:var(--blue)}.f-delivered{background:rgba(61,220,132,.15);color:var(--ok)}.f-cancelled{background:rgba(255,92,92,.15);color:var(--bad)}
-.refunded{background:rgba(255,92,92,.15);color:var(--bad)}.part{background:rgba(255,197,61,.15);color:var(--warn)}
-.rbox{margin-top:18px;padding-top:14px;border-top:1px dashed var(--line)}.rbox .r{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}.rbox input{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:8px 12px;outline:0;min-width:0}.rbox input:focus{border-color:var(--accent)}.rbox .btn{background:var(--bad)}.rbox .btn:disabled{opacity:.5}
-.detail td{background:var(--bg);padding:0}
-.dbox{display:grid;grid-template-columns:1.3fr 1fr;gap:28px;padding:20px 24px}
-.dbox h4{margin:0 0 8px;font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
-.li{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line)}
-.dbox select{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:8px 12px;margin-top:8px}
-dialog{background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:18px;width:min(440px,92vw);padding:24px}
-dialog::backdrop{background:rgba(0,0,0,.7)}
-dialog h2{margin:0 0 4px;font:800 1.8rem/1 "Barlow Condensed",sans-serif;text-transform:uppercase}
-dialog label{display:block;margin-top:12px;font-size:.75rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
-dialog input{display:block;width:100%;margin-top:5px;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px;outline:0;text-transform:none;letter-spacing:0;font-weight:400;font-size:.95rem}
-dialog input:focus{border-color:var(--accent)}
-.flash{position:fixed;left:50%;bottom:24px;translate:-50% 100px;color:#111;font-weight:600;padding:12px 22px;border-radius:99px;opacity:0;transition:.3s;z-index:9;max-width:92vw}
-.flash.show{translate:-50% 0;opacity:1}
-.empty{text-align:center;padding:60px;color:var(--muted)}
+.btn.sm{padding:5px 10px;font-size:.82rem}.btn.bad{background:var(--bad)}.btn.ok{background:var(--ok);color:#111}
+h1{font:800 2.2rem/1 "Barlow Condensed",sans-serif;text-transform:uppercase;margin:26px 0 16px}
+h2{font:800 1.4rem/1 "Barlow Condensed",sans-serif;text-transform:uppercase;margin:0 0 12px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.sp{flex:1}
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px;margin:0 0 18px}
+.tile{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.tile span{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.tile b{display:block;font:800 1.9rem/1.15 "Barlow Condensed",sans-serif;margin-top:4px;font-variant-numeric:tabular-nums}
+.tile small{color:var(--muted);font-size:.78rem}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:16px;min-width:0}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.bar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.bar input,.bar select,.f input,.f select,.f textarea{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px 12px;outline:0;min-width:0}
+.bar input{flex:1;min-width:200px}
+input:focus,select:focus,textarea:focus{border-color:var(--accent)!important}
+.tw{overflow-x:auto;border:1px solid var(--line);border-radius:14px}
+table{width:100%;border-collapse:collapse;background:var(--panel)}
+th{text-align:left;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);padding:10px 14px;background:var(--panel2);white-space:nowrap}
+td{padding:11px 14px;border-top:1px solid var(--line);vertical-align:top;font-variant-numeric:tabular-nums}
+tr.click{cursor:pointer}tr.click:hover td{background:var(--panel2)}
 .right{text-align:right}
-@media (max-width:760px){.stats{grid-template-columns:1fr 1fr}.dbox{grid-template-columns:1fr}th:nth-child(2),td:nth-child(2),th:nth-child(6),td:nth-child(6){display:none}td,th{padding:10px}}
+.pill{display:inline-block;padding:2px 9px;border-radius:99px;font-size:.74rem;font-weight:600;background:var(--panel2);color:var(--muted);white-space:nowrap}
+.p-ok{background:rgba(61,220,132,.15);color:var(--ok)}.p-warn{background:rgba(255,197,61,.15);color:var(--warn)}.p-bad{background:rgba(255,92,92,.15);color:var(--bad)}
+.p-blue{background:rgba(61,139,255,.15);color:var(--blue)}.p-acc{background:rgba(255,77,26,.15);color:var(--accent)}
+.detail td{background:var(--bg)}
+.dbox{display:grid;grid-template-columns:1.3fr 1fr;gap:24px}
+.li{display:flex;justify-content:space-between;gap:10px;padding:5px 0;border-bottom:1px solid var(--line)}
+h4{margin:0 0 6px;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.f label{display:block;margin-top:10px;font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.f input,.f select,.f textarea{display:block;width:100%;margin-top:5px;text-transform:none;letter-spacing:0;font-weight:400;font-size:.95rem}
+.f textarea{min-height:90px;resize:vertical;font-family:ui-monospace,Menlo,monospace;font-size:.85rem}
+.f .g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}.f .g3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.f .g4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.check{display:flex!important;gap:8px;align-items:center;text-transform:none!important;letter-spacing:0!important;font-size:.9rem!important;color:var(--text)!important;font-weight:500!important}
+.check input{width:auto!important;margin:0!important}
+dialog{background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:18px;width:min(560px,94vw);padding:24px;max-height:92vh}
+dialog.wide{width:min(900px,96vw)}
+dialog::backdrop{background:rgba(0,0,0,.7)}
+.acts{display:flex;gap:10px;justify-content:flex-end;margin-top:16px;flex-wrap:wrap}
+.err{color:var(--bad);min-height:1.2em;margin:10px 0 0;font-size:.9rem}
+.flash{position:fixed;left:50%;bottom:24px;translate:-50% 120px;color:#111;font-weight:600;padding:12px 22px;border-radius:99px;opacity:0;transition:.3s;z-index:20;max-width:92vw}
+.flash.show{translate:-50% 0;opacity:1}
+.empty{text-align:center;padding:40px;color:var(--muted)}
+.setup{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:8px;font-size:.9rem}
+.setup div{display:flex;gap:8px;align-items:flex-start}
+.thumbs{display:flex;gap:6px;flex-wrap:wrap}.thumbs img{width:64px;height:64px;object-fit:cover;border-radius:8px;border:1px solid var(--line)}
+.chart{position:relative}
+.chart svg{display:block;width:100%;height:auto}
+.chart .tip{position:absolute;pointer-events:none;background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:6px 10px;font-size:.8rem;white-space:nowrap;translate:-50% -110%}
+.chart .tip[hidden]{display:none}
+.funnel .st{display:grid;grid-template-columns:150px 1fr 110px;gap:10px;align-items:center;margin:6px 0;font-size:.88rem}
+.funnel .tr{height:18px;background:var(--grid);border-radius:4px;overflow:hidden}
+.funnel .fl{height:100%;background:var(--accent);border-radius:0 4px 4px 0}
+details summary{cursor:pointer;color:var(--muted);font-size:.85rem;margin-top:8px}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+@media (max-width:860px){.cols,.dbox,.f .g4{grid-template-columns:1fr}.f .g3{grid-template-columns:1fr 1fr}.funnel .st{grid-template-columns:110px 1fr 80px}}
 </style>
 </head>
 <body>
 <header><div class="wrap">
-  <div class="logo">Nnedverse <b>Orders</b></div>
-  <div><button class="btn ghost" id="refresh">Refresh</button> <a class="btn" href="/api/admin/orders.csv">Export CSV</a></div>
+  <a class="logo" href="/admin">Nnedverse <b>Admin</b></a>
+  <nav class="tabs" id="tabs" aria-label="Sections"></nav>
+  <a class="btn ghost" href="/" target="_blank" rel="noopener">View store</a>
+  <button class="btn ghost" id="signout" type="button">Sign out</button>
 </div></header>
-
-<main class="wrap">
-  <div class="stats">
-    <div class="stat"><span>Net revenue</span><b id="sRev">–</b></div>
-    <div class="stat"><span>Paid orders</span><b id="sPaid">–</b></div>
-    <div class="stat"><span>To ship</span><b id="sShip">–</b></div>
-    <div class="stat"><span>Unpaid / abandoned</span><b id="sOpen">–</b></div>
-  </div>
-  <div class="bar">
-    <input id="q" type="search" placeholder="Search name, email, phone, order number…">
-    <select id="fPay"><option value="">All payments</option><option value="paid">Paid</option><option value="created">Unpaid</option></select>
-    <select id="fFul"><option value="">All fulfilment</option><option>new</option><option>packed</option><option>shipped</option><option>delivered</option><option>cancelled</option></select>
-  </div>
-  <table>
-    <thead><tr><th>Order</th><th>Date</th><th>Customer</th><th>Payment</th><th>Fulfilment</th><th>Items</th><th class="right">Total</th></tr></thead>
-    <tbody id="rows"></tbody>
-  </table>
-</main>
-
-<dialog id="shipDlg">
-  <form id="shipForm">
-    <h2>Mark as shipped</h2>
-    <p class="muted" id="shipRef" style="margin:0"></p>
-    <label>Courier (optional)<input id="tCarrier" placeholder="e.g. Delhivery, Blue Dart"></label>
-    <label>Tracking number (optional)<input id="tNumber"></label>
-    <label>Tracking link (optional)<input id="tUrl" type="url" placeholder="https://..."></label>
-    <p class="muted" id="shipNote" style="font-size:.85rem"></p>
-    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px"><button type="button" id="shipCancel" class="btn ghost">Cancel</button><button class="btn">Mark shipped &amp; email</button></div>
-  </form>
-</dialog>
+<main class="wrap" id="view"></main>
 <div id="flash" class="flash" role="status"></div>
-<script>
-const $=id=>document.getElementById(id);
-const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-let data=[],sym="₹",open=null;
-const money=n=>sym+Number(n).toLocaleString("en-IN",{maximumFractionDigits:2});
-const ful=o=>o.fulfillment||"new";
-const payPill=o=>o.status!=="paid"?'<span class="pill created">Unpaid</span>':(o.refunded||0)>=o.amount?'<span class="pill refunded">Refunded</span>':(o.refunded||0)>0?'<span class="pill part">Part refunded</span>':'<span class="pill paid">Paid</span>';
-const left=o=>Math.round((o.amount-(o.refunded||0))*100)/100;
 
-async function load(){
-  const r=await fetch("/api/admin/orders");
-  if(!r.ok){$("rows").innerHTML=`<tr><td colspan="7" class="empty">Could not load orders (${r.status}).</td></tr>`;return}
-  const j=await r.json();data=j.orders;sym=j.symbol;render();
+<dialog id="dlg"><div id="dlgBody"></div></dialog>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const money = (n) => "₹" + Number(n || 0).toLocaleString("en-IN", { maximumFractionDigits: 2 });
+const num = (n) => Number(n || 0).toLocaleString("en-IN");
+const date = (d, t) => d ? new Date(d).toLocaleString("en-IN", t ? { dateStyle: "medium", timeStyle: "short" } : { dateStyle: "medium" }) : "-";
+async function api(method, url, body) {
+  const r = await fetch(url, { method, headers: body !== undefined ? { "Content-Type": "application/json" } : {}, body: body !== undefined ? JSON.stringify(body) : undefined });
+  if (r.status === 401) { location.reload(); throw new Error("Signed out"); }
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(j.error || `Request failed (${r.status})`);
+  return j;
 }
-function refundBox(o){
-  if(o.status!=="paid"||!o.paymentId)return"";
-  const hist=(o.refunds||[]).map(r=>`<div class="li"><span>${money(r.amount)} <span class="muted">· ${esc(r.status)}${r.reason?" · "+esc(r.reason):""}</span></span><span class="muted">${new Date(r.createdAt).toLocaleDateString("en-IN",{dateStyle:"medium"})}</span></div>`).join("");
-  const form=left(o)>0?`<div class="r"><input id="rAmt-${esc(o.orderId)}" type="number" min="1" max="${left(o)}" step="0.01" placeholder="Amount (max ${money(left(o))})" style="width:190px"><input id="rWhy-${esc(o.orderId)}" placeholder="Reason (optional)" style="flex:1"><button class="btn" data-refund="${esc(o.orderId)}">Refund</button></div><p class="muted" style="font-size:.8rem;margin:6px 0 0">Leave the amount empty to refund the full remaining ${money(left(o))}.</p>`:'<p class="muted" style="margin:6px 0 0">Fully refunded.</p>';
-  return `<div class="rbox"><h4>Refunds</h4>${hist}${form}</div>`}
-function render(){
-  const paid=data.filter(o=>o.status==="paid");
-  $("sRev").textContent=money(paid.reduce((s,o)=>s+o.amount-(o.refunded||0),0));
-  $("sPaid").textContent=paid.length;
-  $("sShip").textContent=paid.filter(o=>["new","packed"].includes(ful(o))).length;
-  $("sOpen").textContent=data.length-paid.length;
-  const q=$("q").value.trim().toLowerCase(),fp=$("fPay").value,ff=$("fFul").value;
-  const list=data.filter(o=>(!fp||o.status===fp)&&(!ff||ful(o)===ff)&&(!q||[o.ref,o.customer.name,o.customer.email,o.customer.phone,o.paymentId].join(" ").toLowerCase().includes(q)));
-  $("rows").innerHTML=list.length?list.map(o=>{
-    const n=o.lines.reduce((s,l)=>s+l.qty,0);
-    let h=`<tr class="row" data-id="${esc(o.orderId)}"><td><b>${esc(o.ref)}</b></td><td class="muted">${new Date(o.createdAt).toLocaleString("en-IN",{dateStyle:"medium",timeStyle:"short"})}</td>
-      <td>${esc(o.customer.name)}<div class="muted" style="font-size:.8rem">${esc(o.customer.email)}</div></td>
-      <td>${payPill(o)}</td>
-      <td><span class="pill f-${ful(o)}">${ful(o)}</span></td><td>${n}</td><td class="right"><b>${money(o.amount)}</b></td></tr>`;
-    if(open===o.orderId)h+=`<tr class="detail"><td colspan="7"><div class="dbox">
-      <div><h4>Items</h4>${o.lines.map(l=>`<div class="li"><span>${esc(l.name)} × ${l.qty}</span><span>${money(l.price*l.qty)}</span></div>`).join("")}
-        <div class="li"><b>Total${o.promo?` (code ${esc(o.promo)})`:""}</b><b>${money(o.amount)}</b></div>
-        ${o.vehicle?`<p class="muted" style="margin:10px 0 0">Vehicle: ${esc(o.vehicle.year)} ${esc(o.vehicle.make)} ${esc(o.vehicle.model)}</p>`:""}
-        ${o.paymentId?`<p class="muted" style="margin:4px 0 0">Payment ID: ${esc(o.paymentId)}</p>`:""}
-        ${refundBox(o)}</div>
-      <div><h4>Ship to</h4><div>${esc(o.customer.name)}<br>${esc(o.customer.addr)}<br>${esc(o.customer.city)} ${esc(o.customer.zip)}<br>${esc(o.customer.phone)}<br>${esc(o.customer.email)}</div>
+let ft;
+function flash(m, bad) { const t = $("flash"); t.textContent = m; t.style.background = bad ? "var(--warn)" : "var(--ok)"; t.classList.add("show"); clearTimeout(ft); ft = setTimeout(() => t.classList.remove("show"), 5000); }
+const dlg = $("dlg");
+function openDlg(html, wide) { $("dlgBody").innerHTML = html; dlg.classList.toggle("wide", !!wide); dlg.showModal(); return $("dlgBody"); }
+dlg.addEventListener("click", (e) => { if (e.target.closest("[data-close]")) dlg.close(); });
+$("signout").onclick = async () => { await fetch("/api/signout", { method: "POST", headers: { "Content-Type": "application/json" }, body: "{}" }); location.href = "/"; };
+
+const SECTIONS = { overview: "Overview", orders: "Orders", products: "Products", inventory: "Inventory", vehicles: "Vehicles", customers: "Customers", coupons: "Coupons", reviews: "Reviews", returns: "Returns", audit: "Audit log" };
+let section = (location.hash || "#overview").slice(1);
+if (!SECTIONS[section]) section = "overview";
+function nav() {
+  $("tabs").innerHTML = Object.entries(SECTIONS).map(([k, v]) => `<button type="button" data-s="${k}" class="${k === section ? "on" : ""}">${v}</button>`).join("");
+}
+$("tabs").onclick = (e) => { const s = e.target.dataset.s; if (s) { section = s; history.replaceState(null, "", "#" + s); go(); } };
+function go() { nav(); $("view").innerHTML = '<p class="muted" style="margin-top:30px">Loading…</p>'; VIEWS[section]().catch((e) => { $("view").innerHTML = `<p class="err" style="margin-top:30px">${esc(e.message)}</p>`; }); }
+
+// ================= Overview =================
+const SETUP = [
+  ["testMode", "Razorpay in test mode", "Switch to live keys before launch.", true],
+  ["webhook", "Razorpay webhook", "Set RAZORPAY_WEBHOOK_SECRET so payments confirm even if the shopper closes the tab."],
+  ["email", "Order emails (SMTP)", "Set SMTP_HOST, SMTP_USER and SMTP_PASS."],
+  ["twoFactor", "Admin two-factor sign in", "Run `npm run totp` and set ADMIN_TOTP_SECRET."],
+  ["business", "Business details for invoices", "Set BUSINESS_NAME, BUSINESS_LEGAL_NAME, BUSINESS_ADDRESS, BUSINESS_STATE and BUSINESS_GSTIN."],
+  ["grievance", "Grievance officer", "Set GRIEVANCE_OFFICER and GRIEVANCE_EMAIL (required by the E-Commerce Rules)."],
+  ["publicUrl", "Public site address", "Set PUBLIC_URL so email links, the sitemap and canonical tags use your domain."],
+  ["shiprocket", "Courier integration (Shiprocket)", "Optional. Set SHIPROCKET_EMAIL, SHIPROCKET_PASSWORD and SHIP_FROM_PIN."],
+  ["whatsapp", "WhatsApp order updates", "Optional. Set WHATSAPP_TOKEN, WHATSAPP_PHONE_ID and template names."],
+  ["assistant", "AI shopping assistant", "Optional. Set ANTHROPIC_API_KEY."],
+  ["errorAlerts", "Error alerts", "Optional. Set ERROR_WEBHOOK_URL to a Slack or Discord webhook."]
+];
+let range = 30;
+function tile(label, value, note) { return `<div class="tile"><span>${label}</span><b>${value}</b>${note ? `<small>${note}</small>` : ""}</div>`; }
+function revenueChart(series) {
+  const W = 900, H = 220, L = 56, B = 26, T = 10, max = Math.max(1, ...series.map((d) => d.revenue));
+  const step = Math.pow(10, Math.floor(Math.log10(max))), top = Math.ceil(max / step) * step, ticks = [0, top / 2, top];
+  const slot = (W - L) / series.length, bw = Math.min(24, Math.max(2, slot - 2)), y = (v) => T + (H - T - B) * (1 - v / top);
+  const bars = series.map((d, i) => {
+    const x = L + i * slot + (slot - bw) / 2, h = (H - T - B) - (y(d.revenue) - T), r = Math.min(4, bw / 2, h);
+    const path = h > 0 ? `M${x},${H - B} V${H - B - h + r} Q${x},${H - B - h} ${x + r},${H - B - h} H${x + bw - r} Q${x + bw},${H - B - h} ${x + bw},${H - B - h + r} V${H - B} Z` : "";
+    return `<g data-i="${i}"><rect x="${L + i * slot}" y="${T}" width="${slot}" height="${H - T - B}" fill="transparent"/>${path ? `<path d="${path}" fill="var(--accent)"/>` : ""}</g>`;
+  }).join("");
+  const labels = series.map((d, i) => (i % Math.ceil(series.length / 8) === 0 ? `<text x="${L + i * slot + slot / 2}" y="${H - 8}" fill="var(--muted)" font-size="11" text-anchor="middle">${d.day.slice(5)}</text>` : "")).join("");
+  return `<div class="chart" id="revChart"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Daily revenue for the last ${series.length} days">
+    ${ticks.map((v) => `<line x1="${L}" x2="${W}" y1="${y(v)}" y2="${y(v)}" stroke="var(--grid)" stroke-width="1"/><text x="${L - 8}" y="${y(v) + 4}" fill="var(--muted)" font-size="11" text-anchor="end">${money(v).replace("₹", "₹")}</text>`).join("")}
+    ${bars}${labels}</svg><div class="tip" hidden></div></div>
+    <details><summary>Show as table</summary><div class="tw" style="margin-top:8px;max-height:240px;overflow:auto"><table><thead><tr><th>Day</th><th class="right">Orders</th><th class="right">Revenue</th></tr></thead>
+    <tbody>${series.map((d) => `<tr><td>${d.day}</td><td class="right">${d.orders}</td><td class="right">${money(d.revenue)}</td></tr>`).join("")}</tbody></table></div></details>`;
+}
+function bindChart(series) {
+  const c = $("revChart"); if (!c) return;
+  const tip = c.querySelector(".tip"), svg = c.querySelector("svg");
+  svg.addEventListener("mousemove", (e) => {
+    const g = e.target.closest("g[data-i]"); if (!g) { tip.hidden = true; return; }
+    const d = series[g.dataset.i], b = c.getBoundingClientRect();
+    tip.innerHTML = `<b>${d.day}</b><br>${money(d.revenue)} · ${d.orders} order${d.orders === 1 ? "" : "s"}`;
+    tip.style.left = e.clientX - b.left + "px"; tip.style.top = e.clientY - b.top + "px"; tip.hidden = false;
+  });
+  svg.addEventListener("mouseleave", () => (tip.hidden = true));
+}
+const FUNNEL = { page_view: "Visited", product_view: "Viewed a product", add_to_cart: "Added to cart", begin_checkout: "Started checkout", payment_started: "Opened payment", purchase: "Bought" };
+const VIEWS = {};
+VIEWS.overview = async () => {
+  const [st, a] = await Promise.all([api("GET", "/api/admin/status"), api("GET", `/api/admin/analytics?days=${range}`)]);
+  const top = a.funnel[0].visitors || 1;
+  $("view").innerHTML = `<div class="row"><h1>Overview</h1><span class="sp"></span><select id="range" aria-label="Date range">${[7, 30, 90, 365].map((d) => `<option value="${d}" ${d === range ? "selected" : ""}>Last ${d} days</option>`).join("")}</select></div>
+  <div class="tiles">
+    ${tile("Revenue", money(a.revenue), `${a.orders} orders`)}${tile("Net after refunds", money(a.netRevenue), `${money(a.refunds)} refunded`)}
+    ${tile("Average order", money(a.aov))}${tile("Conversion", a.conversionRate == null ? "-" : a.conversionRate + "%", `${num(a.visitors)} visitors`)}
+    ${tile("Gross margin", a.grossMargin == null ? "-" : a.grossMargin + "%", a.grossMargin == null ? "Add cost prices to products" : `${money(a.grossProfit)} profit ex-GST · ${a.costCoverage}% of units costed`)}
+    ${tile("Refund rate", a.refundRate + "%")}${tile("Repeat customers", a.repeatRate + "%", `${num(a.customers)} customers all time`)}
+    ${tile("Lifetime value", money(a.ltv), "Avg net spend per customer")}${tile("New customers", num(a.newCustomers))}
+    ${tile("Abandoned checkouts", num(a.abandonedCheckouts))}${tile("Online / COD", `${a.online} / ${a.cod}`)}
+    <div class="tile"><span>Cost per new customer</span><b id="cac">-</b><small><label>Ad spend this period ₹ <input id="spend" type="number" min="0" style="width:90px;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:2px 6px"></label></small></div>
+  </div>
+  <div class="card"><h2>Daily revenue</h2>${revenueChart(a.series)}</div>
+  <div class="cols">
+    <div class="card funnel"><h2>Shopper funnel</h2>${a.funnel.map((s) => `<div class="st"><span>${FUNNEL[s.name]}</span><div class="tr"><div class="fl" style="width:${Math.max(s.visitors ? 1 : 0, (s.visitors / top) * 100)}%"></div></div><span class="right">${num(s.visitors)} · ${Math.round((s.visitors / top) * 100)}%</span></div>`).join("")}
+      <p class="small muted">Unique visitors per step, counted by an anonymous ID in each browser.</p></div>
+    <div class="card"><h2>Best sellers</h2>${a.bestSellers.length ? `<div class="tw"><table><thead><tr><th>Product</th><th class="right">Units</th><th class="right">Revenue</th></tr></thead><tbody>${a.bestSellers.map((b) => `<tr><td>${esc(b.name)}</td><td class="right">${b.units}</td><td class="right">${money(b.revenue)}</td></tr>`).join("")}</tbody></table></div>` : '<p class="muted">No sales in this period.</p>'}</div>
+    <div class="card"><h2>Traffic sources</h2>${a.sources.length ? a.sources.map((s) => `<div class="li"><span>${esc(s.key)}</span><span>${num(s.count)}</span></div>`).join("") : '<p class="muted">No visits recorded yet.</p>'}</div>
+    <div class="card"><h2>Top searches</h2>${a.searches.length ? a.searches.map((s) => `<div class="li"><span>${esc(s.key)}</span><span>${num(s.count)}</span></div>`).join("") : '<p class="muted">No searches yet.</p>'}</div>
+  </div>
+  ${a.lowStock.length ? `<div class="card"><h2>Low stock</h2>${a.lowStock.map((p) => `<div class="li"><span>${esc(p.name)} <span class="muted small">${esc(p.sku)}</span></span><span class="pill ${p.stock ? "p-warn" : "p-bad"}">${p.stock} left</span></div>`).join("")}</div>` : ""}
+  <div class="card"><h2>Setup checklist</h2><div class="setup">${SETUP.map(([k, label, hint, inverse]) => { const ok = inverse ? !st[k] : st[k];
+    return `<div><span class="pill ${ok ? "p-ok" : inverse ? "p-warn" : "p-bad"}">${ok ? "Done" : inverse ? "Test" : "To do"}</span><span>${label}${ok ? "" : `<br><span class="muted small">${esc(hint)}</span>`}</span></div>`; }).join("")}</div></div>`;
+  $("range").onchange = (e) => { range = Number(e.target.value); go(); };
+  $("spend").oninput = (e) => { const s = Number(e.target.value); $("cac").textContent = s && a.newCustomers ? money(s / a.newCustomers) : "-"; };
+  bindChart(a.series);
+};
+
+// ================= Orders =================
+let orders = [], next = {}, shiprocket = false, openId = null;
+const fl = (o) => o.fulfillment || "new";
+const payPill = (o) => o.status === "expired" ? '<span class="pill">Expired</span>' : o.status === "created" ? '<span class="pill p-warn">Unpaid</span>'
+  : o.status === "cod" ? '<span class="pill p-blue">COD due</span>' : (o.refunded || 0) >= o.amount ? '<span class="pill p-bad">Refunded</span>'
+  : (o.refunded || 0) > 0 ? '<span class="pill p-warn">Part refunded</span>' : `<span class="pill p-ok">Paid${o.paymentMethod === "cod" ? " (COD)" : ""}</span>`;
+const fPill = { new: "p-acc", packed: "p-warn", shipped: "p-blue", out_for_delivery: "p-blue", delivered: "p-ok", cancelled: "p-bad", returned: "p-bad" };
+const left = (o) => Math.round((o.amount - (o.refunded || 0)) * 100) / 100;
+VIEWS.orders = async () => {
+  const j = await api("GET", "/api/admin/orders"); orders = j.orders; next = j.next; shiprocket = j.shiprocket;
+  const live = orders.filter((o) => o.status === "paid" || o.status === "cod");
+  $("view").innerHTML = `<div class="row"><h1>Orders</h1><span class="sp"></span><a class="btn ghost" href="/api/admin/orders.csv">Export CSV</a></div>
+  <div class="tiles">${tile("To pack", live.filter((o) => fl(o) === "new").length)}${tile("Packed, not shipped", live.filter((o) => fl(o) === "packed").length)}
+    ${tile("In transit", live.filter((o) => ["shipped", "out_for_delivery"].includes(fl(o))).length)}${tile("Needs attention", orders.filter((o) => o.stockIssue).length, "Paid after stock ran out")}</div>
+  <div class="bar"><input id="q" type="search" placeholder="Search name, email, phone, order or invoice number…">
+    <select id="fPay"><option value="">All payments</option><option value="paid">Paid</option><option value="cod">COD due</option><option value="created">Unpaid</option><option value="expired">Expired</option></select>
+    <select id="fFul"><option value="">All fulfilment</option>${Object.keys(next).map((s) => `<option value="${s}">${s.replace(/_/g, " ")}</option>`).join("")}</select></div>
+  <div class="tw"><table><thead><tr><th>Order</th><th>Date</th><th>Customer</th><th>Payment</th><th>Fulfilment</th><th class="right">Total</th></tr></thead><tbody id="rows"></tbody></table></div>`;
+  ["q", "fPay", "fFul"].forEach((i) => $(i).addEventListener("input", drawOrders));
+  $("rows").onclick = orderClick; $("rows").onchange = orderChange;
+  drawOrders();
+};
+function refundBox(o) {
+  if (o.status !== "paid") return "";
+  const hist = (o.refunds || []).map((r) => `<div class="li"><span>${money(r.amount)} <span class="muted">· ${esc(r.status)}${r.reason ? " · " + esc(r.reason) : ""}</span></span><span class="muted">${date(r.createdAt)}</span></div>`).join("");
+  const cod = o.paymentMethod === "cod";
+  return `<div style="margin-top:14px"><h4>Refunds</h4>${hist}${left(o) > 0 ? `<div class="row" style="margin-top:8px"><input id="rAmt-${esc(o.orderId)}" type="number" min="1" max="${left(o)}" step="0.01" placeholder="Amount (max ${money(left(o))})" style="width:180px;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:7px 10px">
+    <input id="rWhy-${esc(o.orderId)}" placeholder="Reason" style="flex:1;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:7px 10px"><button class="btn bad sm" data-refund="${esc(o.orderId)}">${cod ? "Record bank refund" : "Refund"}</button></div>
+    <p class="muted small" style="margin:6px 0 0">${cod ? "COD orders can't be refunded through Razorpay. Send the money by bank or UPI first, then record it here." : "Leave the amount empty to refund the full remaining amount."}</p>` : '<p class="muted small">Fully refunded.</p>'}</div>`;
+}
+function drawOrders() {
+  const q = $("q").value.trim().toLowerCase(), fp = $("fPay").value, ff = $("fFul").value;
+  const list = orders.filter((o) => (!fp || o.status === fp) && (!ff || fl(o) === ff) && (!q || [o.ref, o.invoiceNo, o.customer.name, o.customer.email, o.customer.phone, o.paymentId].join(" ").toLowerCase().includes(q)));
+  $("rows").innerHTML = list.length ? list.map((o) => {
+    const t = o.totals || {}, can = (o.status === "paid" || o.status === "cod");
+    let h = `<tr class="click" data-id="${esc(o.orderId)}"><td><b>${esc(o.ref)}</b>${o.stockIssue ? ' <span class="pill p-bad">Stock issue</span>' : ""}</td><td class="muted">${date(o.createdAt, 1)}</td>
+      <td>${esc(o.customer.name)}<div class="muted small">${esc(o.customer.email)}</div></td><td>${payPill(o)}</td><td><span class="pill ${fPill[fl(o)]}">${fl(o).replace(/_/g, " ")}</span></td><td class="right"><b>${money(o.amount)}</b></td></tr>`;
+    if (openId === o.orderId) h += `<tr class="detail"><td colspan="6"><div class="dbox">
+      <div><h4>Items</h4>${o.lines.map((l) => `<div class="li"><span>${esc(l.name)} × ${l.qty} <span class="muted small">${esc(l.sku || "")}</span></span><span>${money(l.price * l.qty)}</span></div>`).join("")}
+        ${t.disc ? `<div class="li muted"><span>Savings${o.promo ? ` (${esc(o.promo)})` : ""}</span><span>−${money(t.disc)}</span></div>` : ""}
+        ${t.ship ? `<div class="li muted"><span>Shipping</span><span>${money(t.ship)}</span></div>` : ""}${t.codFee ? `<div class="li muted"><span>COD fee</span><span>${money(t.codFee)}</span></div>` : ""}
+        <div class="li"><b>Total</b><b>${money(o.amount)}</b></div>${t.tax ? `<p class="muted small" style="margin:4px 0 0">Includes GST ${money(t.tax)}</p>` : ""}
+        ${o.vehicle ? `<p class="muted small" style="margin:8px 0 0">Vehicle: ${esc(o.vehicle.year)} ${esc(o.vehicle.make)} ${esc(o.vehicle.model)}</p>` : ""}
+        <p class="muted small" style="margin:4px 0 0">${o.paymentId ? `Payment ID ${esc(o.paymentId)} · ` : ""}${o.invoiceNo ? `Invoice ${esc(o.invoiceNo)} · <a href="${esc(o.links.invoice)}" target="_blank" rel="noopener">Open invoice</a>` : "No invoice yet"}</p>
+        ${refundBox(o)}
+        <h4 style="margin-top:14px">History</h4>${(o.history || []).map((h) => `<div class="small"><span class="muted">${date(h.at, 1)}</span> · ${esc(h.event)}${h.note ? `: ${esc(h.note)}` : ""} <span class="muted">(${esc(h.by)})</span></div>`).join("")}
+        <div class="row" style="margin-top:8px"><input id="note-${esc(o.orderId)}" placeholder="Add an internal note" style="flex:1;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:7px 10px"><button class="btn ghost sm" data-note="${esc(o.orderId)}">Add note</button></div></div>
+      <div><h4>Ship to</h4><div>${esc(o.customer.name)}<br>${esc(o.customer.addr)}<br>${esc(o.customer.city)}, ${esc(o.customer.state || "")} ${esc(o.customer.zip)}<br>${esc(o.customer.phone)}<br>${esc(o.customer.email)}</div>
         <h4 style="margin-top:16px">Fulfilment</h4>
-        <select data-ful="${esc(o.orderId)}" ${o.status!=="paid"?"disabled title='Only paid orders can be fulfilled'":""}>${["new","packed","shipped","delivered","cancelled"].map(s=>`<option ${s===ful(o)?"selected":""}>${s}</option>`).join("")}</select></div>
+        ${can ? `<select data-ful="${esc(o.orderId)}" style="background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:7px 10px"><option selected>${fl(o)}</option>${next[fl(o)].map((s) => `<option value="${s}">→ ${s.replace(/_/g, " ")}</option>`).join("")}</select>` : '<p class="muted small">Only paid or COD orders can be fulfilled.</p>'}
+        ${o.tracking && (o.tracking.number || o.tracking.url) ? `<p class="small">Courier: ${esc(o.tracking.carrier || "-")} · ${esc(o.tracking.number || "")} ${o.tracking.url ? `<a href="${esc(o.tracking.url)}" target="_blank" rel="noopener">track</a>` : ""}</p>` : ""}
+        ${o.shipment?.labelUrl ? `<p class="small"><a href="${esc(o.shipment.labelUrl)}" target="_blank" rel="noopener">Download shipping label</a></p>` : ""}
+        ${can && shiprocket && !o.shipment && ["new", "packed"].includes(fl(o)) ? `<button class="btn sm" data-ship="${esc(o.orderId)}" style="margin-top:8px">Book courier (Shiprocket)</button>` : ""}
+        ${o.status === "cod" ? '<p class="muted small">Marking a COD order delivered also records the cash as collected.</p>' : ""}</div>
     </div></td></tr>`;
-    return h}).join(""):`<tr><td colspan="7" class="empty">No orders yet.</td></tr>`;
+    return h;
+  }).join("") : '<tr><td colspan="6" class="empty">No orders match.</td></tr>';
 }
-$("rows").onclick=async e=>{
-  const rb=e.target.closest("[data-refund]");
-  if(rb){const id=rb.dataset.refund,o=data.find(x=>x.orderId===id);
-    const a=document.getElementById("rAmt-"+id).value,why=document.getElementById("rWhy-"+id).value;
-    const amt=a===""?left(o):Number(a);
-    if(!confirm(`Refund ${money(amt)} to ${o.customer.name} for order ${o.ref}?
-This sends the money back through Razorpay and cannot be undone.`))return;
-    rb.disabled=true;rb.textContent="Refunding…";
-    const r=await fetch(`/api/admin/orders/${encodeURIComponent(id)}/refund`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({amount:a===""?undefined:Number(a),reason:why})});
-    const j=await r.json().catch(()=>({}));
-    if(!r.ok)flash(j.error||"Refund failed",true);else flash(`Refund of ${money(j.refund.amount)} ${j.refund.status==="processed"?"processed":"started"}. Customer emailed.`);
-    await load();return}
-  if(e.target.closest("select")||e.target.closest("input"))return;const tr=e.target.closest("tr.row");if(!tr)return;open=open===tr.dataset.id?null:tr.dataset.id;render()};
-async function setStatus(id,status,tracking){
-  const r=await fetch(`/api/admin/orders/${encodeURIComponent(id)}/fulfillment`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({status,tracking})});
-  const j=await r.json().catch(()=>({}));
-  if(!r.ok)alert(j.error||"Could not update status");
-  else if(status==="shipped")flash(j.emailed?"Marked shipped. Customer emailed.":j.emailError?"Marked shipped, but: "+j.emailError:"Marked shipped (customer was already emailed).",!!j.emailError);
-  await load()}
-let shipId=null;
-$("rows").onchange=e=>{const id=e.target.dataset.ful;if(!id)return;
-  if(e.target.value!=="shipped")return setStatus(id,e.target.value);
-  const o=data.find(x=>x.orderId===id),t=o.tracking||{};
-  shipId=id;$("shipRef").textContent=o.ref+" · "+o.customer.email;
-  $("tCarrier").value=t.carrier||"";$("tNumber").value=t.number||"";$("tUrl").value=t.url||"";
-  $("shipNote").textContent=o.shippedEmailSent?"The customer was already emailed for this order; no second email will be sent.":"The customer will get a \"your order has shipped\" email.";
-  $("shipDlg").showModal()};
-$("shipCancel").onclick=()=>{$("shipDlg").close();load()};
-$("shipDlg").addEventListener("cancel",()=>load());
-$("shipForm").onsubmit=async e=>{e.preventDefault();$("shipDlg").close();
-  await setStatus(shipId,"shipped",{carrier:$("tCarrier").value,number:$("tNumber").value,url:$("tUrl").value})};
-let ft;function flash(m,bad){const t=$("flash");t.textContent=m;t.style.background=bad?"var(--warn)":"var(--ok)";t.classList.add("show");clearTimeout(ft);ft=setTimeout(()=>t.classList.remove("show"),5000)}
-["q","fPay","fFul"].forEach(i=>$(i).addEventListener("input",render));
-$("refresh").onclick=load;
-load();setInterval(()=>{if(!document.hidden&&!document.activeElement.matches("select,input"))load()},30000);
+async function orderClick(e) {
+  const rb = e.target.closest("[data-refund]");
+  if (rb) {
+    const id = rb.dataset.refund, o = orders.find((x) => x.orderId === id), a = $("rAmt-" + id).value, why = $("rWhy-" + id).value, amt = a === "" ? left(o) : Number(a);
+    if (!confirm(`${o.paymentMethod === "cod" ? "Record a bank refund of" : "Refund"} ${money(amt)} to ${o.customer.name} for ${o.ref}? This can't be undone.`)) return;
+    rb.disabled = true;
+    try { const j = await api("POST", `/api/admin/orders/${encodeURIComponent(id)}/refund`, { amount: a === "" ? undefined : Number(a), reason: why }); flash(`Refund of ${money(j.refund.amount)} ${j.refund.status}. Customer emailed.`); }
+    catch (x) { flash(x.message, true); }
+    return VIEWS.orders();
+  }
+  const nb = e.target.closest("[data-note]");
+  if (nb) { const id = nb.dataset.note; try { await api("POST", `/api/admin/orders/${encodeURIComponent(id)}/note`, { note: $("note-" + id).value }); flash("Note added"); VIEWS.orders(); } catch (x) { flash(x.message, true); } return; }
+  const sb = e.target.closest("[data-ship]");
+  if (sb) { sb.disabled = true; sb.textContent = "Booking…"; try { const j = await api("POST", `/api/admin/orders/${encodeURIComponent(sb.dataset.ship)}/shipment`, {}); flash(`Courier booked${j.shipment.awb ? ": AWB " + j.shipment.awb : ""}`); } catch (x) { flash(x.message, true); } return VIEWS.orders(); }
+  if (e.target.closest("select,input,a,button")) return;
+  const tr = e.target.closest("tr.click"); if (!tr) return;
+  openId = openId === tr.dataset.id ? null : tr.dataset.id; drawOrders();
+}
+async function setStatus(id, status, tracking) {
+  try {
+    const j = await api("POST", `/api/admin/orders/${encodeURIComponent(id)}/fulfillment`, { status, tracking });
+    if (status === "shipped") flash(j.emailed ? "Marked shipped. Customer emailed." : j.emailError ? "Marked shipped, but: " + j.emailError : "Marked shipped (customer was already emailed).", !!j.emailError);
+    else flash(`Marked ${status.replace(/_/g, " ")}`);
+  } catch (x) { flash(x.message, true); }
+  VIEWS.orders();
+}
+function orderChange(e) {
+  const id = e.target.dataset.ful; if (!id || e.target.value === fl(orders.find((o) => o.orderId === id))) return;
+  const status = e.target.value;
+  if (status === "cancelled" && !confirm("Cancel this order? Its stock goes back on sale. Refund paid orders separately.")) return VIEWS.orders();
+  if (status !== "shipped") return setStatus(id, status);
+  const o = orders.find((x) => x.orderId === id), t = o.tracking || {};
+  const b = openDlg(`<form class="f" id="shipForm"><h2>Mark as shipped</h2><p class="muted" style="margin:0">${esc(o.ref)} · ${esc(o.customer.email)}</p>
+    <label>Courier<input name="carrier" value="${esc(t.carrier || "")}" placeholder="Delhivery, Blue Dart…"></label><label>Tracking number<input name="number" value="${esc(t.number || "")}"></label>
+    <label>Tracking link<input name="url" type="url" value="${esc(t.url || "")}" placeholder="https://"></label>
+    <p class="muted small">${o.shippedEmailSent ? "The customer was already emailed; no second email will be sent." : "The customer gets a \"your order has shipped\" email and WhatsApp message (if set up)."}</p>
+    <div class="acts"><button type="button" class="btn ghost" data-close>Cancel</button><button class="btn">Mark shipped</button></div></form>`);
+  dlg.onclose = () => { dlg.onclose = null; VIEWS.orders(); };
+  b.querySelector("form").onsubmit = (ev) => { ev.preventDefault(); const f = Object.fromEntries(new FormData(ev.target)); dlg.onclose = null; dlg.close(); setStatus(id, "shipped", f); };
+}
+
+// ================= Products =================
+let products = [], cats = [], vehicles = {};
+VIEWS.products = async () => {
+  const j = await api("GET", "/api/admin/products"); products = j.products; cats = j.cats; vehicles = j.vehicles;
+  $("view").innerHTML = `<div class="row"><h1>Products</h1><span class="sp"></span><button class="btn ghost" id="imp" type="button">Import CSV</button><a class="btn ghost" href="/api/admin/products.csv">Export CSV</a><button class="btn" id="newP" type="button">New product</button></div>
+  <div class="bar"><input id="pq" type="search" placeholder="Search name or SKU"><select id="pst"><option value="">All statuses</option><option>active</option><option>draft</option><option>archived</option></select></div>
+  <div class="tw"><table><thead><tr><th>Product</th><th>SKU</th><th class="right">Price</th><th class="right">Cost</th><th>Stock</th><th>Status</th><th>Fits</th><th></th></tr></thead><tbody id="prows"></tbody></table></div>`;
+  const draw = () => {
+    const q = $("pq").value.toLowerCase(), s = $("pst").value;
+    $("prows").innerHTML = products.filter((p) => (!s || p.status === s) && (!q || (p.name + " " + p.sku).toLowerCase().includes(q))).map((p) => `<tr>
+      <td>${p.images[0] ? `<img src="${esc(p.images[0])}" alt="" style="width:32px;height:32px;object-fit:cover;border-radius:6px;vertical-align:middle;margin-right:8px">` : `<span style="margin-right:8px">${p.icon}</span>`}<a href="/p/${esc(p.slug)}" target="_blank" rel="noopener">${esc(p.name)}</a></td>
+      <td class="muted">${esc(p.sku)}</td><td class="right">${money(p.price)}${p.mrp ? `<div class="muted small"><s>${money(p.mrp)}</s></div>` : ""}</td><td class="right">${p.costPrice != null ? money(p.costPrice) : '<span class="muted">-</span>'}</td>
+      <td><span class="pill ${p.stock === 0 ? "p-bad" : p.stock <= p.lowStockAt ? "p-warn" : "p-ok"}">${p.stock}</span> <button class="btn ghost sm" data-stock="${p.id}" type="button">Adjust</button></td>
+      <td><span class="pill ${p.status === "active" ? "p-ok" : ""}">${p.status}</span></td>
+      <td class="small">${p.universal ? "Every vehicle" : p.fitment.length ? esc(p.fitment.slice(0, 3).map((f) => f.make + (f.model ? " " + f.model : "")).join(", ")) + (p.fitment.length > 3 ? ` +${p.fitment.length - 3}` : "") : '<span class="p-bad pill">None</span>'}</td>
+      <td><button class="btn ghost sm" data-edit="${p.id}" type="button">Edit</button></td></tr>`).join("") || '<tr><td colspan="8" class="empty">No products match.</td></tr>';
+  };
+  $("pq").oninput = draw; $("pst").onchange = draw; draw();
+  $("newP").onclick = () => editProduct(null);
+  $("imp").onclick = importDlg;
+  $("prows").onclick = (e) => { const ed = e.target.dataset.edit, st = e.target.dataset.stock; if (ed) editProduct(products.find((p) => p.id === Number(ed))); if (st) stockDlg(products.find((p) => p.id === Number(st))); };
+};
+const specsText = (o) => Object.entries(o || {}).map(([k, v]) => `${k}: ${v}`).join("\n");
+const faqText = (l) => (l || []).map((f) => `Q: ${f.q}\nA: ${f.a}`).join("\n\n");
+const fitText = (l) => (l || []).map((f) => [f.make, f.model || "", f.yearFrom || "", f.yearTo || ""].join(", ").replace(/(, )+$/, "")).join("\n");
+function editProduct(p) {
+  const x = p || { status: "draft", gstRate: 18, lowStockAt: 5, weightG: 500, icon: "📦", installDifficulty: "Easy", category: cats[0], images: [], specs: {}, faqs: [], fitment: [], dims: { l: 30, b: 20, h: 10 } };
+  const b = openDlg(`<form class="f" id="pf"><h2>${p ? "Edit product" : "New product"}</h2>
+    <div class="g2"><label>Name<input name="name" value="${esc(x.name || "")}" required maxlength="120"></label><label>SKU<input name="sku" value="${esc(x.sku || "")}" required maxlength="40"></label></div>
+    <div class="g3"><label>Category<select name="category">${cats.map((c) => `<option ${c === x.category ? "selected" : ""}>${c}</option>`).join("")}</select></label><label>Brand<input name="brand" value="${esc(x.brand || "")}"></label>
+      <label>Status<select name="status">${["draft", "active", "archived"].map((s) => `<option ${s === x.status ? "selected" : ""}>${s}</option>`).join("")}</select></label></div>
+    <div class="g4"><label>Price ₹ (incl. GST)<input name="price" type="number" step="0.01" min="0" value="${x.price ?? ""}" required></label><label>MRP ₹ (optional)<input name="mrp" type="number" step="0.01" min="0" value="${x.mrp ?? ""}"></label>
+      <label>Cost price ₹<input name="costPrice" type="number" step="0.01" min="0" value="${x.costPrice ?? ""}" title="What you pay the supplier. Never shown to customers."></label>
+      <label>GST %<select name="gstRate">${[0, 5, 12, 18, 28].map((r) => `<option ${r === x.gstRate ? "selected" : ""}>${r}</option>`).join("")}</select></label></div>
+    <div class="g4"><label>HSN code<input name="hsn" value="${esc(x.hsn || "")}"></label>${p ? "" : `<label>Opening stock<input name="stock" type="number" min="0" value="0"></label>`}<label>Low-stock alert at<input name="lowStockAt" type="number" min="0" value="${x.lowStockAt}"></label>
+      <label>Packed weight (g)<input name="weightG" type="number" min="1" value="${x.weightG}"></label></div>
+    <div class="g4"><label>Box L (cm)<input name="dl" type="number" min="1" value="${x.dims?.l || 30}"></label><label>Box B (cm)<input name="db" type="number" min="1" value="${x.dims?.b || 20}"></label><label>Box H (cm)<input name="dh" type="number" min="1" value="${x.dims?.h || 10}"></label><label>Icon (emoji)<input name="icon" value="${esc(x.icon)}" maxlength="8"></label></div>
+    <label>URL slug<input name="slug" value="${esc(x.slug || "")}" placeholder="Made from the name if empty"></label>
+    <label>Short description<input name="shortDesc" value="${esc(x.shortDesc || "")}" maxlength="200"></label>
+    <label>Full description<textarea name="description" style="font-family:inherit">${esc(x.description || "")}</textarea></label>
+    <label>Photos (one https:// link per line)<textarea name="images">${esc((x.images || []).join("\n"))}</textarea></label>
+    <div class="row"><input type="file" id="upl" accept="image/jpeg,image/png,image/webp" style="flex:1"><button type="button" class="btn ghost sm" id="uplBtn">Upload photo</button></div>
+    <label>Video link (YouTube)<input name="videoUrl" value="${esc(x.videoUrl || "")}" placeholder="https://www.youtube.com/watch?v=…"></label>
+    <h4 style="margin-top:16px">Fitment</h4>
+    <label class="check"><input type="checkbox" name="universal" ${x.universal ? "checked" : ""}> Fits every vehicle</label>
+    <label>Vehicles it fits: one per line as "Make, Model, from year, to year". Leave model or years empty to mean all.<textarea name="fitment" placeholder="Hyundai, Creta, 2020, 2026&#10;Maruti Suzuki">${esc(fitText(x.fitment))}</textarea></label>
+    <details><summary>Known makes and models</summary><p class="small muted">${Object.entries(vehicles).map(([m, ms]) => `<b>${esc(m)}</b>: ${esc(Object.keys(ms).join(", "))}`).join("<br>")}</p></details>
+    <label>Compatibility warning (shown on the page)<input name="fitNotes" value="${esc(x.fitNotes || "")}" maxlength="300"></label>
+    <h4 style="margin-top:16px">Details</h4>
+    <label>Specifications (one "Name: value" per line)<textarea name="specs">${esc(specsText(x.specs))}</textarea></label>
+    <div class="g2"><label>In the box<input name="included" value="${esc(x.included || "")}"></label><label>Warranty<input name="warranty" value="${esc(x.warranty || "")}" placeholder="6 months manufacturer warranty"></label></div>
+    <div class="g2"><label>Installation difficulty<input name="installDifficulty" value="${esc(x.installDifficulty || "Easy")}"></label><span></span></div>
+    <label>Installation guide<textarea name="installGuide" style="font-family:inherit">${esc(x.installGuide || "")}</textarea></label>
+    <label>FAQs ("Q: …" then "A: …", blank line between)<textarea name="faqs">${esc(faqText(x.faqs))}</textarea></label>
+    <h4 style="margin-top:16px">Search engines</h4>
+    <label>SEO title (max 70)<input name="seoTitle" value="${esc(x.seoTitle || "")}" maxlength="70"></label>
+    <label>Meta description (max 160)<input name="metaDesc" value="${esc(x.metaDesc || "")}" maxlength="160"></label>
+    <p class="err" role="alert"></p>
+    <div class="acts"><button type="button" class="btn ghost" data-close>Cancel</button><button class="btn">${p ? "Save changes" : "Create product"}</button></div></form>`, true);
+  $("uplBtn").onclick = async () => {
+    const file = $("upl").files[0]; if (!file) return flash("Choose a photo first", true);
+    if (file.size > 5 * 1024 * 1024) return flash("Photos must be under 5 MB", true);
+    const data = await new Promise((r) => { const fr = new FileReader(); fr.onload = () => r(fr.result); fr.readAsDataURL(file); });
+    try { const j = await api("POST", "/api/admin/uploads", { data }); const ta = b.querySelector("[name=images]"); ta.value = (ta.value.trim() ? ta.value.trim() + "\n" : "") + j.url; flash("Photo uploaded"); }
+    catch (x) { flash(x.message, true); }
+  };
+  b.querySelector("form").onsubmit = async (e) => {
+    e.preventDefault();
+    const f = Object.fromEntries(new FormData(e.target)), err = e.target.querySelector(".err");
+    const body = { ...f, universal: !!f.universal, price: Number(f.price), gstRate: Number(f.gstRate), lowStockAt: Number(f.lowStockAt), weightG: Number(f.weightG),
+      dims: { l: f.dl, b: f.db, h: f.dh }, images: f.images.split("\n").map((s) => s.trim()).filter(Boolean),
+      specs: Object.fromEntries(f.specs.split("\n").map((l) => l.split(/:(.*)/s).map((s) => s.trim())).filter(([k, v]) => k && v)),
+      faqs: f.faqs.split(/\n\s*\n/).map((blk) => { const m = /Q:\s*([\s\S]*?)\n\s*A:\s*([\s\S]*)/.exec(blk.trim()); return m ? { q: m[1].trim(), a: m[2].trim() } : null; }).filter(Boolean),
+      fitment: f.fitment.split("\n").map((l) => l.split(",").map((s) => s.trim())).filter((r) => r[0]).map(([make, model, a, z]) => ({ make, model: model || null, yearFrom: a || null, yearTo: z || null })) };
+    try { await api(p ? "PUT" : "POST", p ? `/api/admin/products/${p.id}` : "/api/admin/products", body); dlg.close(); flash(p ? "Product saved" : "Product created"); VIEWS.products(); }
+    catch (x) { err.textContent = x.message; }
+  };
+}
+function stockDlg(p) {
+  const b = openDlg(`<form class="f"><h2>Adjust stock</h2><p class="muted" style="margin:0">${esc(p.name)} · now ${p.stock} in stock</p>
+    <div class="g2"><label>Change by (e.g. 20 or -2)<input name="delta" type="number" required></label><label>Reason<select name="reason"><option value="restock">New stock arrived</option><option value="adjust">Stock count correction</option><option value="damaged">Damaged / written off</option><option value="return">Customer return</option></select></label></div>
+    <label>Note (optional)<input name="note" maxlength="100" placeholder="Supplier invoice no, etc."></label><p class="err" role="alert"></p>
+    <div class="acts"><button type="button" class="btn ghost" data-close>Cancel</button><button class="btn">Save</button></div></form>`);
+  b.querySelector("form").onsubmit = async (e) => {
+    e.preventDefault(); const f = Object.fromEntries(new FormData(e.target));
+    try { const j = await api("POST", `/api/admin/products/${p.id}/stock`, { delta: Number(f.delta), reason: f.reason, note: f.note }); dlg.close(); flash(`Stock is now ${j.stock}`); VIEWS[section](); }
+    catch (x) { e.target.querySelector(".err").textContent = x.message; }
+  };
+}
+function importDlg() {
+  const b = openDlg(`<form class="f"><h2>Import products (CSV)</h2>
+    <p class="muted small">Matches existing products by SKU and updates them; new SKUs are created as drafts unless you set a status. Columns: sku, name, category, price, mrp, cost_price, stock, status, gst_rate, hsn, brand, short_desc, weight_g, universal, fits. "stock" sets the exact stock level. "fits" is Make:Model:from:to separated by | (use * for all models). Tip: export first and edit that file.</p>
+    <label>CSV file<input type="file" id="csvFile" accept=".csv,text/csv"></label><label>…or paste CSV<textarea name="csv" style="min-height:160px"></textarea></label>
+    <div id="impOut"></div><p class="err" role="alert"></p><div class="acts"><button type="button" class="btn ghost" data-close>Close</button><button class="btn">Import</button></div></form>`, true);
+  $("csvFile").onchange = async (e) => { b.querySelector("[name=csv]").value = await e.target.files[0].text(); };
+  b.querySelector("form").onsubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const j = await api("POST", "/api/admin/products/import", { csv: e.target.elements.csv.value });
+      $("impOut").innerHTML = `<div class="tw" style="max-height:220px;overflow:auto;margin-top:10px"><table><tbody>${j.results.map((r) => `<tr><td>Line ${r.line}</td><td>${esc(r.sku)}</td><td>${r.error ? `<span class="pill p-bad">${esc(r.error)}</span>` : `<span class="pill p-ok">${r.ok}</span>`}</td></tr>`).join("")}</tbody></table></div>`;
+      flash(`Imported ${j.results.filter((r) => r.ok).length} of ${j.results.length} rows`, j.results.some((r) => r.error));
+      if (section === "products") VIEWS.products();
+    } catch (x) { e.target.querySelector(".err").textContent = x.message; }
+  };
+}
+
+// ================= Inventory =================
+VIEWS.inventory = async () => {
+  const [{ products: ps }, { log }] = await Promise.all([api("GET", "/api/admin/products"), api("GET", "/api/admin/inventory")]);
+  products = ps;
+  const name = new Map(ps.map((p) => [p.id, p.name]));
+  const low = ps.filter((p) => p.status === "active" && p.stock <= p.lowStockAt);
+  $("view").innerHTML = `<h1>Inventory</h1>
+  <div class="tiles">${tile("Units in stock", num(ps.reduce((s, p) => s + p.stock, 0)))}${tile("Stock value at cost", money(ps.reduce((s, p) => s + p.stock * (p.costPrice || 0), 0)), ps.some((p) => p.costPrice == null) ? "Some products have no cost price" : "")}
+    ${tile("Low stock", low.length)}${tile("Out of stock", ps.filter((p) => p.status === "active" && p.stock === 0).length)}</div>
+  <div class="card"><h2>Low stock</h2>${low.length ? low.map((p) => `<div class="li"><span>${esc(p.name)} <span class="muted small">${esc(p.sku)}</span></span><span><span class="pill ${p.stock ? "p-warn" : "p-bad"}">${p.stock} left</span> <button class="btn ghost sm" data-stock="${p.id}" type="button">Restock</button></span></div>`).join("") : '<p class="muted">Everything is above its alert level.</p>'}</div>
+  <div class="card"><h2>Stock history</h2><div class="tw"><table><thead><tr><th>When</th><th>Product</th><th>Change</th><th>After</th><th>Reason</th><th>Ref</th></tr></thead>
+  <tbody>${log.map((l) => `<tr><td class="muted">${date(l.createdAt, 1)}</td><td>${esc(name.get(l.productId) || l.productId)}</td><td class="${l.delta < 0 ? "" : ""}">${l.delta > 0 ? "+" : ""}${l.delta}</td><td>${l.stockAfter}</td><td>${esc(l.reason)}</td><td class="muted">${esc(l.ref || "")}</td></tr>`).join("") || '<tr><td colspan="6" class="empty">No stock movements yet.</td></tr>'}</tbody></table></div></div>`;
+  $("view").onclick = (e) => { const st = e.target.dataset.stock; if (st) stockDlg(products.find((p) => p.id === Number(st))); };
+};
+
+// ================= Vehicles =================
+VIEWS.vehicles = async () => {
+  const { vehicles: vs } = await api("GET", "/api/admin/vehicles");
+  const by = {}; vs.forEach((v) => (by[v.make] ||= []).push(v));
+  $("view").innerHTML = `<h1>Vehicles</h1><p class="muted">These makes and models appear in the fit finder, the product fitment editor and My Garage.</p>
+  <form class="card f" id="vf"><h2>Add or update a model</h2><div class="g4"><label>Make<input name="make" list="mk" required></label><label>Model<input name="model" required></label>
+    <label>First year<input name="yearFrom" type="number" required></label><label>Last year<input name="yearTo" type="number" value="${new Date().getFullYear()}" required></label></div>
+    <datalist id="mk">${Object.keys(by).map((m) => `<option>${esc(m)}</option>`).join("")}</datalist><p class="err" role="alert"></p><button class="btn">Save model</button></form>
+  ${Object.entries(by).map(([m, list]) => `<div class="card"><h2>${esc(m)}</h2>${list.map((v) => `<div class="li"><span>${esc(v.model)} <span class="muted">${v.yearFrom}–${v.yearTo}</span></span><button class="btn ghost sm" data-del="${v.id}" type="button">Delete</button></div>`).join("")}</div>`).join("")}`;
+  $("vf").onsubmit = async (e) => { e.preventDefault(); try { await api("POST", "/api/admin/vehicles", Object.fromEntries(new FormData(e.target))); flash("Model saved"); VIEWS.vehicles(); } catch (x) { e.target.querySelector(".err").textContent = x.message; } };
+  $("view").onclick = async (e) => { const d = e.target.dataset.del; if (!d || !confirm("Delete this model? Products that list it keep their fitment rows.")) return; await api("DELETE", `/api/admin/vehicles/${d}`); VIEWS.vehicles(); };
+};
+
+// ================= Customers =================
+VIEWS.customers = async () => {
+  const { customers } = await api("GET", "/api/admin/customers");
+  $("view").innerHTML = `<div class="row"><h1>Customers</h1><span class="sp"></span><a class="btn ghost" href="/api/admin/subscribers.csv">Newsletter list (CSV)</a></div>
+  <div class="tiles">${tile("Customers", customers.length)}${tile("With accounts", customers.filter((c) => c.account).length)}${tile("Repeat buyers", customers.filter((c) => c.orders > 1).length)}
+    ${tile("Marketing opt-ins", customers.filter((c) => c.marketingOk).length)}</div>
+  <div class="bar"><input id="cq" type="search" placeholder="Search name, email or phone"></div>
+  <div class="tw"><table><thead><tr><th>Customer</th><th>Account</th><th class="right">Orders</th><th class="right">Lifetime spend</th><th>Last order</th><th>Cars</th></tr></thead><tbody id="crows"></tbody></table></div>`;
+  const draw = () => { const q = $("cq").value.toLowerCase();
+    $("crows").innerHTML = customers.filter((c) => !q || [c.name, c.email, c.phone].join(" ").toLowerCase().includes(q)).sort((a, b) => b.spent - a.spent).map((c) => `<tr>
+      <td>${esc(c.name)}<div class="muted small">${esc(c.email)}${c.phone ? " · " + esc(c.phone) : ""}</div></td><td>${c.account ? '<span class="pill p-ok">Account</span>' : '<span class="pill">Guest</span>'}${c.marketingOk ? ' <span class="pill p-blue">Opted in</span>' : ""}</td>
+      <td class="right">${c.orders}${c.refundedOrders ? `<div class="muted small">${c.refundedOrders} refunded</div>` : ""}</td><td class="right">${money(c.spent)}</td><td class="muted">${date(c.lastOrder)}</td>
+      <td class="small">${(c.garage || []).map((v) => `${esc(v.year)} ${esc(v.make)} ${esc(v.model)}`).join("<br>")}</td></tr>`).join("") || '<tr><td colspan="6" class="empty">No customers yet.</td></tr>'; };
+  $("cq").oninput = draw; draw();
+};
+
+// ================= Coupons =================
+VIEWS.coupons = async () => {
+  const { coupons } = await api("GET", "/api/admin/coupons");
+  $("view").innerHTML = `<h1>Coupons</h1>
+  <form class="card f" id="cf"><h2>Create or edit a coupon</h2><div class="g4"><label>Code<input name="code" required maxlength="30" style="text-transform:uppercase"></label><label>Discount %<input name="percent" type="number" min="1" max="90" required></label>
+    <label>Minimum order ₹<input name="minOrder" type="number" min="0" value="0"></label><label>Max uses (empty = no limit)<input name="maxUses" type="number" min="1"></label></div>
+    <div class="g2"><label>Expires (optional)<input name="expiresAt" type="datetime-local"></label><label class="check" style="margin-top:28px"><input type="checkbox" name="active" checked> Active</label></div>
+    <p class="err" role="alert"></p><button class="btn">Save coupon</button></form>
+  <div class="tw"><table><thead><tr><th>Code</th><th>Discount</th><th>Min order</th><th>Used</th><th>Expires</th><th>Status</th><th></th></tr></thead><tbody>
+  ${coupons.map((c) => `<tr><td><b>${esc(c.code)}</b></td><td>${c.percent}%</td><td>${money(c.minOrder)}</td><td>${c.uses}${c.maxUses ? " / " + c.maxUses : ""}</td><td class="muted">${date(c.expiresAt)}</td>
+    <td><span class="pill ${c.active && (!c.expiresAt || new Date(c.expiresAt) > new Date()) ? "p-ok" : "p-bad"}">${c.active ? (c.expiresAt && new Date(c.expiresAt) < new Date() ? "Expired" : "Active") : "Off"}</span></td>
+    <td><button class="btn ghost sm" type="button" data-edit="${esc(c.code)}">Edit</button></td></tr>`).join("") || '<tr><td colspan="7" class="empty">No coupons yet.</td></tr>'}</tbody></table></div>`;
+  const f = $("cf");
+  f.onsubmit = async (e) => { e.preventDefault(); const d = Object.fromEntries(new FormData(f));
+    try { await api("POST", "/api/admin/coupons", { ...d, active: !!d.active, percent: Number(d.percent) }); flash("Coupon saved"); VIEWS.coupons(); } catch (x) { f.querySelector(".err").textContent = x.message; } };
+  $("view").querySelector("tbody").onclick = (e) => { const c = coupons.find((x) => x.code === e.target.dataset.edit); if (!c) return;
+    f.code.value = c.code; f.percent.value = c.percent; f.minOrder.value = c.minOrder; f.maxUses.value = c.maxUses || ""; f.active.checked = c.active;
+    f.expiresAt.value = c.expiresAt ? new Date(new Date(c.expiresAt).getTime() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16) : ""; f.scrollIntoView({ behavior: "smooth" }); };
+};
+
+// ================= Reviews =================
+VIEWS.reviews = async () => {
+  const { reviews } = await api("GET", "/api/admin/reviews");
+  $("view").innerHTML = `<h1>Reviews</h1><p class="muted">Only customers with a delivered order can review. Approve reviews that are genuine and on-topic, positive or negative. Hiding honest negative reviews is not allowed under the E-Commerce Rules.</p>
+  <div class="bar"><select id="rs"><option value="pending">Waiting for review</option><option value="approved">Approved</option><option value="rejected">Rejected</option><option value="">All</option></select></div><div id="rl"></div>`;
+  const draw = () => { const s = $("rs").value;
+    $("rl").innerHTML = reviews.filter((r) => !s || r.status === s).map((r) => `<div class="card"><div class="row"><b>${"★".repeat(r.rating)}${"☆".repeat(5 - r.rating)}</b><span>${esc(r.product)}</span><span class="sp"></span><span class="muted small">${esc(r.author)} · order ${esc(r.orderRef)} · ${date(r.createdAt)}</span></div>
+      ${r.title ? `<h4 style="margin:10px 0 4px;color:var(--text);text-transform:none;letter-spacing:0;font-size:1rem">${esc(r.title)}</h4>` : ""}<p style="margin:6px 0">${esc(r.body) || '<span class="muted">No text</span>'}</p>
+      <div class="row"><span class="pill ${r.status === "approved" ? "p-ok" : r.status === "rejected" ? "p-bad" : "p-warn"}">${r.status}</span>${r.reports ? `<span class="pill p-bad">${r.reports} report(s)</span>` : ""}<span class="muted small">${r.helpful} found helpful</span><span class="sp"></span>
+      ${r.status !== "approved" ? `<button class="btn ok sm" data-r="${r.id}" data-s="approved" type="button">Approve</button>` : ""}${r.status !== "rejected" ? `<button class="btn ghost sm" data-r="${r.id}" data-s="rejected" type="button">Reject</button>` : ""}</div></div>`).join("") || '<p class="empty">Nothing here.</p>'; };
+  $("rs").onchange = draw; draw();
+  $("rl").onclick = async (e) => { const id = e.target.dataset.r; if (!id) return; await api("POST", `/api/admin/reviews/${id}`, { status: e.target.dataset.s }); flash("Review " + e.target.dataset.s); VIEWS.reviews(); };
+};
+
+// ================= Returns =================
+VIEWS.returns = async () => {
+  const { returns, next: rn } = await api("GET", "/api/admin/returns");
+  const label = { approved: "Approve", rejected: "Reject", picked_up: "Mark picked up", received: "Mark received", refunded: "Refund", replaced: "Mark replaced" };
+  $("view").innerHTML = `<h1>Returns</h1><div class="tiles">${tile("Waiting for you", returns.filter((r) => ["requested", "received"].includes(r.status)).length)}${tile("In progress", returns.filter((r) => ["approved", "picked_up"].includes(r.status)).length)}${tile("All time", returns.length)}</div>
+  ${returns.map((r) => `<div class="card" data-id="${r.id}"><div class="row"><b>Return #${r.id}</b><span>Order ${esc(r.orderRef)}</span><span class="pill ${r.status === "refunded" || r.status === "replaced" ? "p-ok" : r.status === "rejected" ? "p-bad" : "p-warn"}">${r.status.replace("_", " ")}</span><span class="sp"></span><span class="muted small">${date(r.createdAt, 1)}</span></div>
+    <p style="margin:8px 0"><b>${esc(r.reason)}</b>${r.details ? ` · ${esc(r.details)}` : ""}</p>
+    ${r.items.map((l) => `<div class="li"><span>${esc(l.name)} × ${l.qty}</span><span>${money(l.price * l.qty)}</span></div>`).join("")}
+    ${r.photoUrls.length ? `<div class="thumbs" style="margin-top:10px">${r.photoUrls.map((u) => `<a href="${esc(u)}" target="_blank" rel="noopener"><img src="${esc(u)}" alt="Return photo"></a>`).join("")}</div>` : ""}
+    ${r.refundAmount != null ? `<p class="small ok-t">Refunded ${money(r.refundAmount)}</p>` : ""}${r.restocked ? '<p class="small muted">Items put back in stock.</p>' : ""}
+    ${rn[r.status].length ? `<div class="f" style="margin-top:10px"><div class="g3"><label>Note to customer<input data-note placeholder="Optional"></label>
+      ${rn[r.status].includes("refunded") ? `<label>Refund amount ₹<input data-amt type="number" min="1" step="0.01" placeholder="${money(r.items.reduce((s, l) => s + l.price * l.qty, 0))}"></label>` : ""}
+      ${rn[r.status].includes("received") ? '<label class="check" style="margin-top:28px"><input type="checkbox" data-restock checked> Put items back in stock</label>' : ""}</div>
+      <div class="row" style="margin-top:10px">${rn[r.status].map((s) => `<button type="button" class="btn ${s === "rejected" ? "ghost" : ""} sm" data-go="${s}">${label[s]}</button>`).join("")}</div></div>` : ""}
+    <details><summary>History</summary>${r.history.map((h) => `<div class="small">${date(h.at, 1)} · ${esc(h.status)} (${esc(h.by)})${h.note ? ": " + esc(h.note) : ""}</div>`).join("")}</details></div>`).join("") || '<p class="empty">No returns yet.</p>'}`;
+  $("view").onclick = async (e) => {
+    const s = e.target.dataset.go; if (!s) return;
+    const card = e.target.closest("[data-id]"), amt = card.querySelector("[data-amt]"), rs = card.querySelector("[data-restock]");
+    if (s === "refunded" && !confirm("Send this refund? It can't be undone.")) return;
+    e.target.disabled = true;
+    try { await api("POST", `/api/admin/returns/${card.dataset.id}`, { status: s, adminNote: card.querySelector("[data-note]").value, refundAmount: amt && amt.value !== "" ? Number(amt.value) : undefined, restock: rs ? rs.checked : false }); flash("Return updated. Customer emailed."); }
+    catch (x) { flash(x.message, true); }
+    VIEWS.returns();
+  };
+};
+
+// ================= Audit =================
+VIEWS.audit = async () => {
+  const { log } = await api("GET", "/api/admin/audit");
+  $("view").innerHTML = `<h1>Audit log</h1><p class="muted">Every admin sign-in and change, newest first.</p><div class="tw"><table><thead><tr><th>When</th><th>Who</th><th>What</th><th>Target</th><th>Details</th><th>IP</th></tr></thead><tbody>
+  ${log.map((l) => `<tr><td class="muted">${date(l.createdAt, 1)}</td><td>${esc(l.actor)}</td><td>${esc(l.action)}</td><td>${esc(l.target || "")}</td><td class="small muted" style="max-width:360px;word-break:break-word">${l.details ? esc(JSON.stringify(l.details)).slice(0, 300) : ""}</td><td class="muted small">${esc(l.ip || "")}</td></tr>`).join("") || '<tr><td colspan="6" class="empty">Nothing yet.</td></tr>'}</tbody></table></div>`;
+};
+
+go();
+setInterval(() => { if (section === "orders" && !document.hidden && !document.activeElement.matches("select,input,textarea") && !dlg.open) VIEWS.orders(); }, 60000);
 </script>
 </body>
 </html>

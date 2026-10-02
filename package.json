@@ -6,13 +6,21 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "node --watch server.js"
+    "dev": "node --watch server.js",
+    "seed": "node seed.js",
+    "totp": "node totp-setup.js",
+    "test": "node --test test/*.test.js",
+    "check": "node --check server.js && node --test test/*.test.js"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.131.0",
     "@supabase/supabase-js": "^2.117.2",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "nodemailer": "^10.0.13",
     "razorpay": "^2.9.4"
+  },
+  "engines": {
+    "node": ">=20"
   }
 }
