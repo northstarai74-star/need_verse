@@ -77,6 +77,11 @@
     $("vbar").innerHTML = v ? `<div class="vbar">🚗 Your car: <b>${esc(S.vehicleName(v))}</b>${f.fit ? " · showing only parts that fit" : ""}
       <button type="button" class="linkbtn" id="vToggle">${f.fit ? "Show everything" : "Only show parts that fit"}</button></div>` : "";
     if ($("vToggle")) $("vToggle").onclick = () => { f.fit = !f.fit; $("fFit").checked = f.fit; render(); };
+    if (!C.products.length) {
+      $("resultInfo").textContent = ""; $("vbar").innerHTML = "";
+      $("grid").innerHTML = `<div class="empty"><div style="font-size:2.6rem" aria-hidden="true">🚗</div><p><b>New products are on their way.</b><br>We're stocking accessories for your car. Check back soon, or join the list below to hear first.</p></div>`;
+      return;
+    }
     $("grid").innerHTML = list.length ? list.map(S.card).join("") : `<div class="empty"><div style="font-size:2.6rem" aria-hidden="true">🔍</div>
       <p>No products match${q ? ` “${esc(q)}”` : ""}${f.fit && v ? ` that fit your ${esc(v.model)}` : ""}.</p>
       <p><button type="button" class="linkbtn" id="emptyClear">Clear search and filters</button>${document.getElementById("aiBtn") ? ' or <button type="button" class="linkbtn" id="emptyAsk">ask the fit assistant</button>' : ""}</p></div>`;

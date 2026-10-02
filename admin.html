@@ -312,7 +312,7 @@ VIEWS.products = async () => {
       <td><span class="pill ${p.status === "active" ? "p-ok" : ""}">${p.status}</span></td>
       <td class="small">${esc(suppliersList.find((s) => s.id === p.supplierId)?.name || "-")}</td>
       <td class="small">${p.universal ? "Every vehicle" : p.fitment.length ? esc(p.fitment.slice(0, 3).map((f) => f.make + (f.model ? " " + f.model : "")).join(", ")) + (p.fitment.length > 3 ? ` +${p.fitment.length - 3}` : "") : '<span class="p-bad pill">None</span>'}</td>
-      <td><button class="btn ghost sm" data-edit="${p.id}" type="button">Edit</button></td></tr>`).join("") || '<tr><td colspan="9" class="empty">No products match.</td></tr>';
+      <td><button class="btn ghost sm" data-edit="${p.id}" type="button">Edit</button></td></tr>`).join("") || (products.length ? '<tr><td colspan="9" class="empty">No products match.</td></tr>' : '<tr><td colspan="9" class="empty">No products yet. Use <b>New product</b> to add one, or <b>Import CSV</b> to add many at once.</td></tr>');
   };
   $("pq").oninput = draw; $("pst").onchange = draw; draw();
   $("newP").onclick = () => editProduct(null);

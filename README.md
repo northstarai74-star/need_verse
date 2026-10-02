@@ -9,7 +9,7 @@ Node.js and Express, Supabase (Postgres) for data, Razorpay for payments. Pages 
 1. `npm install`
 2. Create a Supabase project and run `schema.sql` in its SQL Editor. Run it again after updates; it is safe to re-run.
 3. `cp .env.example .env` and fill in the required sections: Razorpay keys, Supabase URL and service role key, and an admin password.
-4. `npm run seed` loads the starter products, about 70 car models and two coupons. Stock is a placeholder (10 each) and fitment is by make only, so set real stock and fitment in the admin before taking orders.
+4. `npm run seed` loads about 70 car models for the fit finder and two coupons (SAVE10, WELCOME5). Then add your products in the admin under Products (one at a time or by CSV import).
 5. `npm run totp` creates a two-factor secret for the admin. Put it in `.env` and add it to your authenticator app.
 6. `npm start`, then open http://localhost:3000. The admin is at http://localhost:3000/admin.
 

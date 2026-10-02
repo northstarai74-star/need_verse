@@ -4,7 +4,7 @@ const { createFake } = require("./fake-supabase");
 
 const KEY_SECRET = "test_key_secret", WEBHOOK_SECRET = "test_webhook_secret";
 
-async function setup(env = {}) {
+async function setup(env = {}, opts = {}) {
   Object.assign(process.env, {
     SUPABASE_URL: "https://db.test", SUPABASE_SERVICE_ROLE_KEY: "service", ADMIN_USER: "admin", ADMIN_PASSWORD: "admin-pass",
     SMTP_HOST: "smtp.test", SMTP_USER: "shop@test", SMTP_PASS: "x", OWNER_EMAIL: "owner@test", PUBLIC_URL: "https://shop.test",
@@ -25,7 +25,7 @@ async function setup(env = {}) {
   const app = createApp({ rzp, keyId: "rzp_test_key", keySecret: KEY_SECRET, webhookSecret: WEBHOOK_SECRET });
   const server = await new Promise((r) => { const s = app.listen(0, () => r(s)); });
   const base = `http://127.0.0.1:${server.address().port}`;
-  await require("../seed")();
+  await require("../seed")(opts.data || require("./fixtures"));
   return { fake, sent, rzpCalls, base, server, client: () => client(base), close: () => new Promise((r) => server.close(r)) };
 }
 

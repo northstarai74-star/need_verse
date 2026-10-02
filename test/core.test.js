@@ -28,9 +28,11 @@ test("coupon minimum order is enforced", () => {
 });
 
 test("kit discount applies only when every kit item is in the cart", () => {
+  const bundles = [{ name: "Clean kit", ids: [15, 14, 13], off: 0.1 }];
   const lines = [{ id: 15, price: 2639, qty: 1 }, { id: 14, price: 1199, qty: 1 }];
-  assert.equal(Core.computeTotals(lines).kit, 0);
-  assert.ok(Core.computeTotals([...lines, { id: 13, price: 1599, qty: 1 }]).kit > 0);
+  assert.equal(Core.computeTotals(lines, { bundles }).kit, 0);
+  assert.equal(Core.computeTotals([...lines, { id: 13, price: 1599, qty: 1 }], { bundles }).kit, 543.7);
+  assert.equal(Core.computeTotals([...lines, { id: 13, price: 1599, qty: 1 }]).kit, 0, "no kits unless you define them");
 });
 
 test("fitment matches make, model and year ranges", () => {

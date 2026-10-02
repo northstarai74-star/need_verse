@@ -228,5 +228,4 @@ test("quote matches what checkout charges", async () => {
   const q = await c.post("/api/quote", { cart: { 15: 1, 14: 1, 13: 1 }, promo: "SAVE10" });
   const o = await c.post("/api/create-order", { cart: { 15: 1, 14: 1, 13: 1 }, promo: "SAVE10", customer: customer() });
   assert.equal(Math.round(q.json.totals.total * 100), o.json.amount);
-  assert.ok(q.json.totals.kit > 0);
 });

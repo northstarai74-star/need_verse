@@ -20,12 +20,9 @@
     Utility: { em: "📦", c: "#3ddc84", sub: "Towing, cargo" }
   };
 
-  // Kits are discounted automatically when every product in them is in the cart.
-  const BUNDLES = [
-    { name: "Weekly Clean Kit", desc: "Vacuum, microfiber towels and ceramic spray for a showroom finish.", ids: [15, 14, 13], off: 0.10, icon: "🧼" },
-    { name: "Road-Trip Safety Kit", desc: "Jump starter, tire inflator and a roadside kit. Never get stranded.", ids: [7, 8, 9], off: 0.12, icon: "🛣️" },
-    { name: "Commuter Essentials", desc: "Phone mount, dash cam and sun shade for the daily drive.", ids: [3, 2, 5], off: 0.08, icon: "🚗" }
-  ];
+  // Kits: discounted automatically when every product in one is in the cart. Empty until you define your own:
+  // { name, desc, ids: [productId, ...], off: 0.10, icon }
+  const BUNDLES = [];
 
   const STATES = ["Andaman and Nicobar Islands", "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chandigarh", "Chhattisgarh",
     "Dadra and Nagar Haveli and Daman and Diu", "Delhi", "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jammu and Kashmir", "Jharkhand",
@@ -54,7 +51,7 @@
     let sub = 0;
     for (const l of lines) { qty[l.id] = l.qty; price[l.id] = l.price; sub += l.price * l.qty; }
     let kit = 0;
-    for (const b of BUNDLES) if (b.ids.every((id) => qty[id])) kit += b.ids.reduce((s, id) => s + price[id], 0) * b.off;
+    for (const b of o.bundles || BUNDLES) if (b.ids.every((id) => qty[id])) kit += b.ids.reduce((s, id) => s + price[id], 0) * b.off;
     const couponOk = !!(o.coupon && sub >= (o.coupon.minOrder || 0));
     const couponDisc = couponOk ? (sub - kit) * o.coupon.percent / 100 : 0;
     const disc = kit + couponDisc, after = sub - disc;

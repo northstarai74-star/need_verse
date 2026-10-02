@@ -1,11 +1,11 @@
-// Loads the starter catalogue from seed/data.js. Safe to run again: existing products,
-// coupons and stock levels are left alone; vehicles are added or updated.
+// Loads the starter data from seed/data.js (car models and coupons). Safe to run again:
+// existing products, coupons and stock levels are left alone; vehicles are added or updated.
 //   npm run seed
 require("dotenv").config();
 const db = require("./db");
-const { products, vehicles, coupons } = require("./seed/data");
 
-async function seed() {
+async function seed(data = require("./seed/data")) {
+  const { products, vehicles, coupons } = data;
   await db.check();
   const existing = new Set((await db.listProducts()).map((p) => p.id));
   let added = 0;
@@ -19,7 +19,7 @@ async function seed() {
     await db.setFitment(p.id, makes.map((make) => ({ make, model: null, yearFrom: null, yearTo: null })));
     added++;
   }
-  await db.syncProductSeq();
+  if (products.length) await db.syncProductSeq();
 
   const rows = [];
   for (const [make, models] of Object.entries(vehicles))
