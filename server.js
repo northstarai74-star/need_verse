@@ -21,7 +21,7 @@ process.on("unhandledRejection", (e) => report(e, "unhandled rejection"));
 
 db.check().then(() => {
   app.listen(PORT, () => {
-    console.log(`Nnedverse running at http://localhost:${PORT}`);
+    console.log(`Needverse running at http://localhost:${PORT}`);
     console.log(`Database: Supabase connected`);
     console.log(`Payments: ${RAZORPAY_KEY_ID.startsWith("rzp_test_") ? "Razorpay TEST mode" : "Razorpay LIVE mode"}`);
     console.log(`Webhook:  ${RAZORPAY_WEBHOOK_SECRET ? "ready at /api/razorpay-webhook" : "NOT configured (set RAZORPAY_WEBHOOK_SECRET)"}`);

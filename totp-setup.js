@@ -5,4 +5,4 @@ const { newTotpSecret } = require("./lib/security");
 const secret = newTotpSecret();
 const user = process.env.ADMIN_USER || "admin";
 console.log(`\nADMIN_TOTP_SECRET=${secret}\n`);
-console.log(`Authenticator link: otpauth://totp/Nnedverse:${encodeURIComponent(user)}?secret=${secret}&issuer=Nnedverse&digits=6&period=30\n`);
+console.log(`Authenticator link: otpauth://totp/Needverse:${encodeURIComponent(user)}?secret=${secret}&issuer=Needverse&digits=6&period=30\n`);

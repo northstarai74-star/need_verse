@@ -1,4 +1,4 @@
-# Nnedverse
+# Needverse
 
 Online store for car accessories in India. Shoppers pick their car once and see only parts that fit, then pay with UPI, cards, netbanking, wallets or cash on delivery.
 

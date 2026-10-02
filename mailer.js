@@ -7,7 +7,7 @@ const enabled = Boolean(SMTP_HOST && SMTP_USER && SMTP_PASS);
 const transport = enabled
   ? nodemailer.createTransport({ host: SMTP_HOST, port: Number(SMTP_PORT), secure: Number(SMTP_PORT) === 465, auth: { user: SMTP_USER, pass: SMTP_PASS } })
   : null;
-const brand = () => process.env.BUSINESS_NAME || "Nnedverse";
+const brand = () => process.env.BUSINESS_NAME || "Needverse";
 const site = () => (process.env.PUBLIC_URL || `http://localhost:${process.env.PORT || 3000}`).replace(/\/$/, "");
 const first = (name) => esc(String(name || "").split(" ")[0]);
 
