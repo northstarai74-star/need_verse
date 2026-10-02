@@ -238,13 +238,17 @@ dialog input:focus{border-color:var(--accent)}
         <button class="userbtn" id="userBtn">👤 <span id="userName">User</span></button>
         <div class="userdrop" id="userDrop">
           <div class="email" id="userEmail">user@example.com</div>
-          <a href="#" onclick="goToProfile()">My Profile</a>
-          <a href="#" onclick="goToOrders()">Order History</a>
-          <a href="#" onclick="goToWishlist()">Wishlist</a>
+          <a href="/account.html">My Profile</a>
+          <a href="/account.html">Order History</a>
+          <a href="/wishlist.html">❤️ Wishlist</a>
           <div class="divider"></div>
           <button onclick="logout()">Sign out</button>
         </div>
       </div>
+      <button id="wishlistBtn" class="cartbtn" style="display:none;background:transparent;border:1px solid var(--line);color:var(--text)" aria-label="Open wishlist" onclick="location.href='/wishlist.html'">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        <b id="wishlistCount">0</b>
+      </button>
       <button id="cartBtn" class="cartbtn" aria-label="Open cart">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6h15l-2 9H8L6 3H3"/><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/></svg>
         Cart <b id="cartCount">0</b>
@@ -466,7 +470,7 @@ function render(){
         <p>${p.desc}</p>
         <div class="stars">${stars(p.rating)}<small>${p.rating} (${p.n.toLocaleString()})</small></div>
         <div style="font-size:.8rem;color:var(--muted);margin:6px 0"><span id="reviewCount${p.id}">${reviews.getProductReviews(p.id).length}</span> customer review${reviews.getProductReviews(p.id).length !== 1 ? 's' : ''}</div>
-        <div class="buy"><span class="price">${money(p.price)}</span><button class="add" data-add="${p.id}">Add to cart</button></div>
+        <div class="buy"><span class="price">${money(p.price)}</span><button class="add" data-add="${p.id}">Add to cart</button><button style="width:36px;height:36px;padding:0;background:transparent;border:1px solid var(--line);border-radius:8px;cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center" data-wishlist="${p.id}" title="Add to wishlist" onclick="toggleWishlist(${p.id})">🤍</button></div>
         <button style="width:100%;background:transparent;border:1px solid var(--line);color:var(--text);padding:8px 12px;border-radius:8px;margin-top:8px;font-size:.85rem;cursor:pointer" data-review="${p.id}" onclick="openReviewModal(${p.id},'${p.name}')">Read reviews</button>
       </div>
     </article>`).join(""):`<div class="empty"><div style="font-size:2.6rem">🔍</div><p>No matches. Try another category or clear your search.</p></div>`}
@@ -553,10 +557,13 @@ function updateAuthUI(){
     $("userMenu").style.display="block";
     $("userName").textContent=user.name.split(" ")[0];
     $("userEmail").textContent=user.email;
+    $("wishlistBtn").style.display="flex";
   }else{
     $("loginLink").style.display="block";
     $("userMenu").style.display="none";
+    $("wishlistBtn").style.display="none";
   }
+  updateWishlistUI();
 }
 $("userBtn")?.onclick=()=>$("userDrop").classList.toggle("show");
 document.onclick=e=>{if(!e.target.closest(".usermenu"))$("userDrop").classList.remove("show")};
@@ -579,16 +586,58 @@ function goToOrders(){
   alert("Order History:\n"+(userData?.orders?.length?userData.orders.map(o=>`Order #${o.ref}: ${o.amount}`).join("\n"):"No orders yet"));
 }
 function goToWishlist(){
+  location.href="/wishlist.html";
+}
+
+/* ===== Wishlist ===== */
+function getWishlist(){
   const user=store.get("currentUser",null);
-  if(!user){toast("Please sign in first");location.href="/auth.html";return}
+  if(!user)return[];
   const users=store.get("users",[]);
   const userData=users.find(u=>u.id===user.id);
-  alert("Wishlist:\n"+(userData?.wishlist?.length?userData.wishlist.join("\n"):"No items in wishlist"));
+  return userData?.wishlist||[];
+}
+
+function setWishlist(wishlist){
+  const user=store.get("currentUser",null);
+  if(!user)return;
+  const users=store.get("users",[]);
+  const idx=users.findIndex(u=>u.id===user.id);
+  if(idx>=0){
+    users[idx].wishlist=wishlist;
+    store.set("users",users);
+  }
+}
+
+function toggleWishlist(productId){
+  const user=store.get("currentUser",null);
+  if(!user){toast("Please sign in to use wishlist");location.href="/auth.html";return}
+  const wishlist=getWishlist();
+  if(wishlist.includes(productId)){
+    setWishlist(wishlist.filter(id=>id!==productId));
+    toast("Removed from wishlist");
+  }else{
+    wishlist.push(productId);
+    setWishlist(wishlist);
+    toast("Added to wishlist ❤️");
+  }
+  updateWishlistUI();
+}
+
+function updateWishlistUI(){
+  const wishlist=getWishlist();
+  $("wishlistCount").textContent=wishlist.length;
+  document.querySelectorAll("[data-wishlist]").forEach(btn=>{
+    const id=Number(btn.dataset.wishlist);
+    btn.textContent=wishlist.includes(id)?"❤️":"🤍";
+    btn.style.color=wishlist.includes(id)?"#ff4d1a":"var(--text)";
+  });
 }
 
 $("yr").textContent=new Date().getFullYear();
 updateAuthUI();
 renderGarage();renderChips();render();renderCart();
+updateWishlistUI();
 
 /* ===== Reviews ===== */
 let currentReviewProductId=null;

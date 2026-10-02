@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>My Wishlist - Nnedverse</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="index.html" media="none" onload="this.media='all'">
+<style>
+:root{
+  --bg:#0a0b0d;--bg2:#101216;--panel:#15181d;--panel2:#1b1f26;--line:#262b34;
+  --text:#f4f1ec;--muted:#8e97a6;--accent:#ff4d1a;--accent2:#ff7a3d;--ok:#3ddc84;--gold:#ffc53d;
+  --disp:"Barlow Condensed","Arial Narrow",Impact,sans-serif;--body:Inter,system-ui,Segoe UI,sans-serif;--r:16px;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:400 16px/1.55 var(--body);-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+button,input,select{font:inherit;color:inherit}
+.wrap{max-width:1240px;margin:0 auto;padding:0 24px}
+.muted{color:var(--muted)}
+
+header{border-bottom:1px solid var(--line);background:var(--panel);padding:20px 0}
+header .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.logo{font:800 1.9rem/1 var(--disp);text-transform:uppercase;letter-spacing:.02em;display:flex;align-items:center;gap:8px;cursor:pointer}
+.logo i{display:grid;place-items:center;width:32px;height:32px;background:var(--accent);border-radius:8px;font-style:normal;font-size:1.3rem;transform:skewX(-8deg)}
+.btn{background:var(--accent);color:#fff;border:0;border-radius:10px;padding:9px 16px;font-weight:600;cursor:pointer;text-decoration:none;display:inline-block;transition:.2s}
+.btn:hover{background:#ff7a3d}
+.btn.ghost{background:transparent;border:1px solid var(--line)}
+.btn.sm{padding:6px 12px;font-size:.85rem}
+
+main{padding:40px 0}
+h1{font:800 2.5rem/1 var(--disp);text-transform:uppercase;margin:0 0 10px}
+.subtitle{color:var(--muted);margin:0 0 30px;font-size:1.05rem}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:18px;margin:20px 0}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;display:flex;flex-direction:column;transition:.25s}
+.card:hover{transform:translateY(-6px);border-color:#3a414e;box-shadow:0 24px 50px rgba(0,0,0,.5)}
+
+.pic{position:relative;aspect-ratio:1/.85;display:grid;place-items:center;overflow:hidden;background:radial-gradient(circle at 50% 45%,var(--c),transparent 70%),var(--bg2)}
+.pic img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1}
+.pic span{position:relative;z-index:1;font-size:3.5rem}
+
+.info{padding:16px 18px 18px;display:flex;flex-direction:column;gap:6px;flex:1}
+.cat-l{font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.card h3{font:600 1.05rem/1.25 var(--body);text-transform:none;letter-spacing:0;margin:0}
+.card p{margin:0;color:var(--muted);font-size:.85rem;flex:1}
+.price{font:800 1.7rem/1 var(--disp);margin:8px 0 12px}
+
+.actions{display:flex;gap:8px;margin-top:12px}
+.actions button{flex:1;padding:10px 12px;border-radius:10px;border:0;cursor:pointer;font-weight:600;font-size:.88rem;transition:.2s}
+.add{background:var(--text);color:#111}
+.add:hover{background:var(--accent);color:#fff}
+.remove{background:rgba(255,92,92,.15);color:#ff5c5c;border:1px solid rgba(255,92,92,.3)}
+.remove:hover{background:#ff5c5c;color:#fff}
+
+.empty{text-align:center;padding:80px 20px;color:var(--muted)}
+.empty div{font-size:4rem;margin-bottom:20px}
+.empty p{margin:10px 0}
+.empty a{color:var(--accent);text-decoration:underline;font-weight:600}
+
+.toast{position:fixed;bottom:20px;left:20px;background:var(--ok);color:#fff;padding:12px 20px;border-radius:8px;opacity:0;transition:.3s;z-index:100}
+.toast.show{opacity:1;bottom:40px}
+
+@media (max-width:720px){
+  .grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
+  .pic span{font-size:2.5rem}
+  .info{padding:12px}
+  .price{font-size:1.3rem}
+}
+</style>
+</head>
+<body>
+
+<header><div class="wrap">
+  <div class="logo" onclick="location.href='/'"><i>N</i>Nnedverse</div>
+  <button class="btn ghost" onclick="location.href='/'">← Continue Shopping</button>
+</div></header>
+
+<main class="wrap">
+  <h1>❤️ My Wishlist</h1>
+  <p class="subtitle" id="subtext">Save items for later and get notified on sales</p>
+
+  <div id="emptyState" class="empty" style="display:none">
+    <div>🛍️</div>
+    <h2>Your wishlist is empty</h2>
+    <p>Add items from the store to see them here</p>
+    <p><a href="/" style="display:inline-block;margin-top:10px">Explore products</a></p>
+  </div>
+
+  <div id="wishlistGrid" class="grid"></div>
+</main>
+
+<div id="toast" class="toast"></div>
+
+<script src="catalog.js"></script>
+<script src="reviews.js"></script>
+<script>
+const store={get(k,d){try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch{}}};
+const $=id=>document.getElementById(id);
+const money=n=>"₹"+Number(n).toLocaleString("en-IN",{maximumFractionDigits:2});
+
+// Check auth
+const user=store.get("currentUser",null);
+if(!user){location.href="/auth.html";throw new Error("Not authenticated")}
+
+function getWishlist(){
+  const users=store.get("users",[]);
+  const userData=users.find(u=>u.id===user.id);
+  return userData?.wishlist||[];
+}
+
+function setWishlist(wishlist){
+  const users=store.get("users",[]);
+  const idx=users.findIndex(u=>u.id===user.id);
+  if(idx>=0){
+    users[idx].wishlist=wishlist;
+    store.set("users",users);
+  }
+}
+
+function renderWishlist(){
+  const wishlist=getWishlist();
+  const items=PRODUCTS.filter(p=>wishlist.includes(p.id));
+
+  if(!items.length){
+    $("emptyState").style.display="block";
+    $("wishlistGrid").innerHTML="";
+    $("subtext").style.display="none";
+    return;
+  }
+
+  $("emptyState").style.display="none";
+  $("subtext").style.display="block";
+  $("subtext").textContent=`${items.length} item${items.length!==1?"s":""} saved`;
+
+  $("wishlistGrid").innerHTML=items.map(p=>`
+    <div class="card">
+      <div class="pic" style="--c:${p.icon==="🛞"?"#ff7a3d":p.icon==="📱"?"#3d8bff":"#ff4d1a"}40">
+        <span>${p.icon}</span>
+      </div>
+      <div class="info">
+        <span class="cat-l">${p.cat}</span>
+        <h3>${p.name}</h3>
+        <p>${p.desc}</p>
+        <div class="price">${money(p.price)}</div>
+        <div class="actions">
+          <button class="add" onclick="addToCart(${p.id})">Add to cart</button>
+          <button class="remove" onclick="removeFromWishlist(${p.id})">💔</button>
+        </div>
+      </div>
+    </div>
+  `).join("");
+}
+
+function removeFromWishlist(productId){
+  const wishlist=getWishlist();
+  const newWishlist=wishlist.filter(id=>id!==productId);
+  setWishlist(newWishlist);
+  toast("Removed from wishlist");
+  renderWishlist();
+}
+
+function addToCart(productId){
+  const cart=store.get("cart",{});
+  cart[productId]=(cart[productId]||0)+1;
+  store.set("cart",cart);
+  toast("Added to cart!");
+  setTimeout(()=>location.href="/",1500);
+}
+
+function toast(msg){
+  const t=$("toast");
+  t.textContent=msg;
+  t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"),2500);
+}
+
+// Init
+renderWishlist();
+</script>
+</body>
+</html>
