@@ -86,4 +86,38 @@ async function importOrder(orderId, o) {
   if (error) fail("import", error);
 }
 
-module.exports = { configured, check, insertOrder, getOrder, findByPaymentId, listOrders, updateOrder, importOrder };
+// Session management
+async function createSession(sessionId, userId, userName, ipAddress) {
+  const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(); // 7 days
+  const { error } = await sb.from("sessions").insert({
+    id: sessionId,
+    user_id: userId,
+    user_name: userName,
+    ip_address: ipAddress,
+    expires_at: expiresAt
+  });
+  if (error) fail("create session", error);
+}
+
+async function getSession(sessionId) {
+  const { data, error } = await sb.from("sessions").select("*").eq("id", sessionId).maybeSingle();
+  if (error) fail("get session", error);
+  if (!data) return null;
+  if (new Date(data.expires_at) < new Date()) {
+    await deleteSession(sessionId);
+    return null;
+  }
+  return { id: data.id, userId: data.user_id, userName: data.user_name, createdAt: data.created_at };
+}
+
+async function deleteSession(sessionId) {
+  const { error } = await sb.from("sessions").delete().eq("id", sessionId);
+  if (error) fail("delete session", error);
+}
+
+async function cleanupExpiredSessions() {
+  const { error } = await sb.from("sessions").delete().lt("expires_at", new Date().toISOString());
+  if (error) fail("cleanup sessions", error);
+}
+
+module.exports = { configured, check, insertOrder, getOrder, findByPaymentId, listOrders, updateOrder, importOrder, createSession, getSession, deleteSession, cleanupExpiredSessions };

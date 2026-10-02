@@ -203,6 +203,16 @@ dialog input:focus{border-color:var(--accent)}
 .toast{position:fixed;left:50%;bottom:28px;translate:-50% 100px;background:var(--text);color:#111;font-weight:600;font-size:.92rem;padding:12px 22px;border-radius:999px;opacity:0;transition:.3s;z-index:70;pointer-events:none;box-shadow:0 12px 40px rgba(0,0,0,.5)}
 .toast.show{translate:-50% 0;opacity:1}
 
+/* auth */
+.authbtn{position:relative;display:flex;align-items:center;gap:8px;background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:999px;padding:10px 18px;font-weight:600;cursor:pointer;transition:.2s;font-size:.92rem}
+.authbtn:hover{border-color:var(--accent);color:var(--accent)}
+#authMenu{position:absolute;top:100%;right:0;margin-top:8px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;min-width:160px;box-shadow:0 12px 30px rgba(0,0,0,.5);opacity:0;pointer-events:none;transition:.2s;z-index:100}
+#authMenu.show{opacity:1;pointer-events:auto}
+#authMenu button{display:block;width:100%;text-align:left;background:none;border:0;color:var(--text);padding:12px 16px;cursor:pointer;font-size:.92rem;transition:.2s}
+#authMenu button:hover{color:var(--accent);background:rgba(255,77,26,.1)}
+#authMenu button:first-child{border-radius:11px 11px 0 0}
+#authMenu button:last-child{border-radius:0 0 11px 11px}
+
 /* responsive */
 @media (max-width:1050px){.grid{grid-template-columns:repeat(3,1fr)}.cats{grid-template-columns:repeat(3,1fr)}.hero .wrap{grid-template-columns:1fr}.trust .wrap{grid-template-columns:1fr 1fr}.links{display:none}.fgrid{grid-template-columns:1fr 1fr}}
 @media (max-width:720px){.wrap{padding:0 16px}.grid{grid-template-columns:repeat(2,1fr);gap:12px}.kits{grid-template-columns:1fr}.cats{grid-template-columns:repeat(2,1fr)}.nav .wrap{gap:12px;height:64px}.logo span{display:none}.search{max-width:none}.hero{padding:44px 0 56px}.pic span{font-size:3.4rem}.info{padding:12px}.price{font-size:1.4rem}.add{padding:8px 12px}.buy{flex-wrap:wrap;gap:8px}.fgrid{grid-template-columns:1fr}.trust .wrap{grid-template-columns:1fr}.reorder{padding:26px}section.s{padding-top:60px}}
@@ -221,10 +231,16 @@ dialog input:focus{border-color:var(--accent)}
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
       <input id="search" type="search" placeholder="Search floor mats, dash cams…" aria-label="Search products">
     </label>
-    <button id="cartBtn" class="cartbtn" aria-label="Open cart">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6h15l-2 9H8L6 3H3"/><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/></svg>
-      Cart <b id="cartCount">0</b>
-    </button>
+    <div style="position:relative;display:flex;gap:12px;align-items:center">
+      <button id="authBtn" class="authbtn" aria-label="Sign in or account menu">
+        <span id="authLabel">Sign in</span>
+      </button>
+      <div id="authMenu"></div>
+      <button id="cartBtn" class="cartbtn" aria-label="Open cart">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6h15l-2 9H8L6 3H3"/><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/></svg>
+        Cart <b id="cartCount">0</b>
+      </button>
+    </div>
   </div>
 </nav>
 
@@ -334,6 +350,18 @@ dialog input:focus{border-color:var(--accent)}
   <p id="doneMsg" class="muted"></p>
   <div class="acts"><button id="doneClose" class="btn">Keep shopping</button></div>
 </dialog>
+
+<dialog id="signin">
+  <form id="signinForm">
+    <h2>Sign in</h2>
+    <p class="muted small" style="margin:0 0 16px">Admin access to manage orders</p>
+    <label>Username<input id="signinUser" name="username" type="text" required></label>
+    <label>Password<input id="signinPass" name="password" type="password" required></label>
+    <p id="signinError" class="muted small" style="margin:12px 0 0;color:var(--accent);display:none"></p>
+    <div class="acts"><button type="button" id="signinCancel" class="btn ghost">Cancel</button><button class="btn" type="submit">Sign in</button></div>
+  </form>
+</dialog>
+
 <div id="toast" class="toast" role="status"></div>
 
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
@@ -473,6 +501,86 @@ $("reorderBtn").onclick=()=>{const l=store.get("lastOrder",{});for(const id in l
 $("newsForm").onsubmit=e=>{e.preventDefault();e.target.reset();toast("You're on the list. Use WELCOME5 for 5% off")};
 
 let tt;function toast(m){const t=$("toast");t.textContent=m;t.classList.add("show");clearTimeout(tt);tt=setTimeout(()=>t.classList.remove("show"),2000)}
+
+/* auth */
+async function checkSession(){
+  try{
+    const r=await fetch("/api/session");
+    const d=await r.json();
+    updateAuthUI(d.loggedIn,d.username);
+  }catch(e){console.error("Session check failed:",e)}
+}
+function updateAuthUI(loggedIn,username){
+  const authBtn=$("authBtn");
+  const authMenu=$("authMenu");
+  if(loggedIn){
+    authBtn.textContent=username+" ▼";
+    authBtn.classList.add("on");
+    authMenu.innerHTML=`<button onclick="goToAdmin()">Admin panel</button><button onclick="signOut()">Sign out</button>`;
+  }else{
+    authBtn.textContent="Sign in";
+    authBtn.classList.remove("on");
+    authMenu.innerHTML="";
+  }
+}
+function toggleAuthMenu(){
+  const authMenu=$("authMenu");
+  authMenu.classList.toggle("show");
+}
+$("authBtn").onclick=e=>{e.stopPropagation();toggleAuthMenu()};
+document.onclick=()=>$("authMenu").classList.remove("show");
+$("signin").onclose=()=>$("authMenu").classList.remove("show");
+
+$("signinCancel").onclick=()=>$("signin").close();
+$("signinForm").onsubmit=async e=>{e.preventDefault();
+  const user=$("signinUser").value;const pass=$("signinPass").value;
+  const errEl=$("signinError");
+  try{
+    const r=await fetch("/api/signin",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:user,password:pass})});
+    if(!r.ok){const d=await r.json();throw new Error(d.error||"Sign in failed")}
+    await r.json();
+    checkSession();
+    $("signin").close();
+    toast("Signed in successfully");
+  }catch(err){
+    errEl.textContent=err.message;
+    errEl.style.display="block";
+  }
+};
+$("authBtn").onmouseenter=()=>$("authBtn").classList.add("on");
+function openSignIn(){
+  $("signinError").style.display="none";
+  $("signinUser").value="";
+  $("signinPass").value="";
+  $("signin").showModal();
+  $("signinUser").focus();
+}
+$("authBtn").ondblclick=openSignIn;
+// Click sign in button to open modal when not logged in
+const originalAuthClick=$("authBtn").onclick;
+$("authBtn").onclick=function(e){
+  e.stopPropagation();
+  const authMenu=$("authMenu");
+  if(!authMenu.innerHTML.includes("Admin")){
+    openSignIn();
+  }else{
+    toggleAuthMenu();
+  }
+};
+
+async function goToAdmin(){
+  window.location.href="/admin";
+}
+async function signOut(){
+  try{
+    await fetch("/api/signout",{method:"POST"});
+    checkSession();
+    $("authMenu").classList.remove("show");
+    toast("Signed out");
+  }catch(e){toast("Sign out failed")}
+}
+
+checkSession();
 
 $("yr").textContent=new Date().getFullYear();
 renderGarage();renderChips();render();renderCart();

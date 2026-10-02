@@ -31,3 +31,15 @@ create index if not exists orders_status_idx     on public.orders (status, fulfi
 -- row level security. With RLS on and no policies, the public "anon" key
 -- (which is visible in browsers) can read and write nothing.
 alter table public.orders enable row level security;
+
+create table if not exists public.sessions (
+  id                  text primary key,
+  user_id             text not null,
+  user_name           text not null,
+  created_at          timestamptz not null default now(),
+  expires_at          timestamptz not null,
+  ip_address          text
+);
+
+create index if not exists sessions_user_id_idx on public.sessions (user_id);
+create index if not exists sessions_expires_at_idx on public.sessions (expires_at);

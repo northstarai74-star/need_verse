@@ -7,7 +7,7 @@ const { STORE, byId, computeTotals } = require("./public/catalog.js");
 const { sendOrderEmails, sendShippedEmail, sendRefundEmail, emailEnabled } = require("./mailer");
 const db = require("./db");
 
-const { RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET, RAZORPAY_WEBHOOK_SECRET, ADMIN_USER = "admin", ADMIN_PASSWORD, PORT = 3000 } = process.env;
+const { RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET, RAZORPAY_WEBHOOK_SECRET, ADMIN_USER = "admin", ADMIN_PASSWORD, PORT = 3000, SESSION_SECRET = "change-me-in-production" } = process.env;
 if (!RAZORPAY_KEY_ID || !RAZORPAY_KEY_SECRET) {
   console.error("\nMissing Razorpay keys. Copy .env.example to .env and fill in RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET.\n");
   process.exit(1);
@@ -16,6 +16,17 @@ if (!RAZORPAY_KEY_ID || !RAZORPAY_KEY_SECRET) {
 const rzp = new Razorpay({ key_id: RAZORPAY_KEY_ID, key_secret: RAZORPAY_KEY_SECRET });
 const app = express();
 const wrap = (fn) => (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next);
+
+// Simple cookie parser
+function cookieParser(req, res, next) {
+  const cookies = {};
+  (req.get("cookie") || "").split(/;\s*/).forEach(c => {
+    const [k, v] = c.split("=");
+    if (k) cookies[k] = decodeURIComponent(v || "");
+  });
+  req.cookies = cookies;
+  next();
+}
 
 // Marks an order paid and sends the confirmation email. Called by both the browser callback and
 // the webhook. The "claim" below is an atomic database update, so only one caller sends the email.
@@ -106,7 +117,69 @@ app.post("/api/razorpay-webhook", express.raw({ type: "*/*", limit: "200kb" }), 
 });
 
 app.use(express.json({ limit: "50kb" }));
+app.use(cookieParser);
+
+// Session middleware - attach session info to requests
+app.use(wrap(async (req, res, next) => {
+  const sessionId = req.cookies?.sid;
+  if (sessionId) {
+    try {
+      const session = await db.getSession(sessionId);
+      req.session = session;
+    } catch (err) {
+      console.error("Session check failed:", err.message);
+    }
+  }
+
+  // Simple cookie setter
+  res.cookie = function(name, value, opts) {
+    const cookieStr = `${name}=${encodeURIComponent(value)}; Path=/; SameSite=Strict${opts?.maxAge ? `; Max-Age=${opts.maxAge}` : ""}`;
+    res.set("Set-Cookie", cookieStr);
+  };
+  res.clearCookie = function(name) {
+    res.set("Set-Cookie", `${name}=; Path=/; Max-Age=0`);
+  };
+
+  next();
+}));
+
 app.use(express.static(path.join(__dirname, "public")));
+
+// Sign in endpoint
+app.post("/api/signin", wrap(async (req, res) => {
+  const { username, password } = req.body || {};
+  if (!username || !password) return res.status(400).json({ error: "Username and password required" });
+
+  const same = (a, b) => { const x = crypto.createHash("sha256").update(String(a)).digest(), y = crypto.createHash("sha256").update(String(b)).digest(); return crypto.timingSafeEqual(x, y); };
+  if (username === ADMIN_USER && same(password, ADMIN_PASSWORD)) {
+    const sessionId = crypto.randomBytes(24).toString("hex");
+    const ipAddress = req.ip || req.connection.remoteAddress;
+    await db.createSession(sessionId, ADMIN_USER, username, ipAddress);
+    res.cookie("sid", sessionId, { maxAge: 7 * 24 * 60 * 60 * 1000 });
+    res.json({ ok: true, username });
+  } else {
+    res.status(401).json({ error: "Invalid credentials" });
+  }
+}));
+
+// Check session endpoint
+app.get("/api/session", wrap(async (req, res) => {
+  if (req.session) {
+    res.json({ loggedIn: true, username: req.session.userName });
+  } else {
+    res.json({ loggedIn: false });
+  }
+}));
+
+// Sign out endpoint
+app.post("/api/signout", wrap(async (req, res) => {
+  const sessionId = req.cookies?.sid;
+  if (sessionId) {
+    await db.deleteSession(sessionId);
+    res.clearCookie("sid");
+  }
+  res.json({ ok: true });
+}));
 
 // Validate the cart coming from the browser; prices are never taken from the client.
 function cleanCart(input) {
@@ -163,14 +236,19 @@ app.post("/api/verify-payment", wrap(async (req, res) => {
 }));
 
 // ---------- Admin (orders page) ----------
-// Protected with HTTP Basic auth. Disabled unless ADMIN_PASSWORD is set.
+// Protected with session-based auth or HTTP Basic auth. Disabled unless ADMIN_PASSWORD is set.
 const same = (a, b) => { const x = crypto.createHash("sha256").update(String(a)).digest(), y = crypto.createHash("sha256").update(String(b)).digest(); return crypto.timingSafeEqual(x, y); };
 function adminAuth(req, res, next) {
   if (!ADMIN_PASSWORD) return res.status(503).send("Admin is disabled. Set ADMIN_PASSWORD in .env.");
+
+  // Check session first
+  if (req.session && req.session.userId === ADMIN_USER) return next();
+
+  // Fall back to HTTP Basic auth
   const [scheme, token] = (req.get("authorization") || "").split(" ");
   const [u, ...p] = scheme === "Basic" && token ? Buffer.from(token, "base64").toString().split(":") : [];
   if (u !== undefined && same(u, ADMIN_USER) && same(p.join(":"), ADMIN_PASSWORD)) return next();
-  res.set("WWW-Authenticate", 'Basic realm="Nnedverse admin"').status(401).send("Login required");
+  res.status(401).json({ error: "Login required" });
 }
 const FULFIL = ["new", "packed", "shipped", "delivered", "cancelled"];
 
