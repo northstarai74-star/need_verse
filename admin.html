@@ -139,6 +139,7 @@ const SETUP = [
 let range = 30;
 function tile(label, value, note) { return `<div class="tile"><span>${label}</span><b>${value}</b>${note ? `<small>${note}</small>` : ""}</div>`; }
 function revenueChart(series) {
+  if (!series.some((d) => d.revenue > 0)) return '<p class="empty" style="padding:40px 0">No sales in this period yet. Revenue for each day shows up here once orders come in.</p>';
   const W = 900, H = 220, L = 56, B = 26, T = 10, max = Math.max(1, ...series.map((d) => d.revenue));
   const step = Math.pow(10, Math.floor(Math.log10(max))), top = Math.ceil(max / step) * step, ticks = [0, top / 2, top];
   const slot = (W - L) / series.length, bw = Math.min(24, Math.max(2, slot - 2)), y = (v) => T + (H - T - B) * (1 - v / top);
