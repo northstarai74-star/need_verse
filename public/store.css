@@ -412,8 +412,6 @@ dialog textarea{display:block;width:100%;margin-top:8px;background:rgba(10,11,13
 .logo img{display:block;height:68px;width:auto}
 .logo-lg img{height:100px}
 @media (max-width:720px){.logo img{height:52px}}
-/* Logo palette: deep orange -> amber, like the VERSE lettering */
-:root{--amber:#ffa000}
-.hero h1 em{background:linear-gradient(90deg,var(--accent) 0%,var(--accent2) 55%,var(--amber) 100%);-webkit-background-clip:text;background-clip:text;color:transparent;padding-bottom:.08em}
+/* Logo palette: deep orange -> amber */
 .btn{background:linear-gradient(135deg,var(--accent),#ff7a00)}
 .finder,.co-summary,.cat:hover,.cat.on,.kit:hover{border-color:rgba(255,160,0,.35)}
