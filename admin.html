@@ -113,7 +113,7 @@ function openDlg(html, wide) { $("dlgBody").innerHTML = html; dlg.classList.togg
 dlg.addEventListener("click", (e) => { if (e.target.closest("[data-close]")) dlg.close(); });
 $("signout").onclick = async () => { await fetch("/api/signout", { method: "POST", headers: { "Content-Type": "application/json" }, body: "{}" }); location.href = "/"; };
 
-const SECTIONS = { overview: "Overview", orders: "Orders", products: "Products", inventory: "Inventory", vehicles: "Vehicles", customers: "Customers", coupons: "Coupons", reviews: "Reviews", returns: "Returns", audit: "Audit log" };
+const SECTIONS = { overview: "Overview", orders: "Orders", products: "Products", inventory: "Inventory", purchasing: "Purchase orders", suppliers: "Suppliers", vehicles: "Vehicles", customers: "Customers", coupons: "Coupons", reviews: "Reviews", returns: "Returns", audit: "Audit log" };
 let section = (location.hash || "#overview").slice(1);
 if (!SECTIONS[section]) section = "overview";
 function nav() {
@@ -296,12 +296,12 @@ function orderChange(e) {
 }
 
 // ================= Products =================
-let products = [], cats = [], vehicles = {};
+let products = [], cats = [], vehicles = {}, suppliersList = [];
 VIEWS.products = async () => {
-  const j = await api("GET", "/api/admin/products"); products = j.products; cats = j.cats; vehicles = j.vehicles;
+  const [j, sj] = await Promise.all([api("GET", "/api/admin/products"), api("GET", "/api/admin/suppliers")]); products = j.products; cats = j.cats; vehicles = j.vehicles; suppliersList = sj.suppliers;
   $("view").innerHTML = `<div class="row"><h1>Products</h1><span class="sp"></span><button class="btn ghost" id="imp" type="button">Import CSV</button><a class="btn ghost" href="/api/admin/products.csv">Export CSV</a><button class="btn" id="newP" type="button">New product</button></div>
   <div class="bar"><input id="pq" type="search" placeholder="Search name or SKU"><select id="pst"><option value="">All statuses</option><option>active</option><option>draft</option><option>archived</option></select></div>
-  <div class="tw"><table><thead><tr><th>Product</th><th>SKU</th><th class="right">Price</th><th class="right">Cost</th><th>Stock</th><th>Status</th><th>Fits</th><th></th></tr></thead><tbody id="prows"></tbody></table></div>`;
+  <div class="tw"><table><thead><tr><th>Product</th><th>SKU</th><th class="right">Price</th><th class="right">Cost</th><th>Stock</th><th>Status</th><th>Supplier</th><th>Fits</th><th></th></tr></thead><tbody id="prows"></tbody></table></div>`;
   const draw = () => {
     const q = $("pq").value.toLowerCase(), s = $("pst").value;
     $("prows").innerHTML = products.filter((p) => (!s || p.status === s) && (!q || (p.name + " " + p.sku).toLowerCase().includes(q))).map((p) => `<tr>
@@ -309,8 +309,9 @@ VIEWS.products = async () => {
       <td class="muted">${esc(p.sku)}</td><td class="right">${money(p.price)}${p.mrp ? `<div class="muted small"><s>${money(p.mrp)}</s></div>` : ""}</td><td class="right">${p.costPrice != null ? money(p.costPrice) : '<span class="muted">-</span>'}</td>
       <td><span class="pill ${p.stock === 0 ? "p-bad" : p.stock <= p.lowStockAt ? "p-warn" : "p-ok"}">${p.stock}</span> <button class="btn ghost sm" data-stock="${p.id}" type="button">Adjust</button></td>
       <td><span class="pill ${p.status === "active" ? "p-ok" : ""}">${p.status}</span></td>
+      <td class="small">${esc(suppliersList.find((s) => s.id === p.supplierId)?.name || "-")}</td>
       <td class="small">${p.universal ? "Every vehicle" : p.fitment.length ? esc(p.fitment.slice(0, 3).map((f) => f.make + (f.model ? " " + f.model : "")).join(", ")) + (p.fitment.length > 3 ? ` +${p.fitment.length - 3}` : "") : '<span class="p-bad pill">None</span>'}</td>
-      <td><button class="btn ghost sm" data-edit="${p.id}" type="button">Edit</button></td></tr>`).join("") || '<tr><td colspan="8" class="empty">No products match.</td></tr>';
+      <td><button class="btn ghost sm" data-edit="${p.id}" type="button">Edit</button></td></tr>`).join("") || '<tr><td colspan="9" class="empty">No products match.</td></tr>';
   };
   $("pq").oninput = draw; $("pst").onchange = draw; draw();
   $("newP").onclick = () => editProduct(null);
@@ -332,6 +333,8 @@ function editProduct(p) {
     <div class="g4"><label>HSN code<input name="hsn" value="${esc(x.hsn || "")}"></label>${p ? "" : `<label>Opening stock<input name="stock" type="number" min="0" value="0"></label>`}<label>Low-stock alert at<input name="lowStockAt" type="number" min="0" value="${x.lowStockAt}"></label>
       <label>Packed weight (g)<input name="weightG" type="number" min="1" value="${x.weightG}"></label></div>
     <div class="g4"><label>Box L (cm)<input name="dl" type="number" min="1" value="${x.dims?.l || 30}"></label><label>Box B (cm)<input name="db" type="number" min="1" value="${x.dims?.b || 20}"></label><label>Box H (cm)<input name="dh" type="number" min="1" value="${x.dims?.h || 10}"></label><label>Icon (emoji)<input name="icon" value="${esc(x.icon)}" maxlength="8"></label></div>
+    <div class="g2"><label>Supplier<select name="supplierId"><option value="">No supplier</option>${suppliersList.map((s) => `<option value="${s.id}" ${s.id === x.supplierId ? "selected" : ""}>${esc(s.name)}</option>`).join("")}</select></label>
+      <label>Supplier's product code<input name="supplierSku" value="${esc(x.supplierSku || "")}" maxlength="60"></label></div>
     <label>URL slug<input name="slug" value="${esc(x.slug || "")}" placeholder="Made from the name if empty"></label>
     <label>Short description<input name="shortDesc" value="${esc(x.shortDesc || "")}" maxlength="200"></label>
     <label>Full description<textarea name="description" style="font-family:inherit">${esc(x.description || "")}</textarea></label>
@@ -403,7 +406,7 @@ function importDlg() {
 
 // ================= Inventory =================
 VIEWS.inventory = async () => {
-  const [{ products: ps }, { log }] = await Promise.all([api("GET", "/api/admin/products"), api("GET", "/api/admin/inventory")]);
+  const [{ products: ps }, { log }, { suggestions }] = await Promise.all([api("GET", "/api/admin/products"), api("GET", "/api/admin/inventory"), api("GET", "/api/admin/reorder")]);
   products = ps;
   const name = new Map(ps.map((p) => [p.id, p.name]));
   const low = ps.filter((p) => p.status === "active" && p.stock <= p.lowStockAt);
@@ -411,9 +414,17 @@ VIEWS.inventory = async () => {
   <div class="tiles">${tile("Units in stock", num(ps.reduce((s, p) => s + p.stock, 0)))}${tile("Stock value at cost", money(ps.reduce((s, p) => s + p.stock * (p.costPrice || 0), 0)), ps.some((p) => p.costPrice == null) ? "Some products have no cost price" : "")}
     ${tile("Low stock", low.length)}${tile("Out of stock", ps.filter((p) => p.status === "active" && p.stock === 0).length)}</div>
   <div class="card"><h2>Low stock</h2>${low.length ? low.map((p) => `<div class="li"><span>${esc(p.name)} <span class="muted small">${esc(p.sku)}</span></span><span><span class="pill ${p.stock ? "p-warn" : "p-bad"}">${p.stock} left</span> <button class="btn ghost sm" data-stock="${p.id}" type="button">Restock</button></span></div>`).join("") : '<p class="muted">Everything is above its alert level.</p>'}</div>
+  <div class="card"><h2>Reorder suggestions</h2><p class="muted small" style="margin-top:-6px">Products that are low or will run out within the supplier's lead time, based on the last 30 days of sales. Stock already on open purchase orders is counted.</p>
+    ${suggestions.length ? Object.entries(suggestions.reduce((g, x) => ((g[x.supplierId || 0] ||= []).push(x), g), {})).map(([sid, list]) => `<div style="margin-top:12px"><div class="row"><b>${esc(list[0].supplier || "No supplier set")}</b><span class="sp"></span>${Number(sid) ? `<button class="btn sm" type="button" data-po="${sid}">Create purchase order</button>` : '<span class="muted small">Link these products to a supplier to order them</span>'}</div>
+      <div class="tw" style="margin-top:8px"><table><thead><tr><th>Product</th><th class="right">In stock</th><th class="right">Sold (30 days)</th><th class="right">On order</th><th>Runs out</th><th class="right">Suggested</th></tr></thead><tbody>
+      ${list.map((x) => `<tr><td>${esc(x.name)} <span class="muted small">${esc(x.sku)}</span></td><td class="right">${x.stock}</td><td class="right">${x.sold30}</td><td class="right">${x.incoming}</td><td>${x.daysLeft == null ? '<span class="muted">No recent sales</span>' : x.daysLeft === 0 ? '<span class="pill p-bad">Now</span>' : `in ${x.daysLeft} days`}</td><td class="right"><b>${x.suggest}</b></td></tr>`).join("")}</tbody></table></div></div>`).join("") : '<p class="muted">Nothing needs reordering right now.</p>'}</div>
   <div class="card"><h2>Stock history</h2><div class="tw"><table><thead><tr><th>When</th><th>Product</th><th>Change</th><th>After</th><th>Reason</th><th>Ref</th></tr></thead>
   <tbody>${log.map((l) => `<tr><td class="muted">${date(l.createdAt, 1)}</td><td>${esc(name.get(l.productId) || l.productId)}</td><td class="${l.delta < 0 ? "" : ""}">${l.delta > 0 ? "+" : ""}${l.delta}</td><td>${l.stockAfter}</td><td>${esc(l.reason)}</td><td class="muted">${esc(l.ref || "")}</td></tr>`).join("") || '<tr><td colspan="6" class="empty">No stock movements yet.</td></tr>'}</tbody></table></div></div>`;
-  $("view").onclick = (e) => { const st = e.target.dataset.stock; if (st) stockDlg(products.find((p) => p.id === Number(st))); };
+  $("view").onclick = (e) => {
+    const st = e.target.dataset.stock; if (st) stockDlg(products.find((p) => p.id === Number(st)));
+    const sid = e.target.dataset.po;
+    if (sid) poDialog(null, Number(sid), suggestions.filter((x) => x.supplierId === Number(sid)).map((x) => ({ productId: x.productId, qty: x.suggest, cost: x.cost ?? "" })));
+  };
 };
 
 // ================= Vehicles =================
@@ -504,6 +515,129 @@ VIEWS.returns = async () => {
     VIEWS.returns();
   };
 };
+
+// ================= Suppliers =================
+VIEWS.suppliers = async () => {
+  const { suppliers } = await api("GET", "/api/admin/suppliers");
+  $("view").innerHTML = `<div class="row"><h1>Suppliers</h1><span class="sp"></span><button class="btn" id="newS" type="button">Add supplier</button></div>
+  <div class="tw"><table><thead><tr><th>Supplier</th><th>Contact</th><th>GSTIN</th><th>Terms</th><th class="right">Lead time</th><th class="right">Products</th><th class="right">Open orders</th><th class="right">Received</th><th></th></tr></thead><tbody>
+  ${suppliers.map((x) => `<tr><td><b>${esc(x.name)}</b>${x.active ? "" : ' <span class="pill">Inactive</span>'}<div class="muted small">${esc(x.state)}</div></td>
+    <td>${esc(x.contactName)}<div class="muted small">${esc(x.email)}${x.phone ? " · " + esc(x.phone) : ""}</div></td><td class="small">${esc(x.gstin || "-")}</td><td class="small">${esc(x.paymentTerms || "-")}</td>
+    <td class="right">${x.leadTimeDays} days</td><td class="right">${x.products}</td><td class="right">${x.openOrders}</td><td class="right">${money(x.received)}</td>
+    <td><button class="btn ghost sm" type="button" data-edit="${x.id}">Edit</button></td></tr>`).join("") || '<tr><td colspan="9" class="empty">No suppliers yet. Add the companies you buy stock from.</td></tr>'}</tbody></table></div>
+  <p class="muted small">Link products to a supplier from the product form, or with the "supplier" column in a CSV import.</p>`;
+  $("newS").onclick = () => supplierDialog(null);
+  $("view").querySelector("tbody").onclick = (e) => { const id = e.target.dataset.edit; if (id) supplierDialog(suppliers.find((x) => x.id === Number(id))); };
+};
+function supplierDialog(x) {
+  const v = x || { leadTimeDays: 7, active: true };
+  const STATES = ["Andaman and Nicobar Islands","Andhra Pradesh","Arunachal Pradesh","Assam","Bihar","Chandigarh","Chhattisgarh","Dadra and Nagar Haveli and Daman and Diu","Delhi","Goa","Gujarat","Haryana","Himachal Pradesh","Jammu and Kashmir","Jharkhand","Karnataka","Kerala","Ladakh","Lakshadweep","Madhya Pradesh","Maharashtra","Manipur","Meghalaya","Mizoram","Nagaland","Odisha","Puducherry","Punjab","Rajasthan","Sikkim","Tamil Nadu","Telangana","Tripura","Uttar Pradesh","Uttarakhand","West Bengal"];
+  const b = openDlg(`<form class="f"><h2>${x ? "Edit supplier" : "Add supplier"}</h2>
+    <label>Company name<input name="name" value="${esc(v.name || "")}" required maxlength="120"></label>
+    <div class="g2"><label>Contact person<input name="contactName" value="${esc(v.contactName || "")}"></label><label>Phone<input name="phone" value="${esc(v.phone || "")}"></label></div>
+    <div class="g2"><label>Email (purchase orders are sent here)<input name="email" type="email" value="${esc(v.email || "")}"></label><label>GSTIN<input name="gstin" value="${esc(v.gstin || "")}" maxlength="15" style="text-transform:uppercase"></label></div>
+    <label>Address<input name="address" value="${esc(v.address || "")}"></label>
+    <div class="g3"><label>State<select name="state"><option value="">Choose</option>${STATES.map((s) => `<option ${s === v.state ? "selected" : ""}>${esc(s)}</option>`).join("")}</select></label>
+      <label>Payment terms<input name="paymentTerms" value="${esc(v.paymentTerms || "")}" placeholder="Net 30, Advance…"></label><label>Lead time (days)<input name="leadTimeDays" type="number" min="0" max="365" value="${v.leadTimeDays}"></label></div>
+    <label>Notes<textarea name="notes" style="font-family:inherit;min-height:60px">${esc(v.notes || "")}</textarea></label>
+    <label class="check"><input type="checkbox" name="active" ${v.active ? "checked" : ""}> Active</label>
+    <p class="err" role="alert"></p><div class="acts"><button type="button" class="btn ghost" data-close>Cancel</button><button class="btn">${x ? "Save" : "Add supplier"}</button></div></form>`);
+  b.querySelector("form").onsubmit = async (e) => {
+    e.preventDefault(); const f = Object.fromEntries(new FormData(e.target));
+    try { await api(x ? "PUT" : "POST", x ? `/api/admin/suppliers/${x.id}` : "/api/admin/suppliers", { ...f, active: !!f.active, leadTimeDays: Number(f.leadTimeDays) }); dlg.close(); flash("Supplier saved"); VIEWS[section](); }
+    catch (err) { e.target.querySelector(".err").textContent = err.message; }
+  };
+}
+
+// ================= Purchase orders =================
+const PO_PILL = { draft: "", sent: "p-blue", partially_received: "p-warn", received: "p-ok", cancelled: "p-bad" };
+let poCache = { orders: [], suppliers: [] };
+VIEWS.purchasing = async () => {
+  poCache = await api("GET", "/api/admin/purchase-orders");
+  const sup = (id) => poCache.suppliers.find((x) => x.id === id);
+  const open = poCache.orders.filter((o) => ["sent", "partially_received"].includes(o.status));
+  $("view").innerHTML = `<div class="row"><h1>Purchase orders</h1><span class="sp"></span><button class="btn" id="newPO" type="button">New purchase order</button></div>
+  <div class="tiles">${tile("Drafts", poCache.orders.filter((o) => o.status === "draft").length)}${tile("Waiting for delivery", open.length)}
+    ${tile("Value on order", money(open.reduce((t, o) => t + o.items.reduce((u, l) => u + (l.qty - l.received) * l.cost, 0), 0)))}${tile("Overdue", open.filter((o) => o.expectedAt && new Date(o.expectedAt) < new Date(new Date().toDateString())).length)}</div>
+  <div class="tw"><table><thead><tr><th>PO</th><th>Supplier</th><th>Status</th><th>Items</th><th>Needed by</th><th class="right">Total</th><th></th></tr></thead><tbody>
+  ${poCache.orders.map((o) => `<tr><td><b>${esc(o.poNo)}</b><div class="muted small">${date(o.createdAt)}</div></td><td>${esc(sup(o.supplierId)?.name || "-")}</td>
+    <td><span class="pill ${PO_PILL[o.status]}">${o.status.replace("_", " ")}</span></td>
+    <td class="small">${o.items.map((l) => `${esc(l.name)}: ${l.received}/${l.qty}`).join("<br>")}</td>
+    <td class="${o.expectedAt && new Date(o.expectedAt) < new Date(new Date().toDateString()) && ["sent", "partially_received"].includes(o.status) ? "" : "muted"}">${o.expectedAt ? date(o.expectedAt) : "-"}</td>
+    <td class="right">${money(o.total)}</td>
+    <td><div class="row" style="gap:6px;flex-wrap:nowrap">
+      ${o.status === "draft" ? `<button class="btn ghost sm" data-act="edit" data-id="${o.id}" type="button">Edit</button><button class="btn sm" data-act="send" data-id="${o.id}" type="button">Send</button>` : ""}
+      ${["sent", "partially_received"].includes(o.status) ? `<button class="btn ok sm" data-act="receive" data-id="${o.id}" type="button">Receive</button>` : ""}
+      ${["draft", "sent"].includes(o.status) ? `<button class="btn ghost sm" data-act="cancel" data-id="${o.id}" type="button">Cancel</button>` : ""}
+      <a class="btn ghost sm" href="/api/admin/purchase-orders/${o.id}/print" target="_blank" rel="noopener">Print</a></div></td></tr>`).join("") || '<tr><td colspan="7" class="empty">No purchase orders yet. Create one here, or from the reorder suggestions on the Inventory page.</td></tr>'}</tbody></table></div>`;
+  $("newPO").onclick = () => poDialog(null);
+  $("view").querySelector("tbody").onclick = async (e) => {
+    const b = e.target.closest("[data-act]"); if (!b) return;
+    const o = poCache.orders.find((x) => x.id === Number(b.dataset.id)), s = sup(o.supplierId);
+    if (b.dataset.act === "edit") return poDialog(o);
+    if (b.dataset.act === "receive") return receiveDialog(o);
+    if (b.dataset.act === "send") {
+      if (!confirm(s.email ? `Mark ${o.poNo} as sent and email it to ${s.email}?` : `Mark ${o.poNo} as sent? ${s.name} has no email address, so send it yourself using Print.`)) return;
+      try { const j = await api("POST", `/api/admin/purchase-orders/${o.id}/send`, {}); flash(j.emailed ? `Sent to ${s.email}` : "Marked as sent. " + (j.emailError || ""), !j.emailed); } catch (x) { flash(x.message, true); }
+    }
+    if (b.dataset.act === "cancel") {
+      if (!confirm(`Cancel ${o.poNo}?`)) return;
+      try { await api("POST", `/api/admin/purchase-orders/${o.id}/cancel`, {}); flash("Purchase order cancelled"); } catch (x) { flash(x.message, true); }
+    }
+    VIEWS.purchasing();
+  };
+};
+async function poDialog(po, supplierId, preset) {
+  const [{ products: ps }, { suppliers }] = await Promise.all([api("GET", "/api/admin/products"), api("GET", "/api/admin/suppliers")]);
+  let lines = po ? po.items.map((l) => ({ productId: l.productId, qty: l.qty, cost: l.cost })) : preset || [];
+  const sid = po ? po.supplierId : supplierId || "";
+  const b = openDlg(`<form class="f" id="poF"><h2>${po ? "Edit " + esc(po.poNo) : "New purchase order"}</h2>
+    <div class="g2"><label>Supplier<select name="supplierId" ${po ? "disabled" : ""} required><option value="">Choose a supplier</option>${suppliers.filter((x) => x.active || x.id === sid).map((x) => `<option value="${x.id}" ${x.id === Number(sid) ? "selected" : ""}>${esc(x.name)}</option>`).join("")}</select></label>
+      <label>Needed by (optional)<input name="expectedAt" type="date" value="${po?.expectedAt ? String(po.expectedAt).slice(0, 10) : ""}"></label></div>
+    <h4 style="margin-top:14px">Items</h4><div id="poLines"></div>
+    <div class="row" style="margin-top:8px"><select id="poAdd" style="flex:1;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px 12px"><option value="">Add a product…</option></select></div>
+    <p style="text-align:right;margin:10px 0 0">Total <b id="poTotal"></b></p>
+    <label>Notes for the supplier<textarea name="notes" style="font-family:inherit;min-height:60px">${esc(po?.notes || "")}</textarea></label>
+    <p class="err" role="alert"></p><div class="acts"><button type="button" class="btn ghost" data-close>Cancel</button><button class="btn">${po ? "Save draft" : "Create draft"}</button></div></form>`, true);
+  const supSel = b.querySelector("[name=supplierId]");
+  const draw = () => {
+    const cur = Number(supSel.value);
+    b.querySelector("#poAdd").innerHTML = '<option value="">Add a product…</option>' + ps.filter((p) => !lines.some((l) => l.productId === p.id))
+      .sort((a, c) => (c.supplierId === cur) - (a.supplierId === cur) || a.name.localeCompare(c.name))
+      .map((p) => `<option value="${p.id}">${p.supplierId === cur ? "★ " : ""}${esc(p.name)} (${esc(p.sku)}) · ${p.stock} in stock</option>`).join("");
+    b.querySelector("#poLines").innerHTML = lines.length ? `<div class="tw"><table><thead><tr><th>Product</th><th>Qty</th><th>Unit cost ₹</th><th class="right">Amount</th><th></th></tr></thead><tbody>
+      ${lines.map((l, i) => { const p = ps.find((x) => x.id === l.productId); return `<tr><td>${esc(p?.name)}<div class="muted small">${esc(p?.sku)} · ${p?.stock} in stock</div></td>
+        <td><input type="number" min="1" value="${l.qty}" data-i="${i}" data-k="qty" style="width:80px;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:6px"></td>
+        <td><input type="number" min="0" step="0.01" value="${l.cost ?? ""}" data-i="${i}" data-k="cost" style="width:110px;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:6px"></td>
+        <td class="right">${money((Number(l.qty) || 0) * (Number(l.cost) || 0))}</td><td><button type="button" class="btn ghost sm" data-rm="${i}">✕</button></td></tr>`; }).join("")}</tbody></table></div>` : '<p class="muted">No items yet. Add products below.</p>';
+    b.querySelector("#poTotal").textContent = money(lines.reduce((t, l) => t + (Number(l.qty) || 0) * (Number(l.cost) || 0), 0));
+  };
+  supSel.onchange = draw;
+  b.querySelector("#poAdd").onchange = (e) => { const p = ps.find((x) => x.id === Number(e.target.value)); if (!p) return; lines.push({ productId: p.id, qty: Math.max(1, p.lowStockAt * 2 - p.stock), cost: p.costPrice ?? "" }); draw(); };
+  b.querySelector("#poLines").oninput = (e) => { const { i, k } = e.target.dataset; if (i == null) return; lines[i][k] = e.target.value; b.querySelector("#poTotal").textContent = money(lines.reduce((t, l) => t + (Number(l.qty) || 0) * (Number(l.cost) || 0), 0)); };
+  b.querySelector("#poLines").onclick = (e) => { const i = e.target.dataset.rm; if (i != null) { lines.splice(Number(i), 1); draw(); } };
+  b.querySelector("form").onsubmit = async (e) => {
+    e.preventDefault(); const f = Object.fromEntries(new FormData(e.target));
+    const body = { supplierId: Number(supSel.value), expectedAt: f.expectedAt, notes: f.notes, lines: lines.map((l) => ({ productId: l.productId, qty: Number(l.qty), cost: l.cost === "" ? "" : Number(l.cost) })) };
+    try { await api(po ? "PUT" : "POST", po ? `/api/admin/purchase-orders/${po.id}` : "/api/admin/purchase-orders", body); dlg.close(); flash(po ? "Draft saved" : "Draft purchase order created"); section = "purchasing"; history.replaceState(null, "", "#purchasing"); go(); }
+    catch (err) { e.target.querySelector(".err").textContent = err.message; }
+  };
+  draw();
+}
+function receiveDialog(o) {
+  const b = openDlg(`<form class="f"><h2>Receive ${esc(o.poNo)}</h2><p class="muted small" style="margin:0">Enter what arrived. Stock goes up straight away, and you can receive the rest later.</p>
+    <div class="tw" style="margin-top:12px"><table><thead><tr><th>Product</th><th class="right">Ordered</th><th class="right">Already in</th><th>Arrived now</th></tr></thead><tbody>
+    ${o.items.map((l) => `<tr><td>${esc(l.name)}<div class="muted small">${esc(l.sku)}</div></td><td class="right">${l.qty}</td><td class="right">${l.received}</td>
+      <td><input type="number" min="0" max="${l.qty - l.received}" value="${l.qty - l.received}" data-p="${l.productId}" ${l.received >= l.qty ? "disabled" : ""} style="width:90px;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:6px"></td></tr>`).join("")}</tbody></table></div>
+    <label class="check" style="margin-top:12px"><input type="checkbox" name="updateCost" checked> Update each product's cost price to the price on this order</label>
+    <p class="err" role="alert"></p><div class="acts"><button type="button" class="btn ghost" data-close>Cancel</button><button class="btn ok">Add to stock</button></div></form>`, true);
+  b.querySelector("form").onsubmit = async (e) => {
+    e.preventDefault();
+    const lines = [...b.querySelectorAll("[data-p]")].filter((i) => !i.disabled).map((i) => ({ productId: Number(i.dataset.p), qty: Number(i.value) || 0 }));
+    try { const j = await api("POST", `/api/admin/purchase-orders/${o.id}/receive`, { lines, updateCost: e.target.elements.updateCost.checked }); dlg.close(); flash(j.order.status === "received" ? "All items received and added to stock" : "Received items added to stock"); VIEWS.purchasing(); }
+    catch (err) { e.target.querySelector(".err").textContent = err.message; }
+  };
+}
 
 // ================= Audit =================
 VIEWS.audit = async () => {

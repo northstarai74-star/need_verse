@@ -132,7 +132,7 @@ const PRODUCT = mapper([
   ["images", "images"], ["videoUrl", "video_url"], ["specs", "specs"], ["included", "included"],
   ["installDifficulty", "install_difficulty"], ["installGuide", "install_guide"], ["warranty", "warranty"],
   ["weightG", "weight_g"], ["dims", "dims_cm"], ["faqs", "faqs"], ["fitNotes", "fit_notes"], ["seoTitle", "seo_title"],
-  ["metaDesc", "meta_desc"], ["createdAt", "created_at"], ["updatedAt", "updated_at"]
+  ["metaDesc", "meta_desc"], ["supplierId", "supplier_id"], ["supplierSku", "supplier_sku"], ["createdAt", "created_at"], ["updatedAt", "updated_at"]
 ]);
 const FIT = mapper([["id", "id"], ["productId", "product_id"], ["make", "make"], ["model", "model"], ["yearFrom", "year_from"], ["yearTo", "year_to"]]);
 
@@ -401,6 +401,61 @@ async function listAudit(limit = 300) {
   return data.map((r) => ({ id: r.id, actor: r.actor, action: r.action, target: r.target, details: r.details, ip: r.ip, createdAt: r.created_at }));
 }
 
+// ---------- Suppliers and purchase orders ----------
+const SUPPLIER = mapper([["id", "id"], ["name", "name"], ["contactName", "contact_name"], ["email", "email"], ["phone", "phone"], ["gstin", "gstin"],
+  ["address", "address"], ["state", "state"], ["paymentTerms", "payment_terms"], ["leadTimeDays", "lead_time_days"], ["notes", "notes"], ["active", "active"], ["createdAt", "created_at"]]);
+async function listSuppliers() {
+  const { data, error } = await sb.from("suppliers").select("*").order("name");
+  if (error) fail("list suppliers", error);
+  return data.map(SUPPLIER.from);
+}
+async function getSupplier(id) {
+  const { data, error } = await sb.from("suppliers").select("*").eq("id", id).maybeSingle();
+  if (error) fail("get supplier", error);
+  return SUPPLIER.from(data);
+}
+async function saveSupplier(id, s) {
+  const row = SUPPLIER.to(s); delete row.id; delete row.created_at;
+  const q = id ? sb.from("suppliers").update(row).eq("id", id) : sb.from("suppliers").insert(row);
+  const { data, error } = await q.select();
+  if (error) {
+    if (error.code === "23505" || /duplicate|unique/i.test(error.message)) return null;
+    fail("save supplier", error);
+  }
+  return SUPPLIER.from(data[0]);
+}
+
+const PO = mapper([["id", "id"], ["poNo", "po_no"], ["supplierId", "supplier_id"], ["status", "status"], ["items", "items"], ["total", "total", 1],
+  ["notes", "notes"], ["expectedAt", "expected_at"], ["history", "history"], ["createdAt", "created_at"], ["updatedAt", "updated_at"]]);
+async function nextPoNo() {
+  const { data, error } = await sb.rpc("next_po_no");
+  if (error) fail("PO number", error);
+  return Number(data);
+}
+async function listPurchaseOrders() {
+  const { data, error } = await sb.from("purchase_orders").select("*").order("created_at", { ascending: false });
+  if (error) fail("list purchase orders", error);
+  return data.map(PO.from);
+}
+async function getPurchaseOrder(id) {
+  const { data, error } = await sb.from("purchase_orders").select("*").eq("id", id).maybeSingle();
+  if (error) fail("get purchase order", error);
+  return PO.from(data);
+}
+async function insertPurchaseOrder(po) {
+  const row = PO.to(po); delete row.id;
+  const { data, error } = await sb.from("purchase_orders").insert(row).select();
+  if (error) fail("create purchase order", error);
+  return PO.from(data[0]);
+}
+async function updatePurchaseOrder(id, patch) {
+  const row = PO.to(patch); delete row.id; delete row.po_no; delete row.created_at;
+  row.updated_at = new Date().toISOString();
+  const { data, error } = await sb.from("purchase_orders").update(row).eq("id", id).select();
+  if (error) fail("update purchase order", error);
+  return PO.from(data[0]);
+}
+
 // ---------- File storage ----------
 async function uploadFile(bucket, path, buffer, contentType) {
   const { error } = await sb.storage.from(bucket).upload(path, buffer, { contentType, upsert: false });
@@ -425,5 +480,6 @@ module.exports = {
   insertReview, listReviews, getReview, updateReview,
   insertReturn, listReturns, getReturn, updateReturn,
   addSubscriber, listSubscribers, insertEvents, listEvents, deleteEventsBefore, audit, listAudit,
+  listSuppliers, getSupplier, saveSupplier, nextPoNo, listPurchaseOrders, getPurchaseOrder, insertPurchaseOrder, updatePurchaseOrder,
   uploadFile, signedUrl
 };

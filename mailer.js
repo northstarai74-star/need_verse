@@ -113,7 +113,9 @@ const sendPasswordReset = (email, name, url) => send(email, `Reset your ${brand(
   <p style="margin:0 0 14px;color:#555">Hi ${first(name)}, use the button below to choose a new password. The link works for 1 hour. If you didn't ask for this, ignore this email.</p>
   <p>${button(url, "Choose a new password")}</p>`));
 
+const sendPurchaseOrder = (po, supplier, html) => send(supplier.email, `Purchase order ${po.poNo} from ${brand()}`, html, { cc: OWNER_EMAIL || undefined });
+
 const sendOwnerAlert = (subject, html) => (OWNER_EMAIL ? send(OWNER_EMAIL, subject, layout(html)) : Promise.resolve(false));
 
 module.exports = { emailEnabled: enabled, sendOrderEmails, sendShippedEmail, sendDeliveredEmail, sendReviewRequest, sendRefundEmail, sendAbandonedEmail,
-  sendReturnUpdate, sendPasswordReset, sendOwnerAlert, body, shippedBody, refundBody };
+  sendReturnUpdate, sendPasswordReset, sendOwnerAlert, sendPurchaseOrder, body, shippedBody, refundBody };

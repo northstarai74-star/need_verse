@@ -13,7 +13,7 @@ const DEFAULTS = {
   sessions: () => ({ created_at: now(), role: "admin" }),
   products: () => ({ short_desc: "", description: "", brand: "", mrp: null, cost_price: null, gst_rate: 18, hsn: "", stock: 0, low_stock_at: 5, status: "draft",
     universal: false, icon: "📦", images: [], video_url: null, specs: {}, included: "", install_difficulty: "Easy", install_guide: "", warranty: "",
-    weight_g: 500, dims_cm: { l: 30, b: 20, h: 10 }, faqs: [], fit_notes: "", seo_title: "", meta_desc: "", created_at: now(), updated_at: now() }),
+    weight_g: 500, supplier_id: null, supplier_sku: "", dims_cm: { l: 30, b: 20, h: 10 }, faqs: [], fit_notes: "", seo_title: "", meta_desc: "", created_at: now(), updated_at: now() }),
   vehicles: () => ({}),
   product_fitment: () => ({ model: null, year_from: null, year_to: null }),
   inventory_log: () => ({ created_at: now(), ref: null }),
@@ -23,24 +23,28 @@ const DEFAULTS = {
   returns: () => ({ details: "", photos: [], status: "requested", admin_note: "", refund_amount: null, restocked: false, history: [], created_at: now(), updated_at: now() }),
   subscribers: () => ({ created_at: now() }),
   events: () => ({ created_at: now() }),
-  audit_log: () => ({ created_at: now() })
+  audit_log: () => ({ created_at: now() }),
+  suppliers: () => ({ contact_name: "", email: "", phone: "", gstin: "", address: "", state: "", payment_terms: "", lead_time_days: 7, notes: "", active: true, created_at: now() }),
+  purchase_orders: () => ({ status: "draft", total: 0, notes: "", expected_at: null, history: [], created_at: now(), updated_at: now() })
 };
-const SERIAL = new Set(["products", "vehicles", "product_fitment", "inventory_log", "reviews", "returns", "events", "audit_log"]);
+const SERIAL = new Set(["products", "vehicles", "product_fitment", "inventory_log", "reviews", "returns", "events", "audit_log", "suppliers", "purchase_orders"]);
 const UNIQUE = {
   orders: [["order_id"], ["ref"], ["payment_id"], ["invoice_no"]], sessions: [["id"]], products: [["id"], ["sku"], ["slug"]],
-  vehicles: [["make", "model"]], coupons: [["code"]], customers: [["id"], ["email"]], reviews: [["product_id", "customer_id"]], subscribers: [["email"]]
+  vehicles: [["make", "model"]], coupons: [["code"]], customers: [["id"], ["email"]], reviews: [["product_id", "customer_id"]], subscribers: [["email"]],
+  suppliers: [["name"]], purchase_orders: [["po_no"]]
 };
 const CHECK = {
   orders: (r) => ["created", "paid", "cod", "expired"].includes(r.status) &&
     ["new", "packed", "shipped", "out_for_delivery", "delivered", "cancelled", "returned"].includes(r.fulfillment),
   products: (r) => r.stock >= 0 && ["active", "draft", "archived"].includes(r.status),
   returns: (r) => ["requested", "approved", "rejected", "picked_up", "received", "refunded", "replaced"].includes(r.status),
+  purchase_orders: (r) => ["draft", "sent", "partially_received", "received", "cancelled"].includes(r.status),
   reviews: (r) => r.rating >= 1 && r.rating <= 5 && ["pending", "approved", "rejected"].includes(r.status)
 };
 
 function createFake() {
   const tables = {}, seq = {}, files = {};
-  let invoiceSeq = 0;
+  let invoiceSeq = 0, poSeq = 0;
   const T = (n) => (tables[n] ||= []);
   const dup = (name, row, except) => (UNIQUE[name] || []).some((cols) =>
     cols.every((c) => row[c] != null) && T(name).some((x) => x !== except && cols.every((c) => x[c] === row[c])));
@@ -145,6 +149,7 @@ function createFake() {
       return { data: p.stock, error: null };
     },
     next_invoice_no() { return { data: ++invoiceSeq, error: null }; },
+    next_po_no() { return { data: ++poSeq, error: null }; },
     use_coupon({ p_code }) { const c = T("coupons").find((x) => x.code === p_code); if (c) c.uses++; return { data: null, error: null }; },
     sync_product_seq() { seq.products = Math.max(0, ...T("products").map((p) => p.id)); return { data: null, error: null }; }
   };

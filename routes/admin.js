@@ -10,6 +10,7 @@ const analytics = require("../lib/analytics");
 const mail = require("../mailer");
 const wa = require("../lib/whatsapp");
 const { parseImage } = require("../lib/uploads");
+const purchasing = require("../lib/purchasing");
 const { requireAdmin } = require("../lib/auth");
 const { clip } = require("../lib/security");
 
@@ -48,7 +49,8 @@ async function cleanProduct(b, existing) {
     images: (Array.isArray(b.images) ? b.images : []).map((u) => clip(u, 500)).filter((u) => /^https:\/\//.test(u)).slice(0, 8),
     specs: Object.fromEntries(Object.entries(b.specs && typeof b.specs === "object" ? b.specs : {}).slice(0, 30).map(([k, v]) => [clip(k, 60), clip(v, 200)]).filter(([k, v]) => k && v)),
     faqs: (Array.isArray(b.faqs) ? b.faqs : []).slice(0, 10).map((f) => ({ q: clip(f?.q, 200), a: clip(f?.a, 1000) })).filter((f) => f.q && f.a),
-    dims: { l: Number(b.dims?.l) || 30, b: Number(b.dims?.b) || 20, h: Number(b.dims?.h) || 10 }
+    dims: { l: Number(b.dims?.l) || 30, b: Number(b.dims?.b) || 20, h: Number(b.dims?.h) || 10 },
+    supplierId: b.supplierId === "" || b.supplierId == null ? null : Number(b.supplierId), supplierSku: clip(b.supplierSku, 60)
   };
   if (!p.name) return { error: "Enter a product name." };
   if (!/^[A-Z0-9][A-Z0-9_-]{1,39}$/.test(p.sku)) return { error: "SKU must be 2 to 40 letters, numbers, dashes or underscores." };
@@ -61,6 +63,7 @@ async function cleanProduct(b, existing) {
   if (!["active", "draft", "archived"].includes(p.status)) return { error: "Invalid status." };
   if (!(p.weightG > 0)) return { error: "Enter the packed weight in grams." };
   if (p.videoUrl && !/^https:\/\//.test(p.videoUrl)) return { error: "Video link must start with https://" };
+  if (p.supplierId != null && !(await db.getSupplier(p.supplierId))) return { error: "Choose a supplier from the list." };
   const all = await db.listProducts();
   if (all.some((x) => x.sku === p.sku && x.id !== existing?.id)) return { error: `Another product already uses SKU ${p.sku}.` };
   if (all.some((x) => x.slug === p.slug && x.id !== existing?.id)) return { error: `Another product already uses the URL /p/${p.slug}.` };
@@ -203,12 +206,13 @@ module.exports = function admin(ctx) {
     res.json({ log: await db.inventoryLog(req.query.product ? Number(req.query.product) : null) });
   }));
 
-  const CSV_COLS = ["sku", "name", "category", "price", "mrp", "cost_price", "stock", "status", "gst_rate", "hsn", "brand", "short_desc", "weight_g", "universal", "fits"];
+  const CSV_COLS = ["sku", "name", "category", "price", "mrp", "cost_price", "stock", "status", "gst_rate", "hsn", "brand", "short_desc", "weight_g", "universal", "fits", "supplier", "supplier_sku"];
   r.get("/api/admin/products.csv", wrap(async (req, res) => {
-    const [list, fit] = await Promise.all([db.listProducts(), db.listFitment()]);
+    const [list, fit, sups] = await Promise.all([db.listProducts(), db.listFitment(), db.listSuppliers()]);
+    const supName = (id) => sups.find((x) => x.id === id)?.name || "";
     const fits = (id) => fit.filter((f) => f.productId === id).map((f) => [f.make, f.model || "*", f.yearFrom || "", f.yearTo || ""].join(":")).join("|");
     res.type("text/csv").attachment("products.csv").send(toCsv([CSV_COLS, ...list.map((p) => [p.sku, p.name, p.category, p.price, p.mrp ?? "", p.costPrice ?? "", p.stock, p.status,
-      p.gstRate, p.hsn, p.brand, p.shortDesc, p.weightG, p.universal ? "yes" : "no", fits(p.id)])]));
+      p.gstRate, p.hsn, p.brand, p.shortDesc, p.weightG, p.universal ? "yes" : "no", fits(p.id), supName(p.supplierId), p.supplierSku])]));
   }));
 
   // Bulk create/update by SKU. "stock" sets the absolute stock level; "fits" is make:model:from:to joined by |.
@@ -217,7 +221,7 @@ module.exports = function admin(ctx) {
     if (rows.length < 2) return bad(res, "Paste a CSV with a header row and at least one product.");
     const head = rows[0].map((h) => h.trim().toLowerCase());
     if (!head.includes("sku")) return bad(res, "The CSV needs a 'sku' column.");
-    const results = [];
+    const results = [], sups = await db.listSuppliers();
     for (const [i, row] of rows.slice(1).entries()) {
       const v = Object.fromEntries(head.map((h, j) => [h, (row[j] ?? "").trim()]));
       const line = i + 2, cur = (await db.listProducts()).find((p) => p.sku === v.sku.toUpperCase());
@@ -228,6 +232,12 @@ module.exports = function admin(ctx) {
       set("sku", "sku"); set("name", "name"); set("category", "category"); set("price", "price", Number); set("mrp", "mrp", Number); set("cost_price", "costPrice", Number);
       set("status", "status"); set("gst_rate", "gstRate", Number); set("hsn", "hsn"); set("brand", "brand"); set("short_desc", "shortDesc"); set("weight_g", "weightG", Number);
       set("universal", "universal", (x) => /^(yes|true|1)$/i.test(x));
+      set("supplier_sku", "supplierSku");
+      if (head.includes("supplier") && v.supplier !== "") {
+        const sup = sups.find((x) => x.name.toLowerCase() === v.supplier.toLowerCase());
+        if (!sup) { results.push({ line, sku: v.sku, error: `No supplier called "${v.supplier}". Add it under Suppliers first.` }); continue; }
+        merged.supplierId = sup.id;
+      }
       if (head.includes("fits") && v.fits !== "") merged.fitment = v.fits.split("|").map((s) => { const [make, model, a, b] = s.split(":"); return { make, model: model && model !== "*" ? model : null, yearFrom: a || null, yearTo: b || null }; });
       const c = await cleanProduct(merged, cur);
       if (c.error) { results.push({ line, sku: v.sku, error: c.error }); continue; }
@@ -359,6 +369,76 @@ module.exports = function admin(ctx) {
     mail.sendReturnUpdate(o, saved).catch((e) => console.error("Return email:", e.message));
     await log(req, "return " + status, o.ref, { returnId: ret.id, refundAmount, restocked });
     res.json({ return: saved });
+  }));
+
+  // ----- Suppliers and purchase orders -----
+  const pfail = (res, e) => { if (e instanceof purchasing.PurchaseError) return bad(res, e.message, e.status); throw e; };
+  r.get("/api/admin/suppliers", wrap(async (req, res) => {
+    const [sups, products, pos] = await Promise.all([db.listSuppliers(), db.listProducts(), db.listPurchaseOrders()]);
+    res.json({ suppliers: sups.map((s) => ({ ...s,
+      products: products.filter((p) => p.supplierId === s.id).length,
+      openOrders: pos.filter((po) => po.supplierId === s.id && purchasing.OPEN.includes(po.status)).length,
+      received: Math.round(pos.filter((po) => po.supplierId === s.id).reduce((t, po) => t + po.items.reduce((u, l) => u + l.received * l.cost, 0), 0) * 100) / 100 })) });
+  }));
+  for (const [method, path] of [["post", "/api/admin/suppliers"], ["put", "/api/admin/suppliers/:id"]]) {
+    r[method](path, wrap(async (req, res) => {
+      const c = purchasing.cleanSupplier(req.body || {});
+      if (c.error) return bad(res, c.error);
+      const id = req.params.id ? Number(req.params.id) : null;
+      if (id && !(await db.getSupplier(id))) return bad(res, "Supplier not found", 404);
+      const saved = await db.saveSupplier(id, c.supplier);
+      if (!saved) return bad(res, `A supplier called ${c.supplier.name} already exists.`, 409);
+      await log(req, id ? "supplier updated" : "supplier created", saved.name, c.supplier);
+      res.json({ supplier: saved });
+    }));
+  }
+
+  r.get("/api/admin/purchase-orders", wrap(async (req, res) => {
+    const [pos, sups] = await Promise.all([db.listPurchaseOrders(), db.listSuppliers()]);
+    res.json({ orders: pos, suppliers: sups });
+  }));
+  r.post("/api/admin/purchase-orders", wrap(async (req, res) => {
+    try { const po = await purchasing.createPO(req.body || {}, actor(req)); await log(req, "purchase order created", po.poNo, { total: po.total }); res.json({ order: po }); }
+    catch (e) { pfail(res, e); }
+  }));
+  r.put("/api/admin/purchase-orders/:id", wrap(async (req, res) => {
+    try { const po = await purchasing.editPO(Number(req.params.id), req.body || {}, actor(req)); await log(req, "purchase order edited", po.poNo, { total: po.total }); res.json({ order: po }); }
+    catch (e) { pfail(res, e); }
+  }));
+  r.post("/api/admin/purchase-orders/:id/send", wrap(async (req, res) => {
+    try {
+      const po = await purchasing.setStatus(Number(req.params.id), "sent", actor(req)), sup = await db.getSupplier(po.supplierId);
+      let emailed = false, emailError = null;
+      if (req.body.email !== false) {
+        if (!sup.email) emailError = "This supplier has no email address, so nothing was emailed.";
+        else try { emailed = await mail.sendPurchaseOrder(po, sup, purchasing.poHtml(po, sup)); if (!emailed) emailError = "Email is not configured on the server (SMTP settings)."; }
+        catch (e) { emailError = "Could not send the email: " + e.message; }
+      }
+      await log(req, "purchase order sent", po.poNo, { emailed });
+      res.json({ order: po, emailed, emailError });
+    } catch (e) { pfail(res, e); }
+  }));
+  r.post("/api/admin/purchase-orders/:id/cancel", wrap(async (req, res) => {
+    try { const po = await purchasing.setStatus(Number(req.params.id), "cancelled", actor(req)); await log(req, "purchase order cancelled", po.poNo); res.json({ order: po }); }
+    catch (e) { pfail(res, e); }
+  }));
+  r.post("/api/admin/purchase-orders/:id/receive", wrap(async (req, res) => {
+    try {
+      const po = await purchasing.receive(Number(req.params.id), req.body.lines, { updateCost: req.body.updateCost === true }, actor(req));
+      await log(req, "purchase order received", po.poNo, { lines: req.body.lines, status: po.status });
+      res.json({ order: po });
+    } catch (e) { pfail(res, e); }
+  }));
+  r.get("/api/admin/purchase-orders/:id/print", wrap(async (req, res) => {
+    const po = await db.getPurchaseOrder(Number(req.params.id));
+    if (!po) return res.status(404).send("Purchase order not found.");
+    const sup = await db.getSupplier(po.supplierId);
+    res.set("Cache-Control", "no-store").type("html").send(`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${po.poNo}</title>
+      <style>@media print{button{display:none}}</style></head><body style="padding:16px"><button onclick="print()" style="margin-bottom:16px;padding:8px 16px">Print or save as PDF</button>${purchasing.poHtml(po, sup)}</body></html>`);
+  }));
+  r.get("/api/admin/reorder", wrap(async (req, res) => {
+    const [products, all, pos, suppliers] = await Promise.all([db.listProducts(), db.listOrders(), db.listPurchaseOrders(), db.listSuppliers()]);
+    res.json({ suggestions: purchasing.suggestions({ products, orders: all, pos, suppliers }) });
   }));
 
   // ----- Analytics, audit -----

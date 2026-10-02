@@ -312,3 +312,46 @@ revoke execute on function public.use_coupon(text)                         from 
 -- Product photos (public) and return evidence (private).
 insert into storage.buckets (id, name, public) values ('product-images', 'product-images', true)  on conflict (id) do nothing;
 insert into storage.buckets (id, name, public) values ('return-photos',  'return-photos',  false) on conflict (id) do nothing;
+
+-- ---------- Suppliers and purchase orders ----------
+create table if not exists public.suppliers (
+  id              serial primary key,
+  name            text not null unique,
+  contact_name    text not null default '',
+  email           text not null default '',
+  phone           text not null default '',
+  gstin           text not null default '',
+  address         text not null default '',
+  state           text not null default '',
+  payment_terms   text not null default '',        -- e.g. "Net 30", "Advance"
+  lead_time_days  integer not null default 7 check (lead_time_days between 0 and 365),
+  notes           text not null default '',
+  active          boolean not null default true,
+  created_at      timestamptz not null default now()
+);
+alter table public.suppliers enable row level security;
+
+alter table public.products add column if not exists supplier_id  integer references public.suppliers(id) on delete set null;
+alter table public.products add column if not exists supplier_sku text not null default '';
+create index if not exists products_supplier_idx on public.products (supplier_id);
+
+create sequence if not exists public.po_seq;
+create table if not exists public.purchase_orders (
+  id            serial primary key,
+  po_no         text not null unique,
+  supplier_id   integer not null references public.suppliers(id),
+  status        text not null default 'draft' check (status in ('draft','sent','partially_received','received','cancelled')),
+  items         jsonb not null,                 -- [{"productId","name","sku","supplierSku","qty","received","cost"}]
+  total         numeric(12,2) not null default 0,
+  notes         text not null default '',
+  expected_at   date,
+  history       jsonb not null default '[]'::jsonb,
+  created_at    timestamptz not null default now(),
+  updated_at    timestamptz not null default now()
+);
+create index if not exists purchase_orders_supplier_idx on public.purchase_orders (supplier_id, status);
+alter table public.purchase_orders enable row level security;
+
+create or replace function public.next_po_no() returns bigint
+language sql security definer set search_path = public as $$ select nextval('po_seq') $$;
+revoke execute on function public.next_po_no() from public, anon, authenticated;
