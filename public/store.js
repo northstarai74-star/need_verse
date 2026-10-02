@@ -216,7 +216,7 @@
       track("payment_started", { value: o.amount / 100 });
       const rz = new Razorpay({
         key: o.key, amount: o.amount, currency: o.currency, name: document.querySelector(".logo span")?.textContent || "Nnedverse", description: "Order " + o.ref, order_id: o.orderId,
-        prefill: { name: contact.name, email: contact.email, contact: contact.phone }, theme: { color: "#ff4d1a" },
+        prefill: { name: contact.name, email: contact.email, contact: contact.phone }, theme: { color: "#f06000" },
         modal: { ondismiss: () => { btn.disabled = false; } },
         handler: async (resp) => {
           try { const v = await api("POST", "/api/verify-payment", resp); done(v.ref, v.amount, v.trackToken, false, o.eta); }

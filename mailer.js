@@ -17,9 +17,9 @@ async function send(to, subject, html, extra = {}) {
   return true;
 }
 
-const button = (href, label) => `<a href="${esc(href)}" style="background:#ff4d1a;color:#fff;padding:11px 20px;border-radius:8px;text-decoration:none;font-weight:bold;display:inline-block">${esc(label)}</a>`;
+const button = (href, label) => `<a href="${esc(href)}" style="background:#f06000;color:#fff;padding:11px 20px;border-radius:8px;text-decoration:none;font-weight:bold;display:inline-block">${esc(label)}</a>`;
 const layout = (inner) => `<div style="font-family:Arial,sans-serif;max-width:560px;margin:auto;color:#111">
-  <div style="background:#ff4d1a;color:#fff;padding:18px 24px;font-size:22px;font-weight:bold">${esc(brand())}</div>
+  <div style="background:#f06000;color:#fff;padding:18px 24px;font-size:22px;font-weight:bold">${esc(brand())}</div>
   <div style="padding:24px;border:1px solid #eee;border-top:0">${inner}
     <p style="margin:24px 0 0;color:#777;font-size:12px">Questions? Just reply to this email.</p></div></div>`;
 const itemRows = (o) => (o.items || []).map((l) =>
@@ -41,7 +41,7 @@ function body(o, forOwner, links = {}) {
     <h3 style="margin:24px 0 6px">Shipping to</h3>
     <p style="margin:0;color:#333;line-height:1.5">${address(c)}<br>${esc(c.phone)}${forOwner ? `<br>${esc(c.email)}` : ""}</p>
     ${!forOwner && links.track ? `<p style="margin:22px 0 0">${button(links.track, "Track your order")}</p>` : ""}
-    ${!forOwner && links.invoice ? `<p style="margin:12px 0 0"><a href="${esc(links.invoice)}" style="color:#ff4d1a">Download your GST invoice</a></p>` : ""}`);
+    ${!forOwner && links.invoice ? `<p style="margin:12px 0 0"><a href="${esc(links.invoice)}" style="color:#f06000">Download your GST invoice</a></p>` : ""}`);
 }
 async function sendOrderEmails(o, links) {
   const ok = await send(o.customer.email, `Order ${o.ref} confirmed`, body(o, false, links));
@@ -69,7 +69,7 @@ const sendDeliveredEmail = (o) => send(o.customer.email, `Order ${o.ref} deliver
 
 function reviewRequestBody(o, products) {
   const links = (o.items || []).map((l) => { const p = products.get(l.id);
-    return p ? `<li style="margin:6px 0"><a href="${esc(site() + "/p/" + p.slug + "#reviews")}" style="color:#ff4d1a">${esc(l.name)}</a></li>` : ""; }).join("");
+    return p ? `<li style="margin:6px 0"><a href="${esc(site() + "/p/" + p.slug + "#reviews")}" style="color:#f06000">${esc(l.name)}</a></li>` : ""; }).join("");
   return layout(`<h2 style="margin:0 0 6px">How did it go?</h2>
     <p style="margin:0;color:#555">Hi ${first(o.customer.name)}, your reviews help other drivers pick parts that fit. Sign in with this email address to leave a review:</p>
     <ul style="padding-left:20px">${links}</ul>`);

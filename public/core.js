@@ -12,7 +12,7 @@
   };
 
   const CATS = {
-    Interior: { em: "💺", c: "#ff4d1a", sub: "Mats, covers, storage" },
+    Interior: { em: "💺", c: "#f06000", sub: "Mats, covers, storage" },
     Electronics: { em: "📹", c: "#3d8bff", sub: "Cams, mounts, scanners" },
     Emergency: { em: "🔋", c: "#ffc53d", sub: "Jump starters, kits" },
     Exterior: { em: "💡", c: "#b25cff", sub: "Lights, wipers, guards" },
