@@ -65,11 +65,15 @@ h2{font-size:clamp(2rem,4vw,3rem)}
 .finder select{flex:1;appearance:none;background:var(--bg) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none' stroke='%238e97a6' stroke-width='2'%3E%3Cpath d='m1 1 5 5 5-5'/%3E%3C/svg%3E") no-repeat right 16px center;border:1px solid var(--line);border-radius:12px;padding:14px 40px 14px 16px;outline:0;cursor:pointer}
 .finder select:focus{border-color:var(--accent)}
 .finder select:disabled{opacity:.45;cursor:not-allowed}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:var(--accent);color:#fff;border:0;border-radius:12px;padding:14px 22px;font-weight:700;cursor:pointer;transition:.2s}
-.btn:hover{background:var(--accent2);transform:translateY(-1px)}
-.btn:disabled{opacity:.4;pointer-events:none}
-.btn.ghost{background:transparent;border:1px solid var(--line)}
-.btn.ghost:hover{border-color:var(--text);background:transparent}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:0;border-radius:14px;padding:14px 24px;font-weight:700;cursor:pointer;transition:.2s;box-shadow:0 8px 24px rgba(255,77,26,.3);position:relative;overflow:hidden}
+.btn::before{content:"";position:absolute;inset:0;background:linear-gradient(135deg,transparent,rgba(255,255,255,.2));opacity:0;transition:.2s}
+.btn:hover{background:linear-gradient(135deg,var(--accent2),#ff6033);transform:translateY(-2px);box-shadow:0 12px 32px rgba(255,77,26,.4)}
+.btn:hover::before{opacity:1}
+.btn:active{transform:translateY(0)}
+.btn:disabled{opacity:.4;pointer-events:none;transform:none}
+.btn.ghost{background:transparent;border:1.5px solid var(--line);box-shadow:none}
+.btn.ghost:hover{border-color:var(--accent);background:rgba(255,77,26,.1)}
+.btn.ghost::before{display:none}
 .btn.block{width:100%}
 .finder .btn{margin-top:20px;width:100%;font-size:1rem}
 .garage{margin-top:16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding-top:16px;border-top:1px dashed var(--line);font-size:.9rem}
@@ -192,14 +196,25 @@ footer li a:hover{color:var(--accent)}
 .df .btn{margin-top:14px}
 
 /* dialogs */
-dialog{background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:22px;width:min(480px,92vw);padding:30px;box-shadow:0 40px 100px rgba(0,0,0,.7)}
-dialog::backdrop{background:rgba(0,0,0,.7);backdrop-filter:blur(4px)}
-dialog h2{font-size:2.2rem;margin-bottom:6px}
-dialog label{display:block;font-size:.78rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-top:14px}
-dialog input{display:block;width:100%;margin-top:6px;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:12px 14px;outline:0;text-transform:none;letter-spacing:0;font-weight:400;font-size:1rem}
-dialog input:focus{border-color:var(--accent)}
-.two{display:grid;grid-template-columns:2fr 1fr;gap:12px}
-.acts{display:flex;gap:10px;justify-content:flex-end;margin-top:22px}
+dialog{background:linear-gradient(135deg,var(--panel2),var(--panel));color:var(--text);border:1px solid rgba(255,77,26,.2);border-radius:24px;width:min(520px,92vw);padding:0;box-shadow:0 50px 150px rgba(0,0,0,.8),inset 0 1px 0 rgba(255,255,255,.05);overflow:hidden}
+dialog::backdrop{background:rgba(0,0,0,.75);backdrop-filter:blur(8px)}
+dialog>:first-child{padding:32px 32px 0}
+dialog h2{font-size:2.4rem;font-weight:800;margin:0 0 8px;background:linear-gradient(120deg,var(--text),rgba(255,255,255,.8));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+dialog p.muted{margin:0 0 24px!important;font-size:.95rem}
+dialog label{display:block;font-size:.75rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-top:18px}
+dialog input{display:block;width:100%;margin-top:8px;background:rgba(10,11,13,.5);border:1.5px solid rgba(38,43,52,.6);border-radius:12px;padding:14px 16px;outline:0;text-transform:none;letter-spacing:0;font-weight:400;font-size:1rem;transition:.25s;color:var(--text)}
+dialog input:focus{border-color:var(--accent);background:rgba(10,11,13,.8);box-shadow:0 0 0 3px rgba(255,77,26,.15),inset 0 1px 2px rgba(0,0,0,.5);transform:translateY(-1px)}
+dialog input::placeholder{color:rgba(142,151,166,.45)}
+.two{display:grid;grid-template-columns:2fr 1fr;gap:14px}
+.co-summary{background:rgba(255,77,26,.08);border:1px solid rgba(255,77,26,.2);border-radius:16px;padding:20px;margin:24px 0;display:flex;flex-direction:column;gap:12px}
+.co-summary div{display:flex;justify-content:space-between;align-items:center;font-size:.95rem;color:var(--muted)}
+.co-summary .co-total{color:var(--text);font-weight:700;font-size:1.3rem;border-top:1px solid rgba(255,77,26,.2);padding-top:12px;margin-top:4px}
+.co-security{display:flex;gap:8px;align-items:center;font-size:.8rem;color:var(--ok);margin:16px 0 0;padding:12px;background:rgba(61,220,132,.1);border-radius:12px;border-left:3px solid var(--ok)}
+.co-security svg{width:16px;height:16px}
+.co-methods{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 0;font-size:.75rem}
+.co-method{display:inline-flex;align-items:center;gap:4px;background:rgba(142,151,166,.1);padding:6px 10px;border-radius:8px;color:var(--muted)}
+.acts{display:flex;gap:10px;justify-content:flex-end;margin-top:24px;padding:0 32px 32px}
+.acts .btn{flex:1}
 .toast{position:fixed;left:50%;bottom:28px;translate:-50% 100px;background:var(--text);color:#111;font-weight:600;font-size:.92rem;padding:12px 22px;border-radius:999px;opacity:0;transition:.3s;z-index:70;pointer-events:none;box-shadow:0 12px 40px rgba(0,0,0,.5)}
 .toast.show{translate:-50% 0;opacity:1}
 
@@ -335,15 +350,42 @@ dialog input:focus{border-color:var(--accent)}
 
 <dialog id="checkout">
   <form id="coForm">
-    <h2>Checkout</h2>
-    <p class="muted small" style="margin:0">One page, no account. Your details are remembered for next time.</p>
-    <label>Full name<input name="name" autocomplete="name" required></label>
-    <label>Email<input name="email" type="email" autocomplete="email" required></label>
-    <label>Phone<input name="phone" type="tel" autocomplete="tel" required></label>
-    <label>Street address<input name="addr" autocomplete="street-address" required></label>
-    <div class="two"><label>City<input name="city" autocomplete="address-level2" required></label><label>ZIP<input name="zip" autocomplete="postal-code" required></label></div>
-    <p class="muted small" style="margin:16px 0 0">Pay securely with UPI, cards, netbanking or wallets via Razorpay.</p>
-    <div class="acts"><button type="button" id="coCancel" class="btn ghost">Back</button><button class="btn" id="payBtn">Pay securely · <span id="coTotal"></span></button></div>
+    <div>
+      <h2>Secure Checkout</h2>
+      <p class="muted small">One page, no account. Your details are remembered for next time.</p>
+
+      <div class="co-summary">
+        <div><span>Subtotal</span><span id="coSub">₹0</span></div>
+        <div id="coDiscRow" hidden><span>Savings</span><span style="color:var(--ok)" id="coDisc"></span></div>
+        <div><span>Shipping</span><span id="coShip">₹0</span></div>
+        <div class="co-total"><span>Total</span><span id="coTotal">₹0</span></div>
+      </div>
+
+      <label>Full name<input name="name" autocomplete="name" placeholder="Your full name" required></label>
+      <label>Email<input name="email" type="email" autocomplete="email" placeholder="you@example.com" required></label>
+      <label>Phone<input name="phone" type="tel" autocomplete="tel" placeholder="+91 98765 43210" required></label>
+      <label>Street address<input name="addr" autocomplete="street-address" placeholder="123 Main St" required></label>
+      <div class="two">
+        <label>City<input name="city" autocomplete="address-level2" placeholder="Your city" required></label>
+        <label>ZIP<input name="zip" autocomplete="postal-code" placeholder="123456" required></label>
+      </div>
+
+      <div class="co-security">
+        <span>🔒</span>
+        <span>Secured by <strong>SSL encryption</strong> & Razorpay</span>
+      </div>
+
+      <div class="co-methods">
+        <span class="co-method">💳 Cards</span>
+        <span class="co-method">🏦 Netbanking</span>
+        <span class="co-method">📱 UPI</span>
+        <span class="co-method">👛 Wallets</span>
+      </div>
+    </div>
+    <div class="acts">
+      <button type="button" id="coCancel" class="btn ghost">Back</button>
+      <button class="btn" id="payBtn" style="flex:2">Pay securely · <span id="coTotal2"></span></button>
+    </div>
   </form>
 </dialog>
 <dialog id="done">
@@ -472,7 +514,15 @@ addEventListener("keydown",e=>{if(e.key==="Escape")openCart(false)});
 /* checkout */
 const co=$("checkout");
 $("checkoutBtn").onclick=()=>{const s=store.get("contact",{});for(const k in s)if($("coForm").elements[k])$("coForm").elements[k].value=s[k];
-  $("coTotal").textContent=money(totals().total);co.showModal()};
+  const t=totals();
+  $("coSub").textContent=money(t.sub);
+  $("coDiscRow").hidden=t.disc<=0;
+  $("coDisc").textContent="−"+money(t.disc);
+  $("coShip").textContent=t.ship?money(t.ship):"Free";
+  const totalStr=money(t.total);
+  $("coTotal").textContent=totalStr;
+  $("coTotal2").textContent=totalStr;
+  co.showModal()};
 $("coCancel").onclick=()=>co.close();
 $("coForm").onsubmit=async e=>{e.preventDefault();
   const f=Object.fromEntries(new FormData($("coForm")));store.set("contact",f);
